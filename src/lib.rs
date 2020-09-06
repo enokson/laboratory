@@ -47,7 +47,7 @@ pub fn expect<T>(result: T) -> Expect<T>
     Expect { result }
 }
 
-pub fn describe (name: &'static str) -> Suite {
+pub fn describe <H>(name: &'static str) -> Suite {
     Suite::describe(name.to_string())
 }
 
@@ -98,6 +98,7 @@ pub struct Suite {
     pub name: String,
     pub tests: Tests,
     pub suites: Suites,
+    pub handle: Box<dyn Fn()>,
     pub before_all_handle: Option<Box<dyn Fn()>>,
     pub before_each_handle: Option<Box<dyn Fn()>>,
     pub after_all_handle: Option<Box<dyn Fn()>>,
@@ -105,11 +106,13 @@ pub struct Suite {
     pub reporter: Report
 }
 impl Suite {
+
     pub fn describe(name: String) -> Suite {
         Suite {
             name,
             tests: vec![],
             suites: vec![],
+            handle: Box::new(handle),
             before_all_handle: None,
             before_each_handle: None,
             after_all_handle: None,
