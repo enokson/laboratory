@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="CargoProjects">
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a4436f1c-e3c3-4ca2-a0b7-3916a0d59bb6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+    <list default="true" id="a4436f1c-e3c3-4ca2-a0b7-3916a0d59bb6" name="Default Changelist" comment="fixed lib">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -14,6 +23,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MacroExpansionManager">
@@ -31,6 +45,48 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
   </component>
+  <component name="RunManager" selected="Cargo Command.test">
+    <configuration default="true" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="channel" value="DEFAULT" />
+      <option name="command" value="cargo test -- --nocapture" />
+      <option name="allFeatures" value="true" />
+      <option name="emulateTerminal" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="build" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="channel" value="DEFAULT" />
+      <option name="command" value="build" />
+      <option name="allFeatures" value="true" />
+      <option name="emulateTerminal" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="channel" value="DEFAULT" />
+      <option name="command" value="test -- --nocapture" />
+      <option name="allFeatures" value="true" />
+      <option name="emulateTerminal" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Cargo Command.test" />
+      <item itemvalue="Cargo Command.build" />
+    </list>
+  </component>
   <component name="RustProjectSettings">
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
   </component>
@@ -44,14 +100,57 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1599405758490</updated>
-      <workItem from="1599405760617" duration="167000" />
+      <workItem from="1599405760617" duration="625000" />
     </task>
+    <task id="LOCAL-00001" summary="fixed lib">
+      <created>1599405961154</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1599405961154</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="2" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fixed lib" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed lib" />
+  </component>
   <component name="WindowStateProjectService">
+    <state x="418" y="182" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1599406349772">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state x="418" y="182" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599406349772" />
+    <state width="773" height="895" key="GridCell.Tab.0.bottom" timestamp="1599406351957">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state width="773" height="895" key="GridCell.Tab.0.bottom/0.0.1920.1046@0.0.1920.1046" timestamp="1599406351957" />
+    <state width="773" height="895" key="GridCell.Tab.0.center" timestamp="1599406351957">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state width="773" height="895" key="GridCell.Tab.0.center/0.0.1920.1046@0.0.1920.1046" timestamp="1599406351957" />
+    <state width="773" height="895" key="GridCell.Tab.0.left" timestamp="1599406351956">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state width="773" height="895" key="GridCell.Tab.0.left/0.0.1920.1046@0.0.1920.1046" timestamp="1599406351956" />
+    <state width="773" height="895" key="GridCell.Tab.0.right" timestamp="1599406351957">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state width="773" height="895" key="GridCell.Tab.0.right/0.0.1920.1046@0.0.1920.1046" timestamp="1599406351957" />
     <state x="779" y="226" width="530" height="595" key="RollbackChangesDialog" timestamp="1599405826859">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>

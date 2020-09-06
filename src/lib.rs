@@ -47,7 +47,7 @@ pub fn expect<T>(result: T) -> Expect<T>
     Expect { result }
 }
 
-pub fn describe <H>(name: &'static str) -> Suite {
+pub fn describe (name: &'static str) -> Suite {
     Suite::describe(name.to_string())
 }
 
@@ -98,7 +98,6 @@ pub struct Suite {
     pub name: String,
     pub tests: Tests,
     pub suites: Suites,
-    pub handle: Box<dyn Fn()>,
     pub before_all_handle: Option<Box<dyn Fn()>>,
     pub before_each_handle: Option<Box<dyn Fn()>>,
     pub after_all_handle: Option<Box<dyn Fn()>>,
@@ -112,7 +111,6 @@ impl Suite {
             name,
             tests: vec![],
             suites: vec![],
-            handle: Box::new(handle),
             before_all_handle: None,
             before_each_handle: None,
             after_all_handle: None,
@@ -280,16 +278,7 @@ mod test {
     #[test]
     fn suite() {
         fn add_one (x: u64) -> u64 { x + 1 };
-        let test_1 = Test::new("should_return_1".to_string(), || {
-            let result = &add_one(0);
-            expect(result).equals(&1)?;
-            Ok(())
-        });
-        let test_2 = Test::new("should_return_2".to_string(), || {
-            let result = &add_one(1);
-            expect(result).equals(&4)?;
-            Ok(())
-        });
+
         describe("Library")
             .tests(vec![
 
