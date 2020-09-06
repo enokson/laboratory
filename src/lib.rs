@@ -288,7 +288,21 @@ mod test {
             Ok(())
         });
         describe("Library")
-            .tests(vec![ test_1, test_2 ])
+            .tests(vec![
+
+                it("should_return_1", || {
+                    let result = &add_one(0);
+                    expect(result).equals(&1)?;
+                    Ok(())
+                }),
+
+                it("should_return_2", || {
+                    let result = &add_one(1);
+                    expect(result).equals(&4)?;
+                    Ok(())
+                })
+
+            ])
             .suites(vec![
 
                 describe("add_one")
