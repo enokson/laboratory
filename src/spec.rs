@@ -18,6 +18,10 @@ impl Spec {
             ignore: false
         }
     }
+    pub fn skip (mut self) -> Self {
+        self.ignore = true;
+        self
+    }
     pub fn run(&mut self) {
         let test = self.test.as_ref();
         if self.ignore == false {
