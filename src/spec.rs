@@ -3,6 +3,7 @@ pub struct Spec {
     pub test: Box<dyn Fn() -> Result<(), String>>,
     pub pass: Option<bool>,
     pub error_msg: Option<String>,
+    pub ignore: bool
 }
 impl Spec {
     pub fn new <T>(name: String, handle: T) -> Spec
@@ -14,21 +15,24 @@ impl Spec {
             test: Box::new(handle),
             pass: None,
             error_msg: None,
+            ignore: false
         }
     }
     pub fn run(&mut self) {
         let test = self.test.as_ref();
-        match (test)() {
-            Ok(_) => {
-                self.pass = Some(true);
-            }
-            Err(message) => {
-                self.pass = Some(false);
-                self.error_msg = Some(message);
-            },
-            _ => {
-                self.pass = Some(false);
-                self.error_msg = Some("something happened".to_string());
+        if self.ignore == false {
+            match (test)() {
+                Ok(_) => {
+                    self.pass = Some(true);
+                }
+                Err(message) => {
+                    self.pass = Some(false);
+                    self.error_msg = Some(message);
+                },
+                _ => {
+                    self.pass = Some(false);
+                    self.error_msg = Some("something happened".to_string());
+                }
             }
         }
     }
