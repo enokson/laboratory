@@ -128,6 +128,16 @@ impl<S> Suite<S> {
 
         let len = self.test_list.len();
         // execute_handle(self.suite_state, self.hooks.get_mut("before all"));
+        self.suite_state = match self.hooks.get_mut("before all") {
+            Some(hook) => match self.suite_state {
+                Some(state) => Some((hook)(state)),
+                None => None
+            },
+            None => match self.suite_state {
+                Some(state) => Some(state),
+                None => None
+            }
+        };
         for i in 0..len {
             // (self.before_each_handle)();
             let test = &mut self.test_list[i];
@@ -155,12 +165,12 @@ impl<S> Suite<S> {
         self.suite_state = Some(state);
         self
     }
-    fn execute_hook(&mut self, hook_name: &str) -> S {
+    fn execute_hook(&mut self, hook_name: &str) -> Option<S> {
         match self.hooks.get_mut(hook_name) {
             Some(hook) => {
                 match self.suite_state {
                     Some(state) => {
-                        (hook)(state)
+                        Some((hook)(state))
                     },
                     None => None
                 }
@@ -176,28 +186,28 @@ impl<S> Suite<S> {
 
     pub fn before_all<H>(mut self, handle: H) -> Self
     where
-        H: FnMut(S) -> S
+        H: FnMut(S) -> S + 'static
     {
         self.hooks.insert("before all".to_string(), Box::new(handle));
         self
     }
     pub fn before_each<H>(mut self, handle: H) -> Self
         where
-            H: FnMut(S) -> S
+            H: FnMut(S) -> S + 'static
     {
         self.hooks.insert("before each".to_string(), Box::new(handle));
         self
     }
     pub fn after_all<H>(mut self, handle: H) -> Self
         where
-            H: FnMut(S) -> S
+            H: FnMut(S) -> S + 'static
     {
         self.hooks.insert("after all".to_string(), Box::new(handle));
         self
     }
     pub fn after_each<H>(mut self, handle: H) -> Self
         where
-            H: FnMut(S) -> S
+            H: FnMut(S) -> S + 'static
     {
         self.hooks.insert("after each".to_string(), Box::new(handle));
         self
