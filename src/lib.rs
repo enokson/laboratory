@@ -15,6 +15,10 @@ pub fn describe<S>(name: &'static str) -> Suite<S> {
     Suite::new(name.to_string())
 }
 
+pub fn describe_skip<S>(name: &'static str) -> Suite<S> {
+    Suite::new(name.to_string()).skip()
+}
+
 pub fn it <H>(name: &'static str, handle: H) -> Spec
 where
     H: Fn() -> Result<(), String> + 'static
@@ -33,9 +37,8 @@ pub fn it_skip<H>(name: &'static str, handle: H) -> Spec
 mod test {
     use std::cell::{RefCell, RefMut};
     use std::rc::Rc;
-    use super::{Spec, Suite, Expect, expect, describe, it};
+    use super::{Spec, Suite, Expect, expect, describe, describe_skip, it, it_skip};
     use std::borrow::BorrowMut;
-    use crate::it_skip;
 
     #[derive(PartialEq)]
     struct Foo {
@@ -95,7 +98,7 @@ mod test {
                     Ok(())
                 }),
 
-                it_skip("should return 2", || {
+                it("should return 2", || {
                     let result = &add_one(1);
                     expect(result).equals(&2)?;
                     Ok(())
@@ -103,7 +106,7 @@ mod test {
 
             ])
             .suites(vec![
-                describe("Person")
+                describe_skip("Person")
                     .specs(vec![
 
                         it("should return baxtiyor", || {

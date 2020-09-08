@@ -14,7 +14,8 @@ pub struct Suite<S> {
     hooks: HashMap<String, Box<dyn FnMut(S) -> S>>,
     reporter: Report,
     suite_state: Option<S>,
-    state_hash: HashMap<u8, S>
+    state_hash: HashMap<u8, S>,
+    pub ignore: bool
 }
 impl<S> Suite<S> {
 
@@ -26,7 +27,8 @@ impl<S> Suite<S> {
             suite_state: None,
             hooks: HashMap::new(),
             reporter: Report::Stdout,
-            state_hash: HashMap::new()
+            state_hash: HashMap::new(),
+            ignore: false
         }
     }
     pub fn run(mut self) -> Self {
@@ -42,6 +44,9 @@ impl<S> Suite<S> {
             // (self.before_each_handle)();
             self.execute_hook("before each");
             let test = &mut self.test_list[i];
+            if self.ignore == true {
+                test.ignore = true;
+            }
             test.run();
             // (self.after_each_handle)();
             self.execute_hook("after each");
@@ -49,6 +54,9 @@ impl<S> Suite<S> {
         let len = self.suite_list.len();
         for i in 0..len {
             let suite = self.suite_list[i].borrow_mut();
+            if self.ignore == true {
+                suite.ignore = true;
+            }
             suite.run_nested(nested + 1);
             suite.print_nested(nested + 1);
         }
@@ -66,6 +74,10 @@ impl<S> Suite<S> {
     pub fn state(mut self, state: S) -> Self {
         // self.state_hash.insert(1, Box::new(state));
         self.state_hash.insert(0, state);
+        self
+    }
+    pub fn skip (mut self) -> Self {
+        self.ignore = true;
         self
     }
     fn execute_hook(&mut self, hook_name: &str) {
