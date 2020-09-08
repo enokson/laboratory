@@ -3,9 +3,14 @@ use std::borrow::{BorrowMut, Borrow};
 use std::char::decode_utf16;
 use hex;
 use std::io::Read;
+use std::any::{Any};
+use std::collections::HashMap;
+use std::rc::Rc;
+use std::cell::{RefCell, RefMut};
+use std::ops::Deref;
 
-pub type Tests = Vec<Test>;
-pub type Suites = Vec<Suite>;
+/*pub type Tests = Vec<Test>;
+pub type Suites<'a> = Vec<Suite<'a>>;
 pub type ExpectResult = Result<(), String>;
 pub type Handle = dyn Fn() -> Result<(), String>;
 pub type HandleRef = Box<Handle>;
@@ -94,28 +99,30 @@ impl Test {
     }
 }
 
-pub struct Suite {
-    pub name: String,
-    pub tests: Tests,
-    pub suites: Suites,
-    pub before_all_handle: Option<Box<dyn Fn()>>,
-    pub before_each_handle: Option<Box<dyn Fn()>>,
-    pub after_all_handle: Option<Box<dyn Fn()>>,
-    pub after_each_handle: Option<Box<dyn Fn()>>,
-    pub reporter: Report
+pub struct Suite<'a> {
+    name: String,
+    test_list: Tests,
+    suite_list: Suites<'a>,
+    before_all_handle: Box<dyn FnMut(dyn Any) + 'a>,
+    before_each_handle: Box<dyn FnMut() + 'a>,
+    after_all_handle: Box<dyn FnMut() + 'a>,
+    after_each_handle: Box<dyn FnMut() + 'a>,
+    reporter: Report,
+    state_hash: Box<dyn Any>
 }
-impl Suite {
+impl <'a>Suite<'a> {
 
-    pub fn describe(name: String) -> Suite {
+    pub fn describe(name: String) -> Suite<'a> {
         Suite {
             name,
-            tests: vec![],
-            suites: vec![],
-            before_all_handle: None,
-            before_each_handle: None,
-            after_all_handle: None,
-            after_each_handle: None,
-            reporter: Report::Stdout
+            test_list: vec![],
+            suite_list: vec![],
+            before_all_handle: Box::new(|| {}),
+            before_each_handle: Box::new(|| {}),
+            after_all_handle: Box::new(|| {}),
+            after_each_handle: Box::new(|| {}),
+            reporter: Report::Stdout,
+            state_hash: Box::new(None)
         }
     }
     pub fn run(mut self) -> Self {
@@ -129,54 +136,60 @@ impl Suite {
                 None => {}
             }
         };
-        let len = self.tests.len();
-        execute_handle(&self.before_all_handle);
+        let len = self.test_list.len();
+        // execute_handle(&self.before_all_handle);
+        (self.before_all_handle)();
         for i in 0..len {
-            execute_handle(&self.before_each_handle);
-            let test = &mut self.tests[i];
+            (self.before_each_handle)();
+            let test = &mut self.test_list[i];
             test.run();
-            execute_handle(&self.after_each_handle);
+            (self.after_each_handle)();
         }
-        for i in 0..self.suites.len() {
-            let suite = &mut self.suites[i];
+        for i in 0..self.suite_list.len() {
+            let suite = &mut self.suite_list[i];
             suite.run_nested(nested + 1);
             suite.print_nested(nested + 1);
         }
-        execute_handle(&self.after_all_handle);
+        (self.after_all_handle)();
 
     }
     pub fn tests(mut self, tests: Tests) -> Self {
-        self.tests = tests;
+        self.test_list = tests;
         self
     }
-    pub fn suites(mut self, suites: Suites) -> Self {
-        self.suites = suites;
+    pub fn suites(mut self, suites: Suites<'a>) -> Self {
+        self.suite_list = suites;
+        self
+    }
+    pub fn state<S: Any>(mut self, state: S) -> Self {
+        // self.state_hash.insert(1, Box::new(state));
+        self.state_hash = Box::new(state);
         self
     }
 
     pub fn before_all<H>(mut self, handle: H) -> Self
     where
-        H: Fn() + 'static
+        H: FnMut() + 'a
     {
-        self.before_all_handle = Some(Box::new(handle));
+        self.before_all_handle = Box::new(handle);
         self
     }
     pub fn before_each<H>(mut self, handle: H) -> Self
-        where H: Fn() + 'static
+        where H: FnMut() + 'a
     {
-        self.before_each_handle = Some(Box::new(handle));
+        self.before_each_handle = Box::new(handle);
         self
     }
     pub fn after_all<H>(mut self, handle: H) -> Self
-        where H: Fn() + 'static
+        where H: FnMut() + 'a
     {
-        self.after_all_handle = Some(Box::new(handle));
+        self.after_all_handle = Box::new(handle);
         self
     }
     pub fn after_each<H>(mut self, handle: H) -> Self
-        where H: Fn() + 'static
+        where H: FnMut() + 'a
     {
-        self.after_each_handle = Some(Box::new(handle));
+        self.after_each_handle = Box::new(handle);
         self
     }
     fn report (mut self, reporter: Report) -> Self {
@@ -206,7 +219,7 @@ impl Suite {
         report += &get_spacing(nested + 2);
         report += &self.name;
         report += "\n";
-        self.tests.iter().for_each(|test| {
+        self.test_list.iter().for_each(|test| {
             match test.pass {
                 Some(result) => {
                     if result == true {
@@ -224,7 +237,7 @@ impl Suite {
             }
             report += "\n";
         });
-        self.suites.iter().for_each(|suite| {
+        self.suite_list.iter().for_each(|suite| {
             report += &suite.print_nested(nested + 1);
         });
         report += "\n";
@@ -234,7 +247,7 @@ impl Suite {
         let mut passed = 0;
         let mut failed = 0;
         let mut ignored = 0;
-        self.tests.iter().for_each(|test| {
+        self.test_list.iter().for_each(|test| {
             match test.pass {
                 Some(result) => {
                     if result == true {
@@ -248,7 +261,7 @@ impl Suite {
                 }
             }
         });
-        self.suites.iter().for_each(|suite| {
+        self.suite_list.iter().for_each(|suite| {
             let results = suite.get_results();
             passed += results.0;
             failed += results.1;
@@ -258,83 +271,141 @@ impl Suite {
     }
 }
 
+pub struct State<T>(Rc<RefCell<T>>);
+impl <T>State<T> {
+    pub fn new (state: T) -> State<T> {
+        State(Rc::new(RefCell::new(state)))
+    }
+    // pub fn as_ref(&self) -> &T {
+    //     self.0.as_ref()
+    // }
+    // pub fn into_inner(self) -> & RefCell<T> {
+    //     self.0.borrow_mut()
+    // }
+}
+
+impl<T> Clone for State<T> {
+    fn clone (&self) -> State<T> {
+        State(self.0.clone())
+    }
+}*/
+
+// impl<T> Deref for State<T> {
+//     type Target = Rc<T>;
+//     fn deref(&self) -> &Rc<T> {
+//         &self.0.
+//     }
+// }
+
+
 #[cfg(test)]
 mod test {
-    use super::{Test, Suite, Expect, expect, describe, it};
+    use std::cell::{RefCell, RefMut};
+    use std::rc::Rc;
+    // use super::{Test, Suite, Expect, State, expect, describe, it};
+    use std::borrow::BorrowMut;
 
     #[derive(PartialEq)]
     struct Foo {
-        bar: String
+        pub bar: String
     }
 
     impl Foo {
-        pub fn new (bar: String) -> Foo {
+        pub fn new (bar: &str) -> Foo {
             Foo {
-                bar
+                bar: bar.to_string()
             }
         }
     }
 
+
+
     #[test]
     fn suite() {
-        fn add_one (x: u64) -> u64 { x + 1 };
 
-        describe("Library")
-            .tests(vec![
+        // #[macro_use]
+        // use super::it::{describe};
 
-                it("should_return_1", || {
-                    let result = &add_one(0);
-                    expect(result).equals(&1)?;
-                    Ok(())
-                }),
+        // let mut counter_rc = Rc::new(RefCell::new(0));
+        //
+        // fn add_one (x: u64) -> u64 { x + 1 };
 
-                it("should_return_2", || {
-                    let result = &add_one(1);
-                    expect(result).equals(&4)?;
-                    Ok(())
-                })
+        // describe("Library")
+        //     .state(0)
+        //     .before_all(|state: i32| {
+        //
+        //     })
+        //     .before_each(|| {
+        //         // let mut counter_ref = counter.borrow_mut();
+        //         // counter.clone() += 1;
+        //         // println!("before_each_hook: {}", counter.clone());
+        //     })
+        //     .after_each(|| {
+        //         // let counter_ref = counter.clone();
+        //         // counter.clone() += 1;
+        //         // println!("after_each_hook: {}", counter.clone());
+        //     })
+        //     .after_all(|| {
+        //         // let counter_ref = counter.clone();
+        //         // counter.clone() += 0;
+        //         // println!("after_all_hook: {}", counter.clone());
+        //     })
+        //     .tests(vec![
+        //
+        //         it("should_return_1", || {
+        //             let result = &add_one(0);
+        //             expect(result).equals(&1)?;
+        //             Ok(())
+        //         }),
+        //
+        //         it("should_return_2", || {
+        //             let result = &add_one(1);
+        //             expect(result).equals(&4)?;
+        //             Ok(())
+        //         })
+        //
+        //     ])
+        //     .suites(vec![
+        //
+        //         describe("add_one")
+        //
+        //             .tests(vec![
+        //
+        //                 it("should_return_1", || {
+        //                     let result = &add_one(0);
+        //                     expect(result).equals(&1)?;
+        //                     Ok(())
+        //                 }),
+        //
+        //                 it("should_return_2", || {
+        //                     let result = &add_one(1);
+        //                     expect(result).equals(&4)?;
+        //                     Ok(())
+        //                 }),
+        //
+        //                 it("should_return_3", || {
+        //                     let result = &add_one(2);
+        //                     expect(result).equals(&3)?;
+        //                     Ok(())
+        //                 })
+        //
+        //             ]),
+        //
+        //         describe("Foo")
+        //
+        //             .tests(vec![
+        //
+        //                 it("should have member \"bar\"", || {
+        //                     expect(Foo::new("baz").bar).to_be("baz".to_string())?;
+        //                     Ok(())
+        //                 })
+        //
+        //             ])
+        //
+        //     ])
+        //     .run()
+        //     .print();
 
-            ])
-            .suites(vec![
-
-                describe("add_one")
-
-                    .tests(vec![
-
-                        it("should_return_1", || {
-                            let result = &add_one(0);
-                            expect(result).equals(&1)?;
-                            Ok(())
-                        }),
-
-                        it("should_return_2", || {
-                            let result = &add_one(1);
-                            expect(result).equals(&4)?;
-                            Ok(())
-                        }),
-
-                        it("should_return_3", || {
-                            let result = &add_one(2);
-                            expect(result).equals(&3)?;
-                            Ok(())
-                        })
-
-                    ]),
-
-                describe("Foo")
-
-                    .tests(vec![
-
-                        it("should have member \"bar\"", || {
-                            expect(Foo::new("baz".to_string()).bar).to_be("baz".to_string())?;
-                            Ok(())
-                        })
-
-                    ])
-
-            ])
-            .run()
-            .print();
-
+            // println!("counter: {}", counter.borrow());
     }
 }

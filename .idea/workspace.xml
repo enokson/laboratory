@@ -14,6 +14,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a4436f1c-e3c3-4ca2-a0b7-3916a0d59bb6" name="Default Changelist" comment="fixed lib">
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
     </list>
@@ -21,6 +22,13 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -42,8 +50,10 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+    <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager" selected="Cargo Command.test">
     <configuration default="true" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
@@ -89,7 +99,9 @@
   </component>
   <component name="RustProjectSettings">
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+    <option name="version" value="2" />
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -101,6 +113,9 @@
       <option name="presentableId" value="Default" />
       <updated>1599405758490</updated>
       <workItem from="1599405760617" duration="625000" />
+      <workItem from="1599516953115" duration="90000" />
+      <workItem from="1599499057321" duration="516000" />
+      <workItem from="1599499598784" duration="7992000" />
     </task>
     <task id="LOCAL-00001" summary="fixed lib">
       <created>1599405961154</created>
@@ -113,7 +128,7 @@
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="2" />
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -125,32 +140,41 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fixed lib" />
     <option name="LAST_COMMIT_MESSAGE" value="fixed lib" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="418" y="182" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1599406349772">
+    <state x="418" y="182" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1599414343874">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state x="418" y="182" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599406349772" />
-    <state width="773" height="895" key="GridCell.Tab.0.bottom" timestamp="1599406351957">
+    <state x="418" y="182" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599414343874" />
+    <state x="643" y="261" width="628" height="526" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1599499088235">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="773" height="895" key="GridCell.Tab.0.bottom/0.0.1920.1046@0.0.1920.1046" timestamp="1599406351957" />
-    <state width="773" height="895" key="GridCell.Tab.0.center" timestamp="1599406351957">
+    <state x="643" y="261" width="628" height="526" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599499088235" />
+    <state x="693" y="273" width="528" height="502" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1599535839181">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="773" height="895" key="GridCell.Tab.0.center/0.0.1920.1046@0.0.1920.1046" timestamp="1599406351957" />
-    <state width="773" height="895" key="GridCell.Tab.0.left" timestamp="1599406351956">
+    <state x="693" y="273" width="528" height="502" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599535839181" />
+    <state width="761" height="895" key="GridCell.Tab.0.bottom" timestamp="1599535832802">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="773" height="895" key="GridCell.Tab.0.left/0.0.1920.1046@0.0.1920.1046" timestamp="1599406351956" />
-    <state width="773" height="895" key="GridCell.Tab.0.right" timestamp="1599406351957">
+    <state width="761" height="895" key="GridCell.Tab.0.bottom/0.0.1920.1046@0.0.1920.1046" timestamp="1599535832802" />
+    <state width="761" height="895" key="GridCell.Tab.0.center" timestamp="1599535832802">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="773" height="895" key="GridCell.Tab.0.right/0.0.1920.1046@0.0.1920.1046" timestamp="1599406351957" />
+    <state width="761" height="895" key="GridCell.Tab.0.center/0.0.1920.1046@0.0.1920.1046" timestamp="1599535832802" />
+    <state width="761" height="895" key="GridCell.Tab.0.left" timestamp="1599535832801">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state width="761" height="895" key="GridCell.Tab.0.left/0.0.1920.1046@0.0.1920.1046" timestamp="1599535832801" />
+    <state width="761" height="895" key="GridCell.Tab.0.right" timestamp="1599535832802">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state width="761" height="895" key="GridCell.Tab.0.right/0.0.1920.1046@0.0.1920.1046" timestamp="1599535832802" />
     <state x="779" y="226" width="530" height="595" key="RollbackChangesDialog" timestamp="1599405826859">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
