@@ -9,8 +9,8 @@ use std::rc::Rc;
 use std::cell::{RefCell, RefMut};
 use std::ops::Deref;
 
-/*pub type Tests = Vec<Test>;
-pub type Suites<'a> = Vec<Suite<'a>>;
+pub type Tests = Vec<Test>;
+pub type Suites<S> = Vec<Suite<S>>;
 pub type ExpectResult = Result<(), String>;
 pub type Handle = dyn Fn() -> Result<(), String>;
 pub type HandleRef = Box<Handle>;
@@ -52,7 +52,7 @@ pub fn expect<T>(result: T) -> Expect<T>
     Expect { result }
 }
 
-pub fn describe (name: &'static str) -> Suite {
+pub fn describe<S>(name: &'static str) -> Suite<S> {
     Suite::describe(name.to_string())
 }
 
@@ -99,30 +99,25 @@ impl Test {
     }
 }
 
-pub struct Suite<'a> {
+pub struct Suite<S> {
     name: String,
     test_list: Tests,
-    suite_list: Suites<'a>,
-    before_all_handle: Box<dyn FnMut(dyn Any) + 'a>,
-    before_each_handle: Box<dyn FnMut() + 'a>,
-    after_all_handle: Box<dyn FnMut() + 'a>,
-    after_each_handle: Box<dyn FnMut() + 'a>,
+    suite_list: Suites<S>,
+    hooks: HashMap<String, Box<dyn FnMut(S) -> S>>,
     reporter: Report,
-    state_hash: Box<dyn Any>
+    suite_state: Option<S>
 }
-impl <'a>Suite<'a> {
+impl<S> Suite<S> {
 
-    pub fn describe(name: String) -> Suite<'a> {
+    pub fn describe(name: String) -> Suite<S> {
         Suite {
             name,
             test_list: vec![],
             suite_list: vec![],
-            before_all_handle: Box::new(|| {}),
-            before_each_handle: Box::new(|| {}),
-            after_all_handle: Box::new(|| {}),
-            after_each_handle: Box::new(|| {}),
+            suite_state: None,
+            hooks: HashMap::new(),
             reporter: Report::Stdout,
-            state_hash: Box::new(None)
+            // state_hash: Box::new(None)
         }
     }
     pub fn run(mut self) -> Self {
@@ -130,66 +125,81 @@ impl <'a>Suite<'a> {
         self
     }
     fn run_nested(&mut self, nested: i32) {
-        let execute_handle = |handle_option: &Option<Box<dyn Fn()>>| {
-            match &handle_option {
-                Some(handle) => { (handle.as_ref())(); },
-                None => {}
-            }
-        };
+
         let len = self.test_list.len();
-        // execute_handle(&self.before_all_handle);
-        (self.before_all_handle)();
+        // execute_handle(self.suite_state, self.hooks.get_mut("before all"));
         for i in 0..len {
-            (self.before_each_handle)();
+            // (self.before_each_handle)();
             let test = &mut self.test_list[i];
             test.run();
-            (self.after_each_handle)();
+            // (self.after_each_handle)();
         }
         for i in 0..self.suite_list.len() {
             let suite = &mut self.suite_list[i];
             suite.run_nested(nested + 1);
             suite.print_nested(nested + 1);
         }
-        (self.after_all_handle)();
+        // (self.after_all_handle)();
 
     }
     pub fn tests(mut self, tests: Tests) -> Self {
         self.test_list = tests;
         self
     }
-    pub fn suites(mut self, suites: Suites<'a>) -> Self {
+    pub fn suites(mut self, suites: Suites<S>) -> Self {
         self.suite_list = suites;
         self
     }
-    pub fn state<S: Any>(mut self, state: S) -> Self {
+    pub fn state(mut self, state: S) -> Self {
         // self.state_hash.insert(1, Box::new(state));
-        self.state_hash = Box::new(state);
+        self.suite_state = Some(state);
         self
+    }
+    fn execute_hook(&mut self, hook_name: &str) -> S {
+        match self.hooks.get_mut(hook_name) {
+            Some(hook) => {
+                match self.suite_state {
+                    Some(state) => {
+                        (hook)(state)
+                    },
+                    None => None
+                }
+            },
+            None => {
+                match self.suite_state {
+                    Some(state) => Some(state),
+                    None => None
+                }
+            }
+        }
     }
 
     pub fn before_all<H>(mut self, handle: H) -> Self
     where
-        H: FnMut() + 'a
+        H: FnMut(S) -> S
     {
-        self.before_all_handle = Box::new(handle);
+        self.hooks.insert("before all".to_string(), Box::new(handle));
         self
     }
     pub fn before_each<H>(mut self, handle: H) -> Self
-        where H: FnMut() + 'a
+        where
+            H: FnMut(S) -> S
     {
-        self.before_each_handle = Box::new(handle);
+        self.hooks.insert("before each".to_string(), Box::new(handle));
         self
     }
     pub fn after_all<H>(mut self, handle: H) -> Self
-        where H: FnMut() + 'a
+        where
+            H: FnMut(S) -> S
     {
-        self.after_all_handle = Box::new(handle);
+        self.hooks.insert("after all".to_string(), Box::new(handle));
         self
     }
     pub fn after_each<H>(mut self, handle: H) -> Self
-        where H: FnMut() + 'a
+        where
+            H: FnMut(S) -> S
     {
-        self.after_each_handle = Box::new(handle);
+        self.hooks.insert("after each".to_string(), Box::new(handle));
         self
     }
     fn report (mut self, reporter: Report) -> Self {
@@ -288,7 +298,7 @@ impl<T> Clone for State<T> {
     fn clone (&self) -> State<T> {
         State(self.0.clone())
     }
-}*/
+}
 
 // impl<T> Deref for State<T> {
 //     type Target = Rc<T>;

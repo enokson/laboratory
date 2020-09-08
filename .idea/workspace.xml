@@ -14,7 +14,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a4436f1c-e3c3-4ca2-a0b7-3916a0d59bb6" name="Default Changelist" comment="fixed lib">
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
     </list>
@@ -55,7 +54,7 @@
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
-  <component name="RunManager" selected="Cargo Command.test">
+  <component name="RunManager" selected="Cargo Command.build">
     <configuration default="true" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="channel" value="DEFAULT" />
       <option name="command" value="cargo test -- --nocapture" />
@@ -159,22 +158,22 @@
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state x="693" y="273" width="528" height="502" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599535839181" />
-    <state width="761" height="895" key="GridCell.Tab.0.bottom" timestamp="1599535832802">
+    <state width="884" height="772" key="GridCell.Tab.0.bottom" timestamp="1599551689636">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="761" height="895" key="GridCell.Tab.0.bottom/0.0.1920.1046@0.0.1920.1046" timestamp="1599535832802" />
-    <state width="761" height="895" key="GridCell.Tab.0.center" timestamp="1599535832802">
+    <state width="884" height="772" key="GridCell.Tab.0.bottom/0.0.1920.1046@0.0.1920.1046" timestamp="1599551689636" />
+    <state width="884" height="772" key="GridCell.Tab.0.center" timestamp="1599551689635">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="761" height="895" key="GridCell.Tab.0.center/0.0.1920.1046@0.0.1920.1046" timestamp="1599535832802" />
-    <state width="761" height="895" key="GridCell.Tab.0.left" timestamp="1599535832801">
+    <state width="884" height="772" key="GridCell.Tab.0.center/0.0.1920.1046@0.0.1920.1046" timestamp="1599551689635" />
+    <state width="884" height="772" key="GridCell.Tab.0.left" timestamp="1599551689635">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="761" height="895" key="GridCell.Tab.0.left/0.0.1920.1046@0.0.1920.1046" timestamp="1599535832801" />
-    <state width="761" height="895" key="GridCell.Tab.0.right" timestamp="1599535832802">
+    <state width="884" height="772" key="GridCell.Tab.0.left/0.0.1920.1046@0.0.1920.1046" timestamp="1599551689635" />
+    <state width="884" height="772" key="GridCell.Tab.0.right" timestamp="1599551689636">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="761" height="895" key="GridCell.Tab.0.right/0.0.1920.1046@0.0.1920.1046" timestamp="1599535832802" />
+    <state width="884" height="772" key="GridCell.Tab.0.right/0.0.1920.1046@0.0.1920.1046" timestamp="1599551689636" />
     <state x="779" y="226" width="530" height="595" key="RollbackChangesDialog" timestamp="1599405826859">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
