@@ -12,7 +12,7 @@ pub fn expect<T>(result: T) -> Expect<T>
 }
 
 pub fn describe<S>(name: &'static str) -> Suite<S> {
-    Suite::describe(name.to_string())
+    Suite::new(name.to_string())
 }
 
 pub fn it <H>(name: &'static str, handle: H) -> Spec
@@ -79,7 +79,7 @@ mod test {
                 state = 0;
                 state
             })
-            .tests(vec![
+            .specs(vec![
 
                 it("should return 1", || {
                     let result = &add_one(0);
@@ -96,7 +96,7 @@ mod test {
             ])
             .suites(vec![
                 describe("Person")
-                    .tests(vec![
+                    .specs(vec![
 
                         it("should return baxtiyor", || {
 

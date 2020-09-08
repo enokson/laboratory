@@ -14,12 +14,11 @@ pub struct Suite<S> {
     hooks: HashMap<String, Box<dyn FnMut(S) -> S>>,
     reporter: Report,
     suite_state: Option<S>,
-    state_hash: HashMap<u8, S>,
-    pass_state: bool
+    state_hash: HashMap<u8, S>
 }
 impl<S> Suite<S> {
 
-    pub fn describe(name: String) -> Suite<S> {
+    pub fn new(name: String) -> Suite<S> {
         Suite {
             name,
             test_list: vec![],
@@ -27,8 +26,7 @@ impl<S> Suite<S> {
             suite_state: None,
             hooks: HashMap::new(),
             reporter: Report::Stdout,
-            state_hash: HashMap::new(),
-            pass_state: false
+            state_hash: HashMap::new()
         }
     }
     pub fn run(mut self) -> Self {
@@ -57,7 +55,7 @@ impl<S> Suite<S> {
         self.execute_hook("after all");
         // (self.after_all_handle)();
     }
-    pub fn tests(mut self, tests: Vec<Spec>) -> Self {
+    pub fn specs(mut self, tests: Vec<Spec>) -> Self {
         self.test_list = tests;
         self
     }
