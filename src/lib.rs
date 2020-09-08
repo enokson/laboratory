@@ -33,11 +33,18 @@ pub fn it_skip<H>(name: &'static str, handle: H) -> Spec
     Spec::new(name.to_string(), handle).skip()
 }
 
+pub fn it_only<H>(name: &'static str, handle: H) -> Spec
+    where
+        H: Fn() -> Result<(), String> + 'static
+{
+    Spec::new(name.to_string(), handle).only()
+}
+
 #[cfg(test)]
 mod test {
     use std::cell::{RefCell, RefMut};
     use std::rc::Rc;
-    use super::{Spec, Suite, Expect, expect, describe, describe_skip, it, it_skip};
+    use super::{Spec, Suite, Expect, expect, describe, describe_skip, it, it_skip, it_only};
     use std::borrow::BorrowMut;
 
     #[derive(PartialEq)]
@@ -92,7 +99,7 @@ mod test {
             })
             .specs(vec![
 
-                it("should return 1", || {
+                it_only("should return 1", || {
                     let result = &add_one(0);
                     expect(result).equals(&1)?;
                     Ok(())
@@ -106,28 +113,27 @@ mod test {
 
             ])
             .suites(vec![
+
+
                 describe_skip("Person")
                     .specs(vec![
 
                         it("should return baxtiyor", || {
-
                             let baxtiyor = Person::new("baxtiyor");
-
                             expect(baxtiyor.name).to_be("baxtiyor".to_string())?;
-
                             Ok(())
                         }),
 
                         it("should return joshua after changing the person's name", || {
                             let mut joshua = Person::new("baxtyior");
                             joshua.change_name("joshua");
-
                             expect(joshua.name).to_be("joshua".to_string())?;
-
                             Ok(())
                         })
 
                     ])
+
+
             ])
             .run()
             .print();

@@ -40,17 +40,45 @@ impl<S> Suite<S> {
         // execute_handle(self.suite_state, self.hooks.get_mut("before all"));
         self.execute_hook("before all");
         let len = self.test_list.len();
+        let mut only_id = None;
+
+        // check for specs marked as only
         for i in 0..len {
-            // (self.before_each_handle)();
-            self.execute_hook("before each");
-            let test = &mut self.test_list[i];
-            if self.ignore == true {
-                test.ignore = true;
+            let test = &self.test_list[i];
+            if test.only_ == true {
+                only_id = Some(i);
+                break;
             }
-            test.run();
-            // (self.after_each_handle)();
-            self.execute_hook("after each");
         }
+        match only_id {
+            Some(id) => {
+
+                // run the first test marked as only
+
+                self.execute_hook("before each");
+                let test = &mut self.test_list[id];
+                test.run();
+                self.execute_hook("after each");
+            },
+            None => {
+
+                // run all tests not marked as ignore
+
+                for i in 0..len {
+                    // (self.before_each_handle)();
+                    self.execute_hook("before each");
+                    let test = &mut self.test_list[i];
+                    if self.ignore == true {
+                        test.ignore = true;
+                    }
+                    test.run();
+                    // (self.after_each_handle)();
+                    self.execute_hook("after each");
+                }
+            }
+        }
+
+
         let len = self.suite_list.len();
         for i in 0..len {
             let suite = self.suite_list[i].borrow_mut();
@@ -134,7 +162,7 @@ impl<S> Suite<S> {
         println!("{}", &report);
         println!("  passing: {}\n", results.0);
         println!("  failing: {}\n", results.1);
-        println!("  skipped: {}\n", results.2);
+        println!("  ignored: {}\n", results.2);
         println!("\n\n");
     }
     fn print_nested (&self, nested: i32) -> String {

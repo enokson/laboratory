@@ -3,7 +3,8 @@ pub struct Spec {
     pub test: Box<dyn Fn() -> Result<(), String>>,
     pub pass: Option<bool>,
     pub error_msg: Option<String>,
-    pub ignore: bool
+    pub ignore: bool,
+    pub only_: bool
 }
 impl Spec {
     pub fn new <T>(name: String, handle: T) -> Spec
@@ -15,11 +16,16 @@ impl Spec {
             test: Box::new(handle),
             pass: None,
             error_msg: None,
-            ignore: false
+            ignore: false,
+            only_: false
         }
     }
     pub fn skip (mut self) -> Self {
         self.ignore = true;
+        self
+    }
+    pub fn only(mut self) -> Self {
+        self.only_ = true;
         self
     }
     pub fn run(&mut self) {
