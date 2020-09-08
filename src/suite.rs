@@ -68,10 +68,6 @@ impl<S> Suite<S> {
         self.state_hash.insert(0, state);
         self
     }
-    pub fn pass_state(mut self) -> Self {
-        self.pass_state = true;
-        self
-    }
     fn execute_hook(&mut self, hook_name: &str) {
         match self.hooks.get_mut(hook_name) {
             Some(hook) => {
