@@ -3,48 +3,111 @@ use console::style;
 use std::borrow::{BorrowMut};
 use std::collections::HashMap;
 
-use super::spec::Spec;
-use super::reporter::{Reporter, SpecReporter};
+use super::spec::{Spec, SpecResult};
+use super::reporter::{ReporterType, Reporter};
 use std::time::Instant;
 
-pub struct Result {
+pub struct SuiteResult {
+    name: String,
     passing: u64,
     failing: u64,
     ignored: u64,
+    child_suites: Vec<SuiteResult>,
+    child_tests: Vec<SpecResult>,
     duration: u128
+}
+impl SuiteResult {
+    pub fn new(name: &str) -> SuiteResult {
+        SuiteResult {
+            name: name.to_string(),
+            passing: 0,
+            failing: 0,
+            ignored: 0,
+            child_suites: vec![],
+            child_tests: vec![],
+            duration: 0
+        }
+    }
+    pub fn add_spec_result (&mut self, spec: SpecResult) {
+        self.child_tests.push(spec);
+    }
+    pub fn updated_from_suite(&mut self, child_result_option: Option<SuiteResult>) {
+        match child_result_option {
+            Some(child_result) => {
+                self.passing += child_result.get_passing();
+                self.failing += child_result.get_failing();
+                self.ignored += child_result.get_ignored();
+                self.child_suites.push(child_result);
+            },
+            _ => {}
+        }
+
+    }
+    pub fn update_from_spec(&mut self, spec: SpecResult) {
+        self.passing += spec.update_passing();
+        self.failing += spec.update_failing();
+        self.ignored += spec.update_ignored();
+        self.child_tests.push(spec);
+    }
+    pub fn get_passing(&self) -> u64 { self.passing }
+    pub fn get_failing(&self) -> u64 { self.failing }
+    pub fn get_ignored(&self) -> u64 { self.ignored }
+    pub fn get_child_specs(&self) -> Vec<SpecResult> {
+        self.child_tests.clone()
+    }
+    pub fn get_child_suites(&self) -> Vec<SuiteResult> {
+        self.child_suites.clone()
+    }
+    pub fn get_name(&self) -> &str { &self.name }
+    pub fn get_duration(&self) -> &u128 { &self.duration }
+    pub fn set_duration(&mut self, duration: u128) { self.duration = duration }
+}
+impl Clone for SuiteResult {
+    fn clone(&self) -> SuiteResult {
+        SuiteResult {
+            name: self.name.clone(),
+            passing: self.passing.clone(),
+            failing: self.failing.clone(),
+            ignored: self.ignored.clone(),
+            child_suites: self.child_suites.clone(),
+            child_tests: self.child_tests.clone(),
+            duration: self.duration.clone()
+        }
+    }
 }
 
 pub struct Suite<S> {
-    name: String,
-    test_list: Vec<Spec>,
-    suite_list: Vec<Suite<S>>,
-    hooks: HashMap<String, Box<dyn FnMut(S) -> S>>,
-    reporter: Reporter,
-    suite_state: Option<S>,
-    state_hash: HashMap<u8, S>,
     duration: u128,
-    pub ignore: bool
+    hooks: HashMap<String, Box<dyn FnMut(S) -> S>>,
+    pub ignore: bool,
+    name: String,
+    reporter: ReporterType,
+    result: Option<SuiteResult>,
+    state_hash: HashMap<u8, S>,
+    suite_list: Vec<Suite<S>>,
+    suite_state: Option<S>,
+    test_list: Vec<Spec>,
 }
 impl<S> Suite<S> {
 
     pub fn new(name: String) -> Suite<S> {
         Suite {
+            duration: 0,
+            hooks: HashMap::new(),
+            ignore: false,
             name,
-            test_list: vec![],
+            reporter: ReporterType::Spec,
+            result: None,
+            state_hash: HashMap::new(),
             suite_list: vec![],
             suite_state: None,
-            hooks: HashMap::new(),
-            reporter: Reporter::Spec,
-            state_hash: HashMap::new(),
-            ignore: false,
-            duration: 0,
+            test_list: vec![],
         }
     }
     pub fn run(mut self) -> Self {
         let start_time = Instant::now();
-        self.run_nested(0);
+        self.run_(0);
         self.duration = start_time.elapsed().as_millis();
-        self.export_report(0);
         self
     }
     pub fn specs(mut self, tests: Vec<Spec>) -> Self {
@@ -65,9 +128,16 @@ impl<S> Suite<S> {
         self
     }
 
-    fn run_nested(&mut self, nested: i32) {
+    fn clone_result(&self) -> Option<SuiteResult> {
+        match &self.result {
+            Some(result) => Some(result.clone()),
+            None => None
+        }
+    }
+    fn run_(&mut self, nest_count: u32) {
 
-        // execute_handle(self.suite_state, self.hooks.get_mut("before all"));
+        let mut result = SuiteResult::new(&self.name);
+        let start_time = Instant::now();
         self.execute_hook("before all");
         let len = self.test_list.len();
         let mut only_id = None;
@@ -80,6 +150,7 @@ impl<S> Suite<S> {
                 break;
             }
         }
+
         match only_id {
             Some(id) => {
 
@@ -88,9 +159,9 @@ impl<S> Suite<S> {
                 self.execute_hook("before each");
                 let test = &mut self.test_list[id];
                 test.run();
+                result.update_from_spec(test.export_results(&self.name));
                 self.execute_hook("after each");
 
-                // self.handle_result(test);
             },
             None => {
 
@@ -104,9 +175,11 @@ impl<S> Suite<S> {
                         test.ignore = true;
                     }
                     test.run();
+                    result.update_from_spec(test.export_results(&self.name));
                     // (self.after_each_handle)();
                     self.execute_hook("after each");
                 }
+
             }
         }
 
@@ -116,11 +189,16 @@ impl<S> Suite<S> {
             if self.ignore == true {
                 suite.ignore = true;
             }
-            suite.run_nested(nested + 1);
-            suite.export_report(nested + 1);
+            suite.run_(nest_count + 1);
+            result.updated_from_suite(suite.clone_result());
         }
         self.execute_hook("after all");
-        // (self.after_all_handle)();
+        result.set_duration(start_time.elapsed().as_millis());
+        self.result = Some(result);
+        if nest_count == 0 {
+            self.report();
+        }
+
     }
     fn execute_hook(&mut self, hook_name: &str) {
         match self.hooks.get_mut(hook_name) {
@@ -137,105 +215,19 @@ impl<S> Suite<S> {
             }
         }
     }
-
-    fn export_report(&self, nested: i32) -> String {
-        match self.reporter {
-            Reporter::Spec => {
-                let mut report = String::new();
-                let get_spacing = |count| {
-                    let mut spaces = String::new();
-                    for i in 1..=count {
-                        spaces += " ";
-                    }
-                    spaces
-                };
-                if nested == 0 {
-                    report += "\n\n";
-                } else {
-                    report += "\n";
+    fn report(&self) {
+        match &self.result {
+            Some(result) => {
+                match &self.reporter {
+                    ReporterType::Spec => Reporter::spec(result.clone())
                 }
-                report += &get_spacing(nested + 2);
-                report += &self.name;
-                report += "\n";
-                self.test_list.iter().for_each(|test| {
-                    match test.pass {
-                        Some(result) => {
-                            if result == true {
-                                report += &format!("{}{} {}", get_spacing(nested + 4), '✓', &test.name);
-                                // println!("{}{} {}", get_spacing(nested + 4), '✓', test.name);
-                            } else {
-                                report += &format!("{}{} {}", get_spacing(nested + 4), '✗', &test.name);
-                                // println!("{}{} {}", get_spacing(nested + 4), '✗', test.name);
-                            }
-                        },
-                        None => {
-                            report += &format!("{}{} {}", get_spacing(nested + 4), ' ', &test.name);
-                            // println!("{}  {}", get_spacing(nested + 4), test.name);
-                        }
-                    }
-                    let duration = match &test.duration {
-                        Some(duration) => duration,
-                        None => &0
-                    };
-                    report += &format!(" ({}ms)", duration);
-                    report += "\n";
-                });
-                self.suite_list.iter().for_each(|suite| {
-                    report += &suite.export_report(nested + 1);
-                });
-                let result = self.get_results();
-                if nested == 0 {
-                    report += "\n\n";
-
-                    if result.failing != 0 {
-
-                    } else {
-                        report += &format!("  ✓ {} tests completed ({}ms)", result.passing, result.duration);
-                    }
-                    report += "\n\n";
-                    println!("{}", report);
-                }
-
-                // report += "\n";
-
-                report
+            },
+            None => {
+                // no result found
+                println!("result not found");
             }
         }
 
-
-    }
-    fn get_results (&self) -> Result {
-        let mut passing = 0;
-        let mut failing = 0;
-        let mut ignored = 0;
-        let mut duration = self.duration;
-        self.test_list.iter().for_each(|test| {
-            match test.pass {
-                Some(result) => {
-                    if result == true {
-                        passing += 1;
-                    } else {
-                        failing += 1;
-                    }
-                },
-                None => {
-                    ignored += 1;
-                }
-            }
-        });
-        self.suite_list.iter().for_each(|suite| {
-            let results = suite.get_results();
-            passing += results.passing;
-            failing += results.failing;
-            ignored += results.ignored;
-            duration += results.duration
-        });
-        Result {
-            passing,
-            failing,
-            ignored,
-            duration
-        }
     }
 
     pub fn before_all<H>(mut self, handle: H) -> Self

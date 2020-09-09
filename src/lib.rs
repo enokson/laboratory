@@ -8,10 +8,12 @@ mod reporter;
 use suite::Suite;
 use expect::Expect;
 use spec::Spec;
-use crate::reporter::Reporter;
+use crate::reporter::ReporterType;
+use std::fmt::{Debug, Display};
 
 pub fn expect<T>(result: T) -> Expect<T>
-    where T: PartialEq {
+    where T: PartialEq + Debug + Display
+{
     Expect { result }
 }
 
@@ -106,22 +108,25 @@ mod test {
                 state = 0;
                 state
             })
-            .specs(vec![
 
-                it("should return 1", || {
-                    let result = &add_one(0);
-                    expect(result).equals(&1)?;
-                    Ok(())
-                }),
-
-                it("should return 2", || {
-                    let result = &add_one(1);
-                    expect(result).equals(&2)?;
-                    Ok(())
-                })
-
-            ])
             .suites(vec![
+
+                describe("add_one()")
+                    .specs(vec![
+
+                        it("should return 1", || {
+                            let result = &add_one(0);
+                            expect(result).equals(&1)?;
+                            Ok(())
+                        }),
+
+                        it("should return 2", || {
+                            let result = &add_one(1);
+                            expect(result).equals(&2)?;
+                            Ok(())
+                        })
+
+                    ]),
 
 
                 describe("Person")
@@ -142,7 +147,7 @@ mod test {
 
                     ]),
 
-                describe("intensive_add_one")
+                describe("intensive_add_one()")
                     .specs(vec![
 
                         it("should return 5", || {
@@ -156,7 +161,6 @@ mod test {
 
             ])
             .run();
-            // .print();
 
     }
 
