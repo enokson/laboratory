@@ -8,3 +8,4 @@ keywords = ["test", "tests", "unit", "unit-tests", "test-runner", "laboratory"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+console = "0.12.0"

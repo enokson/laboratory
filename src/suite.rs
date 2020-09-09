@@ -1,10 +1,17 @@
+use console::style;
+
 use std::borrow::{BorrowMut};
 use std::collections::HashMap;
 
 use super::spec::Spec;
+use super::reporter::{Reporter, SpecReporter};
+use std::time::Instant;
 
-enum Report {
-    Stdout
+pub struct Result {
+    passing: u64,
+    failing: u64,
+    ignored: u64,
+    duration: u128
 }
 
 pub struct Suite<S> {
@@ -12,9 +19,10 @@ pub struct Suite<S> {
     test_list: Vec<Spec>,
     suite_list: Vec<Suite<S>>,
     hooks: HashMap<String, Box<dyn FnMut(S) -> S>>,
-    reporter: Report,
+    reporter: Reporter,
     suite_state: Option<S>,
     state_hash: HashMap<u8, S>,
+    duration: u128,
     pub ignore: bool
 }
 impl<S> Suite<S> {
@@ -26,15 +34,37 @@ impl<S> Suite<S> {
             suite_list: vec![],
             suite_state: None,
             hooks: HashMap::new(),
-            reporter: Report::Stdout,
+            reporter: Reporter::Spec,
             state_hash: HashMap::new(),
-            ignore: false
+            ignore: false,
+            duration: 0,
         }
     }
     pub fn run(mut self) -> Self {
+        let start_time = Instant::now();
         self.run_nested(0);
+        self.duration = start_time.elapsed().as_millis();
+        self.export_report(0);
         self
     }
+    pub fn specs(mut self, tests: Vec<Spec>) -> Self {
+        self.test_list = tests;
+        self
+    }
+    pub fn suites(mut self, suites: Vec<Suite<S>>) -> Self {
+        self.suite_list = suites;
+        self
+    }
+    pub fn state(mut self, state: S) -> Self {
+        // self.state_hash.insert(1, Box::new(state));
+        self.state_hash.insert(0, state);
+        self
+    }
+    pub fn skip (mut self) -> Self {
+        self.ignore = true;
+        self
+    }
+
     fn run_nested(&mut self, nested: i32) {
 
         // execute_handle(self.suite_state, self.hooks.get_mut("before all"));
@@ -59,6 +89,8 @@ impl<S> Suite<S> {
                 let test = &mut self.test_list[id];
                 test.run();
                 self.execute_hook("after each");
+
+                // self.handle_result(test);
             },
             None => {
 
@@ -78,7 +110,6 @@ impl<S> Suite<S> {
             }
         }
 
-
         let len = self.suite_list.len();
         for i in 0..len {
             let suite = self.suite_list[i].borrow_mut();
@@ -86,27 +117,10 @@ impl<S> Suite<S> {
                 suite.ignore = true;
             }
             suite.run_nested(nested + 1);
-            suite.print_nested(nested + 1);
+            suite.export_report(nested + 1);
         }
         self.execute_hook("after all");
         // (self.after_all_handle)();
-    }
-    pub fn specs(mut self, tests: Vec<Spec>) -> Self {
-        self.test_list = tests;
-        self
-    }
-    pub fn suites(mut self, suites: Vec<Suite<S>>) -> Self {
-        self.suite_list = suites;
-        self
-    }
-    pub fn state(mut self, state: S) -> Self {
-        // self.state_hash.insert(1, Box::new(state));
-        self.state_hash.insert(0, state);
-        self
-    }
-    pub fn skip (mut self) -> Self {
-        self.ignore = true;
-        self
     }
     fn execute_hook(&mut self, hook_name: &str) {
         match self.hooks.get_mut(hook_name) {
@@ -121,6 +135,106 @@ impl<S> Suite<S> {
             None => {
 
             }
+        }
+    }
+
+    fn export_report(&self, nested: i32) -> String {
+        match self.reporter {
+            Reporter::Spec => {
+                let mut report = String::new();
+                let get_spacing = |count| {
+                    let mut spaces = String::new();
+                    for i in 1..=count {
+                        spaces += " ";
+                    }
+                    spaces
+                };
+                if nested == 0 {
+                    report += "\n\n";
+                } else {
+                    report += "\n";
+                }
+                report += &get_spacing(nested + 2);
+                report += &self.name;
+                report += "\n";
+                self.test_list.iter().for_each(|test| {
+                    match test.pass {
+                        Some(result) => {
+                            if result == true {
+                                report += &format!("{}{} {}", get_spacing(nested + 4), '✓', &test.name);
+                                // println!("{}{} {}", get_spacing(nested + 4), '✓', test.name);
+                            } else {
+                                report += &format!("{}{} {}", get_spacing(nested + 4), '✗', &test.name);
+                                // println!("{}{} {}", get_spacing(nested + 4), '✗', test.name);
+                            }
+                        },
+                        None => {
+                            report += &format!("{}{} {}", get_spacing(nested + 4), ' ', &test.name);
+                            // println!("{}  {}", get_spacing(nested + 4), test.name);
+                        }
+                    }
+                    let duration = match &test.duration {
+                        Some(duration) => duration,
+                        None => &0
+                    };
+                    report += &format!(" ({}ms)", duration);
+                    report += "\n";
+                });
+                self.suite_list.iter().for_each(|suite| {
+                    report += &suite.export_report(nested + 1);
+                });
+                let result = self.get_results();
+                if nested == 0 {
+                    report += "\n\n";
+
+                    if result.failing != 0 {
+
+                    } else {
+                        report += &format!("  ✓ {} tests completed ({}ms)", result.passing, result.duration);
+                    }
+                    report += "\n\n";
+                    println!("{}", report);
+                }
+
+                // report += "\n";
+
+                report
+            }
+        }
+
+
+    }
+    fn get_results (&self) -> Result {
+        let mut passing = 0;
+        let mut failing = 0;
+        let mut ignored = 0;
+        let mut duration = self.duration;
+        self.test_list.iter().for_each(|test| {
+            match test.pass {
+                Some(result) => {
+                    if result == true {
+                        passing += 1;
+                    } else {
+                        failing += 1;
+                    }
+                },
+                None => {
+                    ignored += 1;
+                }
+            }
+        });
+        self.suite_list.iter().for_each(|suite| {
+            let results = suite.get_results();
+            passing += results.passing;
+            failing += results.failing;
+            ignored += results.ignored;
+            duration += results.duration
+        });
+        Result {
+            passing,
+            failing,
+            ignored,
+            duration
         }
     }
 
@@ -152,81 +266,5 @@ impl<S> Suite<S> {
         self.hooks.insert("after each".to_string(), Box::new(handle));
         self
     }
-    fn report (mut self, reporter: Report) -> Self {
-        self.reporter = reporter;
-        self
-    }
-    pub fn print (&self) {
-        let report = self.print_nested(0);
-        let results = self.get_results();
-        println!("{}", &report);
-        println!("  passing: {}\n", results.0);
-        println!("  failing: {}\n", results.1);
-        println!("  ignored: {}\n", results.2);
-        println!("\n\n");
-    }
-    fn print_nested (&self, nested: i32) -> String {
-        let mut report = String::new();
 
-        let get_spacing = |count| {
-            let mut spaces = String::new();
-            for i in 1..=count {
-                spaces += " ";
-            }
-            spaces
-        };
-        report += "\n\n";
-        report += &get_spacing(nested + 2);
-        report += &self.name;
-        report += "\n";
-        self.test_list.iter().for_each(|test| {
-            match test.pass {
-                Some(result) => {
-                    if result == true {
-                        report += &format!("{}{} {}", get_spacing(nested + 4), '✓', &test.name);
-                        // println!("{}{} {}", get_spacing(nested + 4), '✓', test.name);
-                    } else {
-                        report += &format!("{}{} {}", get_spacing(nested + 4), '✗', &test.name);
-                        // println!("{}{} {}", get_spacing(nested + 4), '✗', test.name);
-                    }
-                },
-                None => {
-                    report += &format!("{}{} {}", get_spacing(nested + 4), ' ', &test.name);
-                    // println!("{}  {}", get_spacing(nested + 4), test.name);
-                }
-            }
-            report += "\n";
-        });
-        self.suite_list.iter().for_each(|suite| {
-            report += &suite.print_nested(nested + 1);
-        });
-        report += "\n";
-        report
-    }
-    fn get_results (&self) -> (i32, i32, i32) {
-        let mut passed = 0;
-        let mut failed = 0;
-        let mut ignored = 0;
-        self.test_list.iter().for_each(|test| {
-            match test.pass {
-                Some(result) => {
-                    if result == true {
-                        passed += 1;
-                    } else {
-                        failed += 1;
-                    }
-                },
-                None => {
-                    ignored += 1;
-                }
-            }
-        });
-        self.suite_list.iter().for_each(|suite| {
-            let results = suite.get_results();
-            passed += results.0;
-            failed += results.1;
-            ignored += results.2;
-        });
-        (passed, failed, ignored)
-    }
 }
