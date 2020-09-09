@@ -1,10 +1,14 @@
+
+
 mod expect;
 mod spec;
 mod suite;
+mod reporter;
 
 use suite::Suite;
 use expect::Expect;
 use spec::Spec;
+use crate::reporter::Reporter;
 
 pub fn expect<T>(result: T) -> Expect<T>
     where T: PartialEq {
@@ -46,6 +50,8 @@ mod test {
     use std::rc::Rc;
     use super::{Spec, Suite, Expect, expect, describe, describe_skip, it, it_skip, it_only};
     use std::borrow::BorrowMut;
+    use std::thread;
+    use std::time::Duration;
 
     #[derive(PartialEq)]
     struct Foo {
@@ -59,8 +65,6 @@ mod test {
             }
         }
     }
-
-
 
     #[test]
     fn suite() {
@@ -81,6 +85,11 @@ mod test {
 
         fn add_one (x: u64) -> u64 { x + 1 };
 
+        fn intensive_add_one (x: u64) -> u64 {
+            thread::sleep(Duration::from_millis(10));
+            x + 1
+        }
+
         describe("Library")
             .state(0)
             .before_all(|state| {
@@ -99,7 +108,7 @@ mod test {
             })
             .specs(vec![
 
-                it_only("should return 1", || {
+                it("should return 1", || {
                     let result = &add_one(0);
                     expect(result).equals(&1)?;
                     Ok(())
@@ -115,7 +124,7 @@ mod test {
             .suites(vec![
 
 
-                describe_skip("Person")
+                describe("Person")
                     .specs(vec![
 
                         it("should return baxtiyor", || {
@@ -131,12 +140,24 @@ mod test {
                             Ok(())
                         })
 
+                    ]),
+
+                describe("intensive_add_one")
+                    .specs(vec![
+
+                        it("should return 5", || {
+                            let result = intensive_add_one(4);
+                            expect(result).equals(5)?;
+                            Ok(())
+                        })
+
                     ])
 
 
             ])
-            .run()
-            .print();
+            .run();
+            // .print();
 
     }
+
 }
