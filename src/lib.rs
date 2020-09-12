@@ -5,11 +5,14 @@ mod spec;
 mod suite;
 mod reporter;
 
-use suite::Suite;
+use suite::{Suite, BitState};
 use expect::Expect;
 use spec::Spec;
 use crate::reporter::ReporterType;
 use std::fmt::{Debug, Display};
+
+use serde_cbor::{to_vec, from_slice};
+use serde::{Deserialize, Serialize};
 
 pub fn expect<T>(result: T) -> Expect<T>
     where T: PartialEq + Debug + Display
@@ -17,11 +20,11 @@ pub fn expect<T>(result: T) -> Expect<T>
     Expect { result }
 }
 
-pub fn describe<S>(name: &'static str) -> Suite<S> {
+pub fn describe(name: &'static str) -> Suite {
     Suite::new(name.to_string())
 }
 
-pub fn describe_skip<S>(name: &'static str) -> Suite<S> {
+pub fn describe_skip(name: &'static str) -> Suite {
     Suite::new(name.to_string()).skip()
 }
 
@@ -46,14 +49,25 @@ pub fn it_only<H>(name: &'static str, handle: H) -> Spec
     Spec::new(name.to_string(), handle).only()
 }
 
+/*pub fn serialize_state<'a, T: Deserialize<'a> + Serialize>(state: &BitState) -> &'a T {
+    from_slice(&state).expect("Could not serialize state.")
+}
+pub fn deserialize_state<'a, T: Deserialize<'a> + Serialize>(state: T) -> BitState {
+    to_vec(&state).expect("Could not deserialize state.")
+}*/
+
 #[cfg(test)]
 mod test {
     use std::cell::{RefCell, RefMut};
     use std::rc::Rc;
-    use super::{Spec, Suite, Expect, expect, describe, describe_skip, it, it_skip, it_only};
-    use std::borrow::BorrowMut;
+    use super::{Spec, Suite, Expect, expect};
+    use super::{describe, describe_skip, it, it_skip, it_only};
+    use std::borrow::{BorrowMut, Borrow};
     use std::thread;
     use std::time::Duration;
+
+    use serde::{Deserialize, Serialize};
+    use serde_cbor::{from_slice, to_vec};
 
     #[derive(PartialEq)]
     struct Foo {
@@ -70,6 +84,14 @@ mod test {
 
     #[test]
     fn suite() {
+
+        #[derive(Deserialize, Serialize, Debug)]
+        struct Counter {
+            count: i32
+        };
+        impl Counter {
+            pub fn new() -> Counter { Counter { count: 0 } }
+        }
 
         struct Person {
             name: String
@@ -93,20 +115,20 @@ mod test {
         }
 
         describe("Library")
-            .state(0)
-            .before_all(|state| {
-                state
+            .state(Counter::new())
+            .before_all(|bit_state| {
+                let counter: Counter = from_slice(&bit_state).expect("Could not serialize state.");
+                to_vec(&counter).expect("Could deserialize state.").borrow()
             })
-            .before_each(|state| {
-                state
+            .before_each(|bit_state| {
+                bit_state
             })
-            .after_each(|mut state| {
-                state += 1;
-                state
+            .after_each(|bit_state| {
+
+                bit_state
             })
-            .after_all(|mut state| {
-                state = 0;
-                state
+            .after_all(|bit_state| {
+                bit_state
             })
 
             .suites(vec![

@@ -7,6 +7,12 @@ use super::spec::{Spec, SpecResult};
 use super::reporter::{ReporterType, Reporter};
 use std::time::Instant;
 
+use serde::{Deserialize, Serialize};
+use serde_cbor::{to_vec, from_slice};
+
+pub type BitState = Vec<u8>;
+
+
 pub struct SuiteResult {
     name: String,
     passing: u64,
@@ -76,21 +82,20 @@ impl Clone for SuiteResult {
     }
 }
 
-pub struct Suite<S> {
+pub struct Suite {
     duration: u128,
-    hooks: HashMap<String, Box<dyn FnMut(S) -> S>>,
+    hooks: HashMap<String, Box<dyn Fn(&BitState) -> &BitState>>,
     pub ignore: bool,
     name: String,
     reporter: ReporterType,
     result: Option<SuiteResult>,
-    state_hash: HashMap<u8, S>,
-    suite_list: Vec<Suite<S>>,
-    suite_state: Option<S>,
+    bit_state: Vec<u8>,
+    suite_list: Vec<Suite>,
     test_list: Vec<Spec>,
 }
-impl<S> Suite<S> {
+impl Suite {
 
-    pub fn new(name: String) -> Suite<S> {
+    pub fn new(name: String) -> Suite {
         Suite {
             duration: 0,
             hooks: HashMap::new(),
@@ -98,9 +103,8 @@ impl<S> Suite<S> {
             name,
             reporter: ReporterType::Spec,
             result: None,
-            state_hash: HashMap::new(),
+            bit_state: vec![],
             suite_list: vec![],
-            suite_state: None,
             test_list: vec![],
         }
     }
@@ -114,13 +118,13 @@ impl<S> Suite<S> {
         self.test_list = tests;
         self
     }
-    pub fn suites(mut self, suites: Vec<Suite<S>>) -> Self {
+    pub fn suites(mut self, suites: Vec<Suite>) -> Self {
         self.suite_list = suites;
         self
     }
-    pub fn state(mut self, state: S) -> Self {
+    pub fn state<'a, S: Deserialize<'a> + Serialize>(mut self, state: S) -> Self {
         // self.state_hash.insert(1, Box::new(state));
-        self.state_hash.insert(0, state);
+        self.bit_state = to_vec(&state).expect("Could not Deserialize state");
         self
     }
     pub fn skip (mut self) -> Self {
@@ -201,14 +205,9 @@ impl<S> Suite<S> {
 
     }
     fn execute_hook(&mut self, hook_name: &str) {
-        match self.hooks.get_mut(hook_name) {
+        match self.hooks.get(hook_name) {
             Some(hook) => {
-                match self.state_hash.remove(&0) {
-                    Some(state) => {
-                        self.state_hash.insert(0, (hook)(state));
-                    },
-                    None => {}
-                }
+                self.bit_state = (hook)(&self.bit_state).clone();
             },
             None => {
 
@@ -232,28 +231,28 @@ impl<S> Suite<S> {
 
     pub fn before_all<H>(mut self, handle: H) -> Self
         where
-            H: FnMut(S) -> S + 'static
+            H: Fn(&BitState) -> &BitState + 'static
     {
         self.hooks.insert("before all".to_string(), Box::new(handle));
         self
     }
     pub fn before_each<H>(mut self, handle: H) -> Self
         where
-            H: FnMut(S) -> S + 'static
+            H: Fn(&BitState) -> &BitState + 'static
     {
         self.hooks.insert("before each".to_string(), Box::new(handle));
         self
     }
     pub fn after_all<H>(mut self, handle: H) -> Self
         where
-            H: FnMut(S) -> S + 'static
+            H: Fn(&BitState) -> &BitState + 'static
     {
         self.hooks.insert("after all".to_string(), Box::new(handle));
         self
     }
     pub fn after_each<H>(mut self, handle: H) -> Self
         where
-            H: FnMut(S) -> S + 'static
+            H: Fn(&BitState) -> &BitState + 'static
     {
         self.hooks.insert("after each".to_string(), Box::new(handle));
         self
