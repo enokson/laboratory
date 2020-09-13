@@ -2,12 +2,13 @@ use super::suite::SuiteResult;
 use super::spec::SpecResult;
 use std::collections::HashMap;
 use console::style;
+use serde_json::{to_string, to_string_pretty};
 
 pub enum ReporterType {
     Spec,
     // Dot,
     Minimal,
-    // Json,
+    Json,
     // Html
 }
 
@@ -139,7 +140,7 @@ impl Reporter {
             ln += "\n";
             ln
         }
-        fn get_spec_lines(spec: &SpecResult, fail_ln: &mut String, failed_id: &mut u64, indention: u32) {
+        fn get_spec_lines(spec: &SpecResult, fail_ln: &mut String, failed_id: &mut u64) {
             match spec.get_pass() {
                 Some(pass) => {
                     if pass != true {
@@ -152,7 +153,7 @@ impl Reporter {
         }
         fn get_all_spec_lines_from_result(suite: &mut SuiteResult, ln: &mut String, fail_ln: &mut String, failed_id: &mut u64, indention: u32) {
             for spec in suite.get_child_specs() {
-                get_spec_lines(&spec, fail_ln, failed_id, indention);
+                get_spec_lines(&spec, fail_ln, failed_id);
             }
             for mut child_suite in suite.get_child_suites() {
                 get_all_spec_lines_from_result(&mut child_suite, ln, fail_ln, failed_id, indention + 2);
@@ -180,5 +181,8 @@ impl Reporter {
         ln += "\n\n";
         println!("{}", ln);
 
+    }
+    pub fn json(suite_results: SuiteResult) {
+        println!("\n\n{}\n\n", to_string_pretty(&suite_results).expect("Could not send to JSON"));
     }
 }

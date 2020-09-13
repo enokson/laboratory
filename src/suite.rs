@@ -38,6 +38,7 @@ impl State {
     }
 }
 
+#[derive(Serialize)]
 pub struct SuiteResult {
     name: String,
     passing: u64,
@@ -167,6 +168,10 @@ impl Suite {
         self.reporter_ = ReporterType::Minimal;
         self
     }
+    pub fn json(mut self) -> Self {
+        self.reporter_ = ReporterType::Json;
+        self
+    }
 
     fn clone_result(&self) -> Option<SuiteResult> {
         match &self.result {
@@ -251,7 +256,8 @@ impl Suite {
             Some(result) => {
                 match &self.reporter_ {
                     ReporterType::Spec => Reporter::spec(result.clone()),
-                    ReporterType::Minimal => Reporter::min(result.clone())
+                    ReporterType::Minimal => Reporter::min(result.clone()),
+                    ReporterType::Json => Reporter::json(result.clone())
                 }
             },
             None => {

@@ -2,7 +2,9 @@
 use std::time::{Instant, Duration};
 use super::suite::State;
 use std::borrow::BorrowMut;
+use serde::Serialize;
 
+#[derive(Serialize)]
 pub struct SpecResult {
     name: String,
     full_name: String,
@@ -10,7 +12,7 @@ pub struct SpecResult {
     error_msg: Option<String>,
     // pub time_started: String,
     // pub time_ended: String,
-    duration: u128,
+    duration: u128
 }
 impl SpecResult {
     pub fn new(
