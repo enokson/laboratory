@@ -10,8 +10,8 @@ mod reporter;
 use suite::{Suite, State};
 use assertion::Expect;
 use spec::Spec;
-use crate::reporter::ReporterType;
-use std::fmt::{Debug, Display};
+use std::fmt::{Debug};
+pub use serde::{Deserialize, Serialize};
 
 #[macro_export]
 macro_rules! should_panic {
@@ -63,10 +63,9 @@ macro_rules! should_not_panic {
     };
 }
 
-pub use serde::{Deserialize, Serialize};
 
 pub fn expect<T>(result: T) -> Expect<T>
-    where T: PartialEq + Debug + Display
+    where T: PartialEq + Debug
 {
     Expect::new(result)
 }
