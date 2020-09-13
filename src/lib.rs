@@ -11,8 +11,6 @@ use spec::Spec;
 use crate::reporter::ReporterType;
 use std::fmt::{Debug, Display};
 
-use serde_cbor::{to_vec, from_slice};
-
 use serde::{Deserialize, Serialize};
 
 pub fn expect<T>(result: T) -> Expect<T>
@@ -68,7 +66,6 @@ mod test {
     use std::time::Duration;
 
     use serde::{Deserialize, Serialize};
-    use serde_cbor::{from_slice, to_vec};
 
     #[derive(PartialEq)]
     struct Foo {
@@ -161,7 +158,7 @@ mod test {
                     })
                     .after_all(|state| {
                         let counter: Counter = state.get_state();
-                        println!("Count: {}", counter.count);
+                        // println!("Count: {}", counter.count);
                     }),
 
 
