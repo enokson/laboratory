@@ -1,22 +1,24 @@
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unreachable_patterns)]
 
-
-mod expect;
+mod assertion;
 mod spec;
 mod suite;
 mod reporter;
 
-use suite::{Suite, BitState};
-use expect::Expect;
+use suite::{Suite, State};
+use assertion::Expect;
 use spec::Spec;
 use crate::reporter::ReporterType;
 use std::fmt::{Debug, Display};
 
-use serde::{Deserialize, Serialize};
+pub use serde::{Deserialize, Serialize};
 
 pub fn expect<T>(result: T) -> Expect<T>
     where T: PartialEq + Debug + Display
 {
-    Expect { result }
+    Expect::new(result)
 }
 
 pub fn describe(name: &'static str) -> Suite {
@@ -29,21 +31,21 @@ pub fn describe_skip(name: &'static str) -> Suite {
 
 pub fn it <H>(name: &'static str, handle: H) -> Spec
 where
-    H: Fn() -> Result<(), String> + 'static
+    H: FnMut(&mut State) -> Result<(), String> + 'static
 {
     Spec::new(name.to_string(), handle)
 }
 
 pub fn it_skip<H>(name: &'static str, handle: H) -> Spec
     where
-        H: Fn() -> Result<(), String> + 'static
+        H: FnMut(&mut State) -> Result<(), String> + 'static
 {
     Spec::new(name.to_string(), handle).skip()
 }
 
 pub fn it_only<H>(name: &'static str, handle: H) -> Spec
     where
-        H: Fn() -> Result<(), String> + 'static
+        H: FnMut(&mut State) -> Result<(), String> + 'static
 {
     Spec::new(name.to_string(), handle).only()
 }
@@ -57,8 +59,6 @@ pub fn deserialize_state<'a, T: Deserialize<'a> + Serialize>(state: T) -> BitSta
 
 #[cfg(test)]
 mod test {
-    use std::cell::{RefCell, RefMut};
-    use std::rc::Rc;
     use super::{Spec, Suite, Expect, expect};
     use super::{describe, describe_skip, it, it_skip, it_only};
     use std::borrow::{BorrowMut, Borrow};

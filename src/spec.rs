@@ -1,4 +1,7 @@
+
 use std::time::{Instant, Duration};
+use super::suite::State;
+use std::borrow::BorrowMut;
 
 pub struct SpecResult {
     name: String,
@@ -112,7 +115,7 @@ impl Clone for SpecResult {
 
 pub struct Spec {
     pub name: String,
-    pub test: Box<dyn Fn() -> Result<(), String>>,
+    pub test: Box<dyn FnMut(&mut State) -> Result<(), String>>,
     pub pass: Option<bool>,
     pub error_msg: Option<String>,
     pub ignore: bool,
@@ -124,7 +127,7 @@ pub struct Spec {
 impl Spec {
     pub fn new <T>(name: String, handle: T) -> Spec
         where
-            T: Fn() -> Result<(), String> + 'static
+            T: FnMut(&mut State) -> Result<(), String> + 'static
     {
         Spec {
             name,
@@ -146,11 +149,11 @@ impl Spec {
         self.only_ = true;
         self
     }
-    pub fn run(&mut self) {
-        let test = self.test.as_ref();
+    pub fn run(&mut self, state: &mut State) {
+        let test: &mut dyn FnMut(&mut State) -> Result<(), String> = self.test.borrow_mut();
         if self.ignore == false {
             let start_time = Instant::now();
-            match (test)() {
+            match (test)(state) {
                 Ok(_) => {
                     self.pass = Some(true);
                 }

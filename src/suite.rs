@@ -114,9 +114,9 @@ pub struct Suite {
     name: String,
     reporter: ReporterType,
     result: Option<SuiteResult>,
-    bit_state: State,
-    suite_list: Vec<Suite>,
-    test_list: Vec<Spec>,
+    state_: State,
+    suites_: Vec<Suite>,
+    specs_: Vec<Spec>,
 }
 impl Suite {
 
@@ -128,9 +128,9 @@ impl Suite {
             name,
             reporter: ReporterType::Spec,
             result: None,
-            bit_state: State::new(),
-            suite_list: vec![],
-            test_list: vec![],
+            state_: State::new(),
+            suites_: vec![],
+            specs_: vec![],
         }
     }
     pub fn run(mut self) -> Self {
@@ -140,16 +140,16 @@ impl Suite {
         self
     }
     pub fn specs(mut self, tests: Vec<Spec>) -> Self {
-        self.test_list = tests;
+        self.specs_ = tests;
         self
     }
     pub fn suites(mut self, suites: Vec<Suite>) -> Self {
-        self.suite_list = suites;
+        self.suites_ = suites;
         self
     }
     pub fn state<'a, S: Deserialize<'a> + Serialize>(mut self, state: S) -> Self {
         // self.state_hash.insert(1, Box::new(state));
-        self.bit_state.set_state(state);
+        self.state_.set_state(state);
         // self.bit_state = to_vec(&state).expect("Could not Deserialize state");
         self
     }
@@ -169,12 +169,12 @@ impl Suite {
         let mut result = SuiteResult::new(&self.name);
         let start_time = Instant::now();
         self.execute_hook("before all");
-        let len = self.test_list.len();
+        let len = self.specs_.len();
         let mut only_id = None;
 
         // check for specs marked as only
         for i in 0..len {
-            let test = &self.test_list[i];
+            let test = &self.specs_[i];
             if test.only_ == true {
                 only_id = Some(i);
                 break;
@@ -187,9 +187,9 @@ impl Suite {
                 // run the first test marked as only
 
                 self.execute_hook("before each");
-                let test = &mut self.test_list[id];
-                test.run();
-                result.update_from_spec(test.export_results(&self.name));
+                let spec = &mut self.specs_[id];
+                spec.run(&mut self.state_);
+                result.update_from_spec(spec.export_results(&self.name));
                 self.execute_hook("after each");
 
             },
@@ -200,12 +200,12 @@ impl Suite {
                 for i in 0..len {
                     // (self.before_each_handle)();
                     self.execute_hook("before each");
-                    let test = &mut self.test_list[i];
+                    let spec = &mut self.specs_[i];
                     if self.ignore == true {
-                        test.ignore = true;
+                        spec.ignore = true;
                     }
-                    test.run();
-                    result.update_from_spec(test.export_results(&self.name));
+                    spec.run(&mut self.state_);
+                    result.update_from_spec(spec.export_results(&self.name));
                     // (self.after_each_handle)();
                     self.execute_hook("after each");
                 }
@@ -213,9 +213,9 @@ impl Suite {
             }
         }
 
-        let len = self.suite_list.len();
+        let len = self.suites_.len();
         for i in 0..len {
-            let suite = self.suite_list[i].borrow_mut();
+            let suite = self.suites_[i].borrow_mut();
             if self.ignore == true {
                 suite.ignore = true;
             }
@@ -233,7 +233,7 @@ impl Suite {
     fn execute_hook(&mut self, hook_name: &str) {
         match self.hooks.get(hook_name) {
             Some(hook) => {
-                (hook)(&mut self.bit_state);
+                (hook)(&mut self.state_);
             },
             None => {
 

@@ -28,33 +28,37 @@ mod tests {
 ### Testing a simple function "add_one"
 ```rust
 
-// the functio to test
-fn add_one(n: i32) -> i32 {
-    n + 1
-}
+fn add_one (x: u64) -> u64 { x + 1 }
 
 #[cfg(test)]
 mod tests {
-    
-    // import testing functions
+
+    use super::*;
     use laboratory::{describe, it, expect};
 
-    // define a test
     #[test]
     fn suite() {
 
-        describe("add_one()")
-            .specs(vec![
-                
-                it("should return 2 when given 1", || {
-                    expect(add_one(1)).to_equal(2)?;
-                    Ok(())
-                })
 
-            ]).run();
+    describe("add_one()")
+        .specs(vec![
+
+            it("should return 1", || {
+                expect(add_one(0)).to_equal(1)?;
+                Ok(())
+            }),
+
+            it("should return 2", || {
+                expect(add_one(1)).to_equal(2)?;
+                Ok(())
+            })
+
+        ]).run();
+
 
     }
 }
+
 ```
 
 Then run: 
@@ -63,10 +67,4 @@ $ cargo test -- --nocapture
 ```
 
 Result:
-```rust
-//  add_one()
-//     ✓  should return 2 when given 1 (0ms)
-//
-//
-//  ✓ 1 tests completed (0ms)
-```
+![laboratory_output](static/simple.png)
