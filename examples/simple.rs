@@ -13,21 +13,17 @@ mod tests {
     #[test]
     fn suite() {
 
-        describe("add_one()")
-            .specs(vec![
+        describe("add_one()").specs(vec![
 
-                it("should return 1", |_| {
-                    expect(add_one(0)).to_equal(1)?;
-                    Ok(())
-                }),
+            it("should return 1", |_| {
+                expect(add_one(0)).to_equal(1)
+            }),
 
-                it("should return 2", |_| {
-                    expect(add_one(1)).to_equal(2)?;
-                    Ok(())
-                })
+            it("should return 2", |_| {
+                expect(add_one(1)).to_equal(2)
+            })
 
-            ]).run();
+        ]).run();
 
-
-        }
+    }
 }
