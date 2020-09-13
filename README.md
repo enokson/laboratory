@@ -8,7 +8,8 @@ Reports test durations
 The use of custom assertion libraries  
 Exclude tests  
 Nested test suites  
-The use of state
+The use of state  
+should panic testing  
 
 ## Installation
 In Cargo.toml:
