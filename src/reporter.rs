@@ -4,6 +4,10 @@ use std::collections::HashMap;
 use console::style;
 use serde_json::{to_string, to_string_pretty};
 
+use std::path::Path;
+use std::fs::File;
+use std::io::Write;
+
 pub enum ReporterType {
     Spec,
     // Dot,
@@ -14,7 +18,7 @@ pub enum ReporterType {
 
 pub struct Reporter;
 impl Reporter {
-    pub fn spec(mut suite_results: SuiteResult) {
+    pub fn spec(mut suite_results: SuiteResult) -> String {
 
         fn get_count(suite: &SuiteResult, count: &mut u64) -> u64 {
             *count += suite.get_passing() + suite.get_failing() as u64;
@@ -116,10 +120,10 @@ impl Reporter {
             ln += &fail_ln;
         }
         ln += "\n\n";
-        println!("{}", ln);
+        ln
 
     }
-    pub fn min(mut suite_results: SuiteResult) {
+    pub fn min(mut suite_results: SuiteResult) -> String {
 
         fn get_count(suite: &SuiteResult, count: &mut u64) -> u64 {
             *count += suite.get_passing() + suite.get_failing() as u64;
@@ -179,10 +183,14 @@ impl Reporter {
             ln += &fail_ln;
         }
         ln += "\n\n";
-        println!("{}", ln);
+        ln
 
     }
-    pub fn json(suite_results: SuiteResult) {
-        println!("\n\n{}\n\n", to_string_pretty(&suite_results).expect("Could not send to JSON"));
+    pub fn json(suite_results: SuiteResult) -> String {
+        to_string_pretty(&suite_results).expect("Could not send to JSON")
+    }
+    pub fn export_to_file(path: &str, report: String) {
+        let mut file = File::create(path).expect("Could not create output file");
+        file.write_all(report.as_bytes()).expect("Could not output to file");
     }
 }

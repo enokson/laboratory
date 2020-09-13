@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use super::spec::{Spec, SpecResult};
 use super::reporter::{ReporterType, Reporter};
 use std::time::Instant;
+use std::path::Path;
 
 use serde::{Serialize};
 // use serde_cbor::{to_vec, from_slice};
@@ -118,6 +119,7 @@ pub struct Suite {
     state_: State,
     suites_: Vec<Suite>,
     specs_: Vec<Spec>,
+    export_: Option<String>
 }
 impl Suite {
 
@@ -132,6 +134,7 @@ impl Suite {
             state_: State::new(),
             suites_: vec![],
             specs_: vec![],
+            export_: None
         }
     }
     pub fn run(mut self) -> Self {
@@ -170,6 +173,10 @@ impl Suite {
     }
     pub fn json(mut self) -> Self {
         self.reporter_ = ReporterType::Json;
+        self
+    }
+    pub fn export_to(mut self, path: &str) -> Self {
+        self.export_ = Some(path.to_string());
         self
     }
 
@@ -252,7 +259,7 @@ impl Suite {
         }
     }
     fn report(&self) {
-        match &self.result {
+        let result = match &self.result {
             Some(result) => {
                 match &self.reporter_ {
                     ReporterType::Spec => Reporter::spec(result.clone()),
@@ -262,7 +269,15 @@ impl Suite {
             },
             None => {
                 // no result found
-                println!("result not found");
+                String::from("result not found")
+            }
+        };
+        match &self.export_ {
+            Some(path) => {
+                Reporter::export_to_file(&path, result);
+            },
+            None => {
+                println!("\n{}\n\n", result);
             }
         }
     }
