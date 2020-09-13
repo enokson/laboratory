@@ -3,9 +3,9 @@ A unit test runner for Rust
 
 ## Features
 The use of hooks such as before, before_each, after, after_each   
-Different reporter options 
+Different reporter options  
 Reports test durations  
-The use of custom assertion libraries
+The use of custom assertion libraries  
 Exclude tests  
 Nested test suites  
 The use of state
