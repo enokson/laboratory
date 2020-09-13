@@ -66,4 +66,9 @@ $ cargo test -- --nocapture
 ```
 
 Result:  
+
+<p align="center">
+  <img src="static/simple.png">
+</p>
+
 ![laboratory_output](static/simple.png)
