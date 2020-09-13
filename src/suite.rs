@@ -112,7 +112,7 @@ pub struct Suite {
     hooks: HashMap<String, Box<dyn Fn(&mut State)>>,
     pub ignore: bool,
     name: String,
-    reporter: ReporterType,
+    reporter_: ReporterType,
     result: Option<SuiteResult>,
     state_: State,
     suites_: Vec<Suite>,
@@ -126,7 +126,7 @@ impl Suite {
             hooks: HashMap::new(),
             ignore: false,
             name,
-            reporter: ReporterType::Spec,
+            reporter_: ReporterType::Spec,
             result: None,
             state_: State::new(),
             suites_: vec![],
@@ -155,6 +155,16 @@ impl Suite {
     }
     pub fn skip (mut self) -> Self {
         self.ignore = true;
+        self
+    }
+
+    // change reporter
+    pub fn spec(mut self) -> Self {
+        self.reporter_ = ReporterType::Spec;
+        self
+    }
+    pub fn min(mut self) -> Self {
+        self.reporter_ = ReporterType::Minimal;
         self
     }
 
@@ -239,8 +249,9 @@ impl Suite {
     fn report(&self) {
         match &self.result {
             Some(result) => {
-                match &self.reporter {
-                    ReporterType::Spec => Reporter::spec(result.clone())
+                match &self.reporter_ {
+                    ReporterType::Spec => Reporter::spec(result.clone()),
+                    ReporterType::Minimal => Reporter::min(result.clone())
                 }
             },
             None => {
