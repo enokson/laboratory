@@ -68,13 +68,7 @@ impl SpecResult {
     }
     pub fn update_ignored(&self) -> u64 {
         match self.pass {
-            Some(is_passing) => {
-                if is_passing {
-                    0
-                } else {
-                    0
-                }
-            },
+            Some(_) => 0,
             None => 1
         }
     }
