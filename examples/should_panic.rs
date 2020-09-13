@@ -16,18 +16,19 @@ mod tests {
 
     #[test]
     fn test() {
-        describe("panic_at_the_disco()")
-            .specs(vec![
 
-                it("should panic when passed true", |_| {
-                    should_panic!(panic_at_the_disco, || { panic_at_the_disco(true); })
-                }),
+        describe("panic_at_the_disco()").specs(vec![
 
-                it("should not panic when passed false", |_| {
-                    should_not_panic!(panic_at_the_disco, || { panic_at_the_disco(false); })
-                })
+            it("should panic when passed true", |_| {
+                should_panic!(panic_at_the_disco, || { panic_at_the_disco(true); })
+            }),
 
-            ]).run();
+            it("should not panic when passed false", |_| {
+                should_not_panic!(panic_at_the_disco, || { panic_at_the_disco(false); })
+            })
+
+        ]).run();
+
     }
 
 }

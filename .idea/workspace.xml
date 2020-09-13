@@ -13,8 +13,7 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added export_to_file feature">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="fixed typos">
       <change beforePath="$PROJECT_DIR$/examples/should_panic.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/should_panic.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -227,7 +226,14 @@
       <option name="project" value="LOCAL" />
       <updated>1600019914865</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="fixed typos">
+      <created>1600020211968</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1600020211968</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -264,7 +270,8 @@
     <MESSAGE value="added json reporting feature" />
     <MESSAGE value="removed line" />
     <MESSAGE value="added export_to_file feature" />
-    <option name="LAST_COMMIT_MESSAGE" value="added export_to_file feature" />
+    <MESSAGE value="fixed typos" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed typos" />
   </component>
   <component name="WindowStateProjectService">
     <state x="418" y="182" width="1084" height="708" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1599977313020">
