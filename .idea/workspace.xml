@@ -13,10 +13,10 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added spec_only example">
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="fixed issue where tests where not being marked as ignored">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/spec.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/spec.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/spec_only.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/spec_only.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/reporter.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/reporter.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/suite.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/suite.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -173,7 +173,28 @@
       <option name="project" value="LOCAL" />
       <updated>1600011960067</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="fixed issue where tests where not being marked to ignore">
+      <created>1600012699254</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1600012699254</updated>
+    </task>
+    <task id="LOCAL-00013" summary="removed line">
+      <created>1600012710857</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1600012710857</updated>
+    </task>
+    <task id="LOCAL-00014" summary="fixed issue where tests where not being marked as ignored">
+      <created>1600012753062</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1600012753062</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -203,7 +224,10 @@
     <MESSAGE value="reorganized code" />
     <MESSAGE value="added skip_spec example" />
     <MESSAGE value="added spec_only example" />
-    <option name="LAST_COMMIT_MESSAGE" value="added spec_only example" />
+    <MESSAGE value="fixed issue where tests where not being marked to ignore" />
+    <MESSAGE value="removed line" />
+    <MESSAGE value="fixed issue where tests where not being marked as ignored" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed issue where tests where not being marked as ignored" />
   </component>
   <component name="WindowStateProjectService">
     <state x="418" y="182" width="1084" height="708" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1599977313020">

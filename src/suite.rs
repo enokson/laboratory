@@ -248,7 +248,18 @@ impl Suite {
                 println!("result not found");
             }
         }
-
+    }
+    fn get_completed_count(&self) -> u128 {
+        let mut count: u128 = 0;
+        for spec in self.specs_.iter() {
+            if spec.ignore == false {
+                count += 1;
+            }
+        }
+        for suite in self.suites_.iter() {
+            count += suite.get_completed_count();
+        }
+        count
     }
 
     pub fn before_all<H>(mut self, handle: H) -> Self

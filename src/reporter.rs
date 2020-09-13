@@ -82,10 +82,10 @@ impl Reporter {
             }
         }
         fn get_count(suite: &SuiteResult, count: &mut u64) -> u64 {
-            *count += suite.get_child_specs().len() as u64;
-            for child in suite.get_child_suites() {
-                get_count(&child, count);
-            }
+            *count += suite.get_passing() + suite.get_failing() as u64;
+            // for child in suite.get_child_suites() {
+            //     get_count(&child, count);
+            // }
             count.clone()
         }
         fn indent(indention: u32) -> String {
