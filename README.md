@@ -28,6 +28,10 @@ mod tests {
 ### Testing a simple function "add_one"
 ```rust
 
+fn main() {
+    add_one(0);
+}
+
 fn add_one (x: u64) -> u64 { x + 1 }
 
 #[cfg(test)]
@@ -39,22 +43,17 @@ mod tests {
     #[test]
     fn suite() {
 
+        describe("add_one()").specs(vec![
 
-    describe("add_one()")
-        .specs(vec![
-
-            it("should return 1", || {
-                expect(add_one(0)).to_equal(1)?;
-                Ok(())
+            it("should return 1", |_| {
+                expect(add_one(0)).to_equal(1)
             }),
 
-            it("should return 2", || {
-                expect(add_one(1)).to_equal(2)?;
-                Ok(())
+            it("should return 2", |_| {
+                expect(add_one(1)).to_equal(2)
             })
 
         ]).run();
-
 
     }
 }
@@ -66,5 +65,5 @@ Then run:
 $ cargo test -- --nocapture
 ```
 
-Result:
+Result:  
 ![laboratory_output](static/simple.png)
