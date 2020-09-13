@@ -95,5 +95,6 @@ pub fn it_only<H>(name: &'static str, handle: H) -> Spec
     where
         H: FnMut(&mut State) -> Result<(), String> + 'static
 {
+
     Spec::new(name.to_string(), handle).only()
 }
