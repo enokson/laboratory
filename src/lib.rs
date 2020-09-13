@@ -13,6 +13,56 @@ use spec::Spec;
 use crate::reporter::ReporterType;
 use std::fmt::{Debug, Display};
 
+#[macro_export]
+macro_rules! should_panic {
+    ($name:expr, $handle: expr) => {
+
+        {
+            use std::panic::{ catch_unwind, set_hook, take_hook };
+
+            set_hook(Box::new(|_| {
+                // println!("");
+            }));
+            let tmp_result = catch_unwind(|| {
+                ($handle)();
+            }).is_ok();
+            let _ = take_hook();
+            if tmp_result == false {
+                Ok(())
+            } else {
+                Err(format!("Expected {} to panic but it didn't", stringify!($name)))
+            }
+
+        }
+
+    };
+}
+
+#[macro_export]
+macro_rules! should_not_panic {
+    ($name:expr, $handle: expr) => {
+
+        {
+            use std::panic::{ catch_unwind, set_hook, take_hook };
+
+            set_hook(Box::new(|_| {
+                // println!("");
+            }));
+            let tmp_result = catch_unwind(|| {
+                ($handle)();
+            }).is_ok();
+            let _ = take_hook();
+            if tmp_result == true {
+                Ok(())
+            } else {
+                Err(format!("Expected {} to panic but it didn't", stringify!($name)))
+            }
+
+        }
+
+    };
+}
+
 pub use serde::{Deserialize, Serialize};
 
 pub fn expect<T>(result: T) -> Expect<T>
