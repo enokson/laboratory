@@ -2,16 +2,41 @@ use console::style;
 
 use std::borrow::{BorrowMut};
 use std::collections::HashMap;
+// use std::cell::RefCell;
 
 use super::spec::{Spec, SpecResult};
 use super::reporter::{ReporterType, Reporter};
 use std::time::Instant;
 
-use serde::{Deserialize, Serialize};
-use serde_cbor::{to_vec, from_slice};
+use serde::{Serialize};
+// use serde_cbor::{to_vec, from_slice};
+// use ron::{to_string, from_str};
+use bincode::{serialize, deserialize};
+
+
+use serde::de::Deserialize;
 
 pub type BitState = Vec<u8>;
 
+pub struct State {
+    state: Vec<u8>
+}
+impl State {
+    pub fn new() -> State {
+        State { state: vec![] }
+    }
+    pub fn get_state<'a, T>(&'a self) -> T
+        where
+            T: Deserialize<'a>
+    {
+        deserialize(&self.state).expect("Could not deserialize state.")
+        // from_str(&self.state).expect("Could not convert from string")
+    }
+    pub fn set_state<T: Serialize>(& mut self, state: T) {
+        // self.state = to_string(&state).expect("Could not convert to String.");
+        self.state = serialize(&state).expect("Could not serialize state.");
+    }
+}
 
 pub struct SuiteResult {
     name: String,
@@ -84,12 +109,12 @@ impl Clone for SuiteResult {
 
 pub struct Suite {
     duration: u128,
-    hooks: HashMap<String, Box<dyn Fn(&BitState) -> &BitState>>,
+    hooks: HashMap<String, Box<dyn Fn(&mut State)>>,
     pub ignore: bool,
     name: String,
     reporter: ReporterType,
     result: Option<SuiteResult>,
-    bit_state: Vec<u8>,
+    bit_state: State,
     suite_list: Vec<Suite>,
     test_list: Vec<Spec>,
 }
@@ -103,7 +128,7 @@ impl Suite {
             name,
             reporter: ReporterType::Spec,
             result: None,
-            bit_state: vec![],
+            bit_state: State::new(),
             suite_list: vec![],
             test_list: vec![],
         }
@@ -124,7 +149,8 @@ impl Suite {
     }
     pub fn state<'a, S: Deserialize<'a> + Serialize>(mut self, state: S) -> Self {
         // self.state_hash.insert(1, Box::new(state));
-        self.bit_state = to_vec(&state).expect("Could not Deserialize state");
+        self.bit_state.set_state(state);
+        // self.bit_state = to_vec(&state).expect("Could not Deserialize state");
         self
     }
     pub fn skip (mut self) -> Self {
@@ -207,7 +233,7 @@ impl Suite {
     fn execute_hook(&mut self, hook_name: &str) {
         match self.hooks.get(hook_name) {
             Some(hook) => {
-                self.bit_state = (hook)(&self.bit_state).clone();
+                (hook)(&mut self.bit_state);
             },
             None => {
 
@@ -231,28 +257,28 @@ impl Suite {
 
     pub fn before_all<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&BitState) -> &BitState + 'static
+            H: Fn(&mut State) + 'static
     {
         self.hooks.insert("before all".to_string(), Box::new(handle));
         self
     }
     pub fn before_each<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&BitState) -> &BitState + 'static
+            H: Fn(&mut State) + 'static
     {
         self.hooks.insert("before each".to_string(), Box::new(handle));
         self
     }
     pub fn after_all<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&BitState) -> &BitState + 'static
+            H: Fn(&mut State) + 'static
     {
         self.hooks.insert("after all".to_string(), Box::new(handle));
         self
     }
     pub fn after_each<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&BitState) -> &BitState + 'static
+            H: Fn(&mut State) + 'static
     {
         self.hooks.insert("after each".to_string(), Box::new(handle));
         self

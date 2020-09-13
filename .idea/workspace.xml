@@ -6,26 +6,19 @@
         <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
         <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
       </path>
-      <path>
-        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
-        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
-        <item name="GROUP_NODE:feature" type="e8cecc67:BranchNodeDescriptor" />
-      </path>
     </expand>
-    <select>
-      <path>
-        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
-        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
-        <item name="GROUP_NODE:feature" type="e8cecc67:BranchNodeDescriptor" />
-        <item name="BRANCH:feature/state" type="e8cecc67:BranchNodeDescriptor" />
-      </path>
-    </select>
+    <select />
   </component>
   <component name="CargoProjects">
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a4436f1c-e3c3-4ca2-a0b7-3916a0d59bb6" name="Default Changelist" comment="added features for reporting">
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/LICENCE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/crucible.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/laboratory.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/test.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
@@ -37,25 +30,13 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Rust File" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="master" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MacroExpansionManager">
-    <option name="directoryName" value="1ovkt558" />
+    <option name="directoryName" value="atz1wk2o" />
   </component>
-  <component name="ProjectId" id="1h8vujwArllG9V1lJW8n89B1nYj" />
+  <component name="ProjectId" id="1hRM2h3gEcwwnYKqUYXfwvEiMZ1" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="false" />
@@ -63,136 +44,23 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../mysql-compose" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
-  <component name="RunManager" selected="Cargo Command.build">
-    <configuration default="true" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-      <option name="channel" value="DEFAULT" />
-      <option name="command" value="cargo test -- --nocapture" />
-      <option name="allFeatures" value="true" />
-      <option name="emulateTerminal" value="false" />
-      <option name="backtrace" value="SHORT" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="build" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-      <option name="channel" value="DEFAULT" />
-      <option name="command" value="build" />
-      <option name="allFeatures" value="true" />
-      <option name="emulateTerminal" value="false" />
-      <option name="backtrace" value="SHORT" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="Cargo Command.test" />
-      <item itemvalue="Cargo Command.build" />
-    </list>
-  </component>
   <component name="RustProjectSettings">
-    <option name="externalLinter" value="Clippy" />
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
-    <option name="version" value="2" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
-  <component name="SvnConfiguration">
-    <configuration />
-  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="a4436f1c-e3c3-4ca2-a0b7-3916a0d59bb6" name="Default Changelist" comment="" />
-      <created>1599405758490</created>
+      <changelist id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="" />
+      <created>1599969246259</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1599405758490</updated>
-      <workItem from="1599405760617" duration="625000" />
-      <workItem from="1599516953115" duration="90000" />
-      <workItem from="1599499057321" duration="516000" />
-      <workItem from="1599499598784" duration="7992000" />
-      <workItem from="1599577614606" duration="68000" />
+      <updated>1599969246259</updated>
+      <workItem from="1599969247737" duration="656000" />
     </task>
-    <task id="LOCAL-00001" summary="fixed lib">
-      <created>1599405961154</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1599405961154</updated>
-    </task>
-    <task id="LOCAL-00002" summary="reorganized project files">
-      <created>1599578958789</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1599578958789</updated>
-    </task>
-    <task id="LOCAL-00003" summary="removed pass_state member from suite">
-      <created>1599579265644</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1599579265644</updated>
-    </task>
-    <task id="LOCAL-00004" summary="removed pass_state method from suite">
-      <created>1599579439143</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1599579439143</updated>
-    </task>
-    <task id="LOCAL-00005" summary="added ignore option to spec">
-      <created>1599579457063</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1599579457063</updated>
-    </task>
-    <task id="LOCAL-00006" summary="added skip feature for spec">
-      <created>1599579942391</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1599579942391</updated>
-    </task>
-    <task id="LOCAL-00007" summary="added skip feature for suite">
-      <created>1599580536153</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1599580536153</updated>
-    </task>
-    <task id="LOCAL-00008" summary="added only feature for suite-spec">
-      <created>1599581195925</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1599581195925</updated>
-    </task>
-    <task id="LOCAL-00009" summary="added features for reporting">
-      <created>1599644408574</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1599644408574</updated>
-    </task>
-    <task id="LOCAL-00010" summary="added features for reporting">
-      <created>1599644413437</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1599644413437</updated>
-    </task>
-    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -208,64 +76,19 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed lib" />
-    <MESSAGE value="reorganized project files" />
-    <MESSAGE value="removed pass_state member from suite" />
-    <MESSAGE value="removed pass_state method from suite" />
-    <MESSAGE value="added ignore option to spec" />
-    <MESSAGE value="added skip feature for spec" />
-    <MESSAGE value="added skip feature for suite" />
-    <MESSAGE value="added only feature for suite-spec" />
-    <MESSAGE value="added features for reporting" />
-    <option name="LAST_COMMIT_MESSAGE" value="added features for reporting" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="418" y="182" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1599645462920">
+    <state x="699" y="326" width="516" height="396" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1599969886326">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state x="418" y="182" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599645462920" />
-    <state x="643" y="261" width="628" height="526" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1599499088235">
+    <state x="699" y="326" width="516" height="396" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1046@0.0.1920.1046" timestamp="1599969886326" />
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1599969729338">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state x="643" y="261" width="628" height="526" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599499088235" />
-    <state x="693" y="273" width="528" height="502" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1599535839181">
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1046@0.0.1920.1046" timestamp="1599969729338" />
+    <state x="764" y="436" width="385" height="176" key="git4idea.remote.GitConfigureRemotesDialog" timestamp="1599969716873">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state x="693" y="273" width="528" height="502" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599535839181" />
-    <state x="98" y="100" width="1724" height="848" key="DiffContextDialog" timestamp="1599553880509">
-      <screen x="0" y="0" width="1920" height="1046" />
-    </state>
-    <state x="98" y="100" width="1724" height="848" key="DiffContextDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599553880509" />
-    <state x="743" y="282" width="428" height="484" key="FileChooserDialogImpl" timestamp="1599570888708">
-      <screen x="0" y="0" width="1920" height="1046" />
-    </state>
-    <state x="743" y="282" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1046@0.0.1920.1046" timestamp="1599570888708" />
-    <state width="809" height="802" key="GridCell.Tab.0.bottom" timestamp="1599909644033">
-      <screen x="0" y="0" width="1920" height="1046" />
-    </state>
-    <state width="809" height="802" key="GridCell.Tab.0.bottom/0.0.1920.1046@0.0.1920.1046" timestamp="1599909644033" />
-    <state width="809" height="802" key="GridCell.Tab.0.center" timestamp="1599909644032">
-      <screen x="0" y="0" width="1920" height="1046" />
-    </state>
-    <state width="809" height="802" key="GridCell.Tab.0.center/0.0.1920.1046@0.0.1920.1046" timestamp="1599909644032" />
-    <state width="809" height="802" key="GridCell.Tab.0.left" timestamp="1599909644032">
-      <screen x="0" y="0" width="1920" height="1046" />
-    </state>
-    <state width="809" height="802" key="GridCell.Tab.0.left/0.0.1920.1046@0.0.1920.1046" timestamp="1599909644032" />
-    <state width="809" height="802" key="GridCell.Tab.0.right" timestamp="1599909644033">
-      <screen x="0" y="0" width="1920" height="1046" />
-    </state>
-    <state width="809" height="802" key="GridCell.Tab.0.right/0.0.1920.1046@0.0.1920.1046" timestamp="1599909644033" />
-    <state x="779" y="226" width="530" height="595" key="RollbackChangesDialog" timestamp="1599405826859">
-      <screen x="0" y="0" width="1920" height="1046" />
-    </state>
-    <state x="779" y="226" width="530" height="595" key="RollbackChangesDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599405826859" />
-    <state x="623" y="231" width="672" height="678" key="search.everywhere.popup" timestamp="1599907766477">
-      <screen x="0" y="0" width="1920" height="1046" />
-    </state>
-    <state x="623" y="231" width="672" height="678" key="search.everywhere.popup/0.0.1920.1046@0.0.1920.1046" timestamp="1599907766477" />
+    <state x="764" y="436" width="385" height="176" key="git4idea.remote.GitConfigureRemotesDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1599969716873" />
   </component>
 </project>

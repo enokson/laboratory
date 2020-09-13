@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/crucible.iml" filepath="$PROJECT_DIR$/.idea/crucible.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/laboratory.iml" filepath="$PROJECT_DIR$/.idea/laboratory.iml" />
     </modules>
   </component>
 </project>

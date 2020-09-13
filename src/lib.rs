@@ -12,6 +12,7 @@ use crate::reporter::ReporterType;
 use std::fmt::{Debug, Display};
 
 use serde_cbor::{to_vec, from_slice};
+
 use serde::{Deserialize, Serialize};
 
 pub fn expect<T>(result: T) -> Expect<T>
@@ -91,6 +92,20 @@ mod test {
         };
         impl Counter {
             pub fn new() -> Counter { Counter { count: 0 } }
+            pub fn update(&mut self) {
+                self.count += 1;
+            }
+        }
+
+        #[derive(Deserialize, Serialize, Debug)]
+        struct Line {
+            ln: String
+        }
+        impl Line {
+            pub fn new() -> Line { Line { ln: String::new() } }
+            pub fn append(&mut self, ln: &str) {
+                self.ln += ln;
+            }
         }
 
         struct Person {
@@ -115,22 +130,6 @@ mod test {
         }
 
         describe("Library")
-            .state(Counter::new())
-            .before_all(|bit_state| {
-                let counter: Counter = from_slice(&bit_state).expect("Could not serialize state.");
-                to_vec(&counter).expect("Could deserialize state.").borrow()
-            })
-            .before_each(|bit_state| {
-                bit_state
-            })
-            .after_each(|bit_state| {
-
-                bit_state
-            })
-            .after_all(|bit_state| {
-                bit_state
-            })
-
             .suites(vec![
 
                 describe("add_one()")
@@ -148,7 +147,22 @@ mod test {
                             Ok(())
                         })
 
-                    ]),
+                    ])
+                    .before_all(|state| {
+                        state.set_state(Counter::new())
+                    })
+                    .before_each(|state| {
+                        let mut counter: Counter = state.get_state();
+                        counter.update();
+                        state.set_state(counter);
+                    })
+                    .after_each(|state| {
+
+                    })
+                    .after_all(|state| {
+                        let counter: Counter = state.get_state();
+                        println!("Count: {}", counter.count);
+                    }),
 
 
                 describe("Person")
