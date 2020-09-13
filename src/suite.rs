@@ -184,33 +184,29 @@ impl Suite {
         match only_id {
             Some(id) => {
 
-                // run the first test marked as only
-
-                self.execute_hook("before each");
-                let spec = &mut self.specs_[id];
-                spec.run(&mut self.state_);
-                result.update_from_spec(spec.export_results(&self.name));
-                self.execute_hook("after each");
-
-            },
-            None => {
-
-                // run all tests not marked as ignore
-
+                // set all other specs to be ignored
                 for i in 0..len {
-                    // (self.before_each_handle)();
-                    self.execute_hook("before each");
-                    let spec = &mut self.specs_[i];
-                    if self.ignore == true {
+                    if i != id {
+                        let spec = &mut self.specs_[i];
                         spec.ignore = true;
                     }
-                    spec.run(&mut self.state_);
-                    result.update_from_spec(spec.export_results(&self.name));
-                    // (self.after_each_handle)();
-                    self.execute_hook("after each");
                 }
 
+            },
+            None => { }
+        }
+
+        // run specs not marked with ignore
+        for i in 0..len {
+            self.execute_hook("before each");
+            let spec = &mut self.specs_[i];
+            if self.ignore == true {
+                spec.ignore = true;
             }
+            spec.run(&mut self.state_);
+            result.update_from_spec(spec.export_results(&self.name));
+            // (self.after_each_handle)();
+            self.execute_hook("after each");
         }
 
         let len = self.suites_.len();
