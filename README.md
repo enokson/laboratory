@@ -2,14 +2,14 @@
 A unit test runner for Rust
 
 ## Features
-The use of hooks such as before, before_each, after, after_each   
-Different reporter options  
-Reports test durations  
-The use of custom assertion libraries  
-Exclude tests  
-Nested test suites  
-The use of state  
-should panic testing  
+* before, before_each, after, after_each hooks  
+* Different reporter options  
+* Reports test durations  
+* The use of custom assertion libraries  
+* Exclude tests  
+* Nested test suites  
+* The use of state  
+* should panic testing  
 
 ## Installation
 In Cargo.toml:
@@ -26,7 +26,7 @@ mod tests {
 ```
 
 ## Getting Started
-### Testing a simple function "add_one"
+### Testing a simple function "add_one()"
 ```rust
 
 fn main() {
@@ -64,6 +64,7 @@ mod tests {
 Then run: 
 ```shell script
 $ cargo test -- --nocapture
+
 ```
 
 Result:  
