@@ -10,8 +10,11 @@ mod tests {
     use laboratory::{describe, it, expect, Deserialize, Serialize};
     use std::fmt::{Debug};
 
+    // We want a counter to count each time a hook or test is called
+    // Any state we want to use in the suite must be able to be serialized and deserialized by serde
     #[derive(Deserialize, Serialize, Debug)]
     struct Counter {
+        // the counter will hold a member for each category
         pub before_all_hit_count: u8,
         pub before_each_hit_count: u8,
         pub after_each_hit_count: u8,
@@ -33,7 +36,7 @@ mod tests {
     #[test]
     fn test() {
 
-        describe("no_op").state(Counter::new()).before_all(|state| {
+        let state: Counter = describe("no_op").state(Counter::new()).before_all(|state| {
             let mut counter: Counter = state.get_state();
             counter.before_all_hit_count += 1;
             state.set_state(counter);
@@ -48,7 +51,7 @@ mod tests {
         }).after_all(|state| {
             let mut counter: Counter = state.get_state();
             counter.after_all_hit_count += 1;
-            println!("\n\n{:#?}", &counter);
+            // println!("\n\n{:#?}", &counter);
             state.set_state(counter);
         }).specs(vec![
 
@@ -66,7 +69,9 @@ mod tests {
                 expect(no_op()).to_be(true)
             })
 
-        ]).run();
+        ]).run().to_state();
+
+        println!("{:#?}\n\n", state);
 
     }
 

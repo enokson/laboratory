@@ -183,6 +183,9 @@ impl Suite {
         self.export_ = Some(path.to_string());
         self
     }
+    pub fn to_state<'a, S: Deserialize<'a>>(&'a self) -> S {
+        self.state_.get_state()
+    }
 
     fn clone_result(&self) -> Option<SuiteResult> {
         match &self.result {
