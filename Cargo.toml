@@ -1,11 +1,11 @@
 [package]
 name = "laboratory"
-description = "A unit test runner for Rust"
+description = "A unit test framework for Rust"
 version = "0.1.0"
 authors = ["Joshua Enokson <kilograhm@pm.me>"]
 edition = "2018"
-keywords = ["test", "tests", "unit"]
-categories = [ "unit-tests", "test-runner" ]
+keywords = ["test", "tests", "unit", "spec", "debug"]
+categories = [ "development-tools::testing", "development-tools::debugging", "development-tools::profiling"  ]
 repository = "https://github.com/enokson/laboratory"
 homepage = "https://github.com/enokson/laboratory"
 license = "MIT"
