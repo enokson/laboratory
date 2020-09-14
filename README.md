@@ -1,5 +1,5 @@
 # laboratory
-A unit test runner for Rust
+A simple, expressive unit-test framework for Rust
 
 ## Features
 * before, before_each, after, after_each hooks  
