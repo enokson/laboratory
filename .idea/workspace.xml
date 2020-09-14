@@ -13,11 +13,10 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added key words, categories">
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="Changed package version to 1.0.0">
+      <change afterPath="$PROJECT_DIR$/coverage.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/should_panic.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/should_panic.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -33,6 +32,12 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--tags" />
+        <option name="title" value="All" />
+      </GitPushTagMode>
+    </option>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
         <entry key="$PROJECT_DIR$" value="master" />
@@ -52,14 +57,13 @@
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="false" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../priority-msg-store" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
@@ -118,7 +122,8 @@
       <workItem from="1600079465800" duration="59000" />
       <workItem from="1600079533525" duration="56000" />
       <workItem from="1600079595905" duration="2621000" />
-      <workItem from="1600103415783" duration="1387000" />
+      <workItem from="1600103415783" duration="2316000" />
+      <workItem from="1600107951496" duration="2553000" />
     </task>
     <task id="LOCAL-00001" summary="updated Cargo.toml">
       <created>1599971494349</created>
@@ -372,7 +377,21 @@
       <option name="project" value="LOCAL" />
       <updated>1600104778198</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="updated README.md">
+      <created>1600105144772</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1600105144772</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Changed package version to 1.0.0">
+      <created>1600105177666</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1600105177666</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -395,7 +414,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="fixed README.md" />
     <MESSAGE value="added examples" />
     <MESSAGE value="added should_panic support for testing" />
     <MESSAGE value="Removed old comment and tests" />
@@ -412,7 +430,6 @@
     <MESSAGE value="fixed typos" />
     <MESSAGE value="re-spaced the test" />
     <MESSAGE value="added minimal-reporter.rs" />
-    <MESSAGE value="updated README.md" />
     <MESSAGE value="Added json_pretty reporting feature" />
     <MESSAGE value="reorganized tests, added to_state feature" />
     <MESSAGE value="added new example: importing-tests.rs" />
@@ -420,7 +437,9 @@
     <MESSAGE value="updated readme" />
     <MESSAGE value="updated readme and examples" />
     <MESSAGE value="added key words, categories" />
-    <option name="LAST_COMMIT_MESSAGE" value="added key words, categories" />
+    <MESSAGE value="updated README.md" />
+    <MESSAGE value="Changed package version to 1.0.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed package version to 1.0.0" />
   </component>
   <component name="WindowStateProjectService">
     <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">
@@ -467,10 +486,10 @@
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state x="456" y="159" key="SettingsEditor/0.0.1920.1046@0.0.1920.1046" timestamp="1600079691625" />
-    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1600082168734">
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1600105220053">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1046@0.0.1920.1046" timestamp="1600082168734" />
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1046@0.0.1920.1046" timestamp="1600105220053" />
     <state x="763" y="439" width="387" height="170" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1600075134664">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
@@ -483,6 +502,10 @@
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state x="765" y="420" width="384" height="207" key="git4idea.ui.GitResetDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1600011379545" />
+    <state x="765" y="369" key="git4idea.ui.GitTagDialog" timestamp="1600105191882">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state x="765" y="369" key="git4idea.ui.GitTagDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1600105191882" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

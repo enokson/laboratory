@@ -99,3 +99,29 @@ pub fn it_only<H>(name: &'static str, handle: H) -> Spec
 
     Spec::new(name.to_string(), handle).only()
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn simple() {
+
+        fn add_one (x: u64) -> u64 { x + 1 }
+
+        describe("add_one()").specs(vec![
+
+            it("should return 1", |_| {
+                expect(add_one(0)).to_equal(1)
+            }),
+
+            it("should return 2", |_| {
+                expect(add_one(1)).to_equal(2)
+            })
+
+        ]).run();
+
+    }
+
+}
