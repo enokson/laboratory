@@ -535,6 +535,7 @@ fn main() {
 pub mod add_one {
 
     pub fn add_one (x: u64) -> u64 { x + 1 }
+
     #[cfg(test)]
     pub mod tests {
 
@@ -560,7 +561,9 @@ pub mod add_one {
 
 }
 pub mod multiply_by_two {
+
     pub fn multiply_by_two (x: u64) -> u64 { x * 2 }
+
     #[cfg(test)]
     pub mod tests {
 

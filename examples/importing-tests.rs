@@ -30,8 +30,11 @@ pub mod add_one {
     }
 
 }
+
 pub mod multiply_by_two {
+
     pub fn multiply_by_two (x: u64) -> u64 { x * 2 }
+
     #[cfg(test)]
     pub mod tests {
 
