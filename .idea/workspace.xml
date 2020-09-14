@@ -13,8 +13,9 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="resolved should_panic.rs issue.">
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="moved functions">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/coverage.sh" beforeDir="false" afterPath="$PROJECT_DIR$/coverage.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/failure.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/failure.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -121,7 +122,7 @@
       <workItem from="1600079533525" duration="56000" />
       <workItem from="1600079595905" duration="2621000" />
       <workItem from="1600103415783" duration="2316000" />
-      <workItem from="1600107951496" duration="4528000" />
+      <workItem from="1600107951496" duration="4743000" />
     </task>
     <task id="LOCAL-00001" summary="updated Cargo.toml">
       <created>1599971494349</created>
@@ -410,7 +411,14 @@
       <option name="project" value="LOCAL" />
       <updated>1600111729620</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="moved functions">
+      <created>1600112501302</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1600112501302</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -433,7 +441,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="reorganized code" />
     <MESSAGE value="added skip_spec example" />
     <MESSAGE value="added spec_only example" />
     <MESSAGE value="fixed issue where tests where not being marked to ignore" />
@@ -458,7 +465,8 @@
     <MESSAGE value="added test to lib.rs, added coverage.sh" />
     <MESSAGE value="commented should_panic.rs panic due to unknown errors" />
     <MESSAGE value="resolved should_panic.rs issue." />
-    <option name="LAST_COMMIT_MESSAGE" value="resolved should_panic.rs issue." />
+    <MESSAGE value="moved functions" />
+    <option name="LAST_COMMIT_MESSAGE" value="moved functions" />
   </component>
   <component name="WindowStateProjectService">
     <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">

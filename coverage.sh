@@ -1,3 +1,5 @@
+rm -r target/debug/examples
+
 export CARGO_INCREMENTAL=0
 # when
 # when -Zpanic_abort_tests -Cpanic=abort are enabled, the should_panic macro fails to catch the panic
