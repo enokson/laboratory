@@ -13,9 +13,12 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="updated readme and examples">
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added key words, categories">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,7 +118,7 @@
       <workItem from="1600079465800" duration="59000" />
       <workItem from="1600079533525" duration="56000" />
       <workItem from="1600079595905" duration="2621000" />
-      <workItem from="1600103415783" duration="997000" />
+      <workItem from="1600103415783" duration="1387000" />
     </task>
     <task id="LOCAL-00001" summary="updated Cargo.toml">
       <created>1599971494349</created>
@@ -362,7 +365,14 @@
       <option name="project" value="LOCAL" />
       <updated>1600082164659</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="added key words, categories">
+      <created>1600104778198</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1600104778198</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -385,7 +395,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="updated licence, keywords, and categories" />
     <MESSAGE value="fixed README.md" />
     <MESSAGE value="added examples" />
     <MESSAGE value="added should_panic support for testing" />
@@ -410,7 +419,8 @@
     <MESSAGE value="added examples to readme" />
     <MESSAGE value="updated readme" />
     <MESSAGE value="updated readme and examples" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated readme and examples" />
+    <MESSAGE value="added key words, categories" />
+    <option name="LAST_COMMIT_MESSAGE" value="added key words, categories" />
   </component>
   <component name="WindowStateProjectService">
     <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">
