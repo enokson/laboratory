@@ -13,11 +13,9 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="commented should_panic.rs panic due to unknown errors">
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="resolved should_panic.rs issue.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/coverage.sh" beforeDir="false" afterPath="$PROJECT_DIR$/coverage.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/failure.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/failure.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/should_panic.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/should_panic.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,7 +121,7 @@
       <workItem from="1600079533525" duration="56000" />
       <workItem from="1600079595905" duration="2621000" />
       <workItem from="1600103415783" duration="2316000" />
-      <workItem from="1600107951496" duration="3772000" />
+      <workItem from="1600107951496" duration="4528000" />
     </task>
     <task id="LOCAL-00001" summary="updated Cargo.toml">
       <created>1599971494349</created>
@@ -405,7 +403,14 @@
       <option name="project" value="LOCAL" />
       <updated>1600110592963</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="resolved should_panic.rs issue.">
+      <created>1600111729620</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1600111729620</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -428,7 +433,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Removed old comment and tests" />
     <MESSAGE value="reorganized code" />
     <MESSAGE value="added skip_spec example" />
     <MESSAGE value="added spec_only example" />
@@ -453,7 +457,8 @@
     <MESSAGE value="Changed package version to 1.0.0" />
     <MESSAGE value="added test to lib.rs, added coverage.sh" />
     <MESSAGE value="commented should_panic.rs panic due to unknown errors" />
-    <option name="LAST_COMMIT_MESSAGE" value="commented should_panic.rs panic due to unknown errors" />
+    <MESSAGE value="resolved should_panic.rs issue." />
+    <option name="LAST_COMMIT_MESSAGE" value="resolved should_panic.rs issue." />
   </component>
   <component name="WindowStateProjectService">
     <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">
