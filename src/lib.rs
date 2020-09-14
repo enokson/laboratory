@@ -7,11 +7,12 @@ mod spec;
 mod suite;
 mod reporter;
 
-use suite::{Suite, State};
-use assertion::Expect;
-use spec::Spec;
+pub use suite::{Suite, State};
+pub use assertion::Expect;
+pub use spec::Spec;
 use std::fmt::{Debug};
 pub use serde::{Deserialize, Serialize};
+
 
 #[macro_export]
 macro_rules! should_panic {
