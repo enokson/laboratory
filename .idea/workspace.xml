@@ -13,12 +13,10 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added new example: importing-tests.rs">
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added inherit state feature">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/hooks.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/hooks.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/state.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/state.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/suite.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/suite.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/add_one.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/simple.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +59,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
@@ -96,6 +95,7 @@
     </configuration>
   </component>
   <component name="RustProjectSettings">
+    <option name="externalLinter" value="Clippy" />
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
     <option name="version" value="2" />
   </component>
@@ -109,6 +109,12 @@
       <updated>1599969246259</updated>
       <workItem from="1599969247737" duration="656000" />
       <workItem from="1600083638562" duration="9198000" />
+      <workItem from="1600078870171" duration="180000" />
+      <workItem from="1600079084910" duration="13000" />
+      <workItem from="1600079106418" duration="353000" />
+      <workItem from="1600079465800" duration="59000" />
+      <workItem from="1600079533525" duration="56000" />
+      <workItem from="1600079595905" duration="221000" />
     </task>
     <task id="LOCAL-00001" summary="updated Cargo.toml">
       <created>1599971494349</created>
@@ -319,6 +325,9 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.md" />
+  </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
@@ -361,6 +370,14 @@
     <option name="LAST_COMMIT_MESSAGE" value="added new example: importing-tests.rs" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories/0.0.1920.1046@0.0.1920.1046" timestamp="1600078749494" />
+    <state x="555" y="168" width="804" height="712" key="#Plugins" timestamp="1600079095351">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state x="555" y="168" width="804" height="712" key="#Plugins/0.0.1920.1046@0.0.1920.1046" timestamp="1600079095351" />
     <state x="418" y="182" width="1084" height="708" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1599977313020">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
@@ -369,6 +386,10 @@
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state x="699" y="326" width="516" height="396" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1046@0.0.1920.1046" timestamp="1599969886326" />
+    <state x="742" y="282" width="428" height="484" key="FileChooserDialogImpl" timestamp="1600079379480">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state x="742" y="282" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1046@0.0.1920.1046" timestamp="1600079379480" />
     <state width="1874" height="470" key="GridCell.Tab.0.bottom" timestamp="1600056587815">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
@@ -389,10 +410,18 @@
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state x="770" y="207" width="374" height="633" key="RollbackChangesDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1600010498131" />
-    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1600022793964">
+    <state x="456" y="159" key="SettingsEditor" timestamp="1600079691625">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1046@0.0.1920.1046" timestamp="1600022793964" />
+    <state x="456" y="159" key="SettingsEditor/0.0.1920.1046@0.0.1920.1046" timestamp="1600079691625" />
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1600075203319">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1046@0.0.1920.1046" timestamp="1600075203319" />
+    <state x="763" y="439" width="387" height="170" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1600075134664">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state x="763" y="439" width="387" height="170" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1046@0.0.1920.1046" timestamp="1600075134664" />
     <state x="764" y="436" width="385" height="176" key="git4idea.remote.GitConfigureRemotesDialog" timestamp="1599969716873">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
@@ -401,5 +430,9 @@
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state x="765" y="420" width="384" height="207" key="git4idea.ui.GitResetDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1600011379545" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

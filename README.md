@@ -67,7 +67,22 @@ $ cargo test -- --nocapture
 ```
 
 Result:  
+```
+running 1 test
 
-<p align="center">
-  <img src="static/simple.png">
-</p>
+
+
+  add_one()
+     ✓  should return 1 (0ms)
+     ✓  should return 2 (0ms)
+
+
+  ✓ 2 tests completed (0ms)
+
+
+
+
+test tests::suite ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+```
