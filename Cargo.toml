@@ -7,6 +7,7 @@ edition = "2018"
 keywords = ["test", "tests", "unit"]
 categories = [ "unit-tests", "test-runner" ]
 repository = "https://github.com/enokson/laboratory"
+homepage = "https://github.com/enokson/laboratory"
 license = "MIT"
 #publish = false
 
