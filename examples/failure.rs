@@ -1,4 +1,5 @@
 
+// add_one should add one to any number, but a typo results in 6 being added
 fn add_one (n: i32) -> i32 { n + 6 }
 
 fn add_two (n: i32) -> i32 { n + 2 }
