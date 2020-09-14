@@ -16,6 +16,7 @@ use bincode::{serialize, deserialize};
 
 
 use serde::de::Deserialize;
+use std::thread::Thread;
 
 pub type BitState = Vec<u8>;
 
@@ -36,6 +37,12 @@ impl State {
     pub fn set_state<T: Serialize>(& mut self, state: T) {
         // self.state = to_string(&state).expect("Could not convert to String.");
         self.state = serialize(&state).expect("Could not serialize state.");
+    }
+    pub fn get_raw_state(&self) -> Vec<u8> {
+        self.state.to_vec()
+    }
+    pub fn set_raw_state(&mut self, vec: Vec<u8>) {
+        self.state = vec;
     }
 }
 
@@ -119,7 +126,8 @@ pub struct Suite {
     state_: State,
     suites_: Vec<Suite>,
     specs_: Vec<Spec>,
-    export_: Option<String>
+    export_: Option<String>,
+    inherit_state_: bool
 }
 impl Suite {
 
@@ -134,7 +142,8 @@ impl Suite {
             state_: State::new(),
             suites_: vec![],
             specs_: vec![],
-            export_: None
+            export_: None,
+            inherit_state_: false
         }
     }
     pub fn run(mut self) -> Self {
@@ -159,6 +168,10 @@ impl Suite {
     }
     pub fn skip (mut self) -> Self {
         self.ignore = true;
+        self
+    }
+    pub fn inherit_state(mut self) -> Self {
+        self.inherit_state_ = true;
         self
     }
 
@@ -239,14 +252,24 @@ impl Suite {
         }
 
         let len = self.suites_.len();
+        let mut raw_state = self.get_state_raw();
         for i in 0..len {
             let suite = self.suites_[i].borrow_mut();
             if self.ignore == true {
                 suite.ignore = true;
             }
+            if suite.should_inherit() {
+                // let raw_state = self.get_state_raw();
+                suite.set_state_raw(&raw_state);
+            }
             suite.run_(nest_count + 1);
             result.updated_from_suite(suite.clone_result());
+            if suite.should_inherit() {
+                raw_state = suite.get_state_raw();
+               // self.set_state_raw(&suite.get_state_raw());
+            }
         }
+        self.set_state_raw(&raw_state);
         self.execute_hook("after all");
         result.set_duration(start_time.elapsed().as_millis());
         self.result = Some(result);
@@ -300,6 +323,18 @@ impl Suite {
             count += suite.get_completed_count();
         }
         count
+    }
+
+    // GETTERS
+    pub fn should_inherit(&self) -> bool { self.inherit_state_ }
+    pub fn should_ignore(&self) -> bool { self.ignore }
+    pub fn get_state_raw(&self) -> Vec<u8> {
+        self.state_.get_raw_state().to_vec()
+    }
+
+    // SETTERS
+    pub fn set_state_raw(&mut self, state: &Vec<u8>) {
+        self.state_.set_raw_state(state.to_vec());
     }
 
     pub fn before_all<H>(mut self, handle: H) -> Self
