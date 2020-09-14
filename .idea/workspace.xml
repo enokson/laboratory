@@ -13,10 +13,9 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="updated readme">
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added examples to readme">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/failure.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/failure.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +113,7 @@
       <workItem from="1600079106418" duration="353000" />
       <workItem from="1600079465800" duration="59000" />
       <workItem from="1600079533525" duration="56000" />
-      <workItem from="1600079595905" duration="1447000" />
+      <workItem from="1600079595905" duration="2166000" />
     </task>
     <task id="LOCAL-00001" summary="updated Cargo.toml">
       <created>1599971494349</created>
@@ -333,7 +332,14 @@
       <option name="project" value="LOCAL" />
       <updated>1600080361901</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="added examples to readme">
+      <created>1600081053076</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1600081053076</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -356,7 +362,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="updated Cargo.toml" />
     <MESSAGE value="removed serde_cbor" />
     <MESSAGE value="updated licence, keywords, and categories" />
     <MESSAGE value="fixed README.md" />
@@ -381,7 +386,8 @@
     <MESSAGE value="reorganized tests, added to_state feature" />
     <MESSAGE value="added new example: importing-tests.rs" />
     <MESSAGE value="updated readme" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated readme" />
+    <MESSAGE value="added examples to readme" />
+    <option name="LAST_COMMIT_MESSAGE" value="added examples to readme" />
   </component>
   <component name="WindowStateProjectService">
     <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">
@@ -428,10 +434,10 @@
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state x="456" y="159" key="SettingsEditor/0.0.1920.1046@0.0.1920.1046" timestamp="1600079691625" />
-    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1600079869661">
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1600081058949">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1046@0.0.1920.1046" timestamp="1600079869661" />
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1046@0.0.1920.1046" timestamp="1600081058949" />
     <state x="763" y="439" width="387" height="170" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1600075134664">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>

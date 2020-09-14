@@ -523,3 +523,217 @@ test tests::test ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ```
+
+## Testing Large Packages Divided by Modules
+```rust
+
+fn main() {
+    add_one::add_one(0);
+    multiply_by_two::multiply_by_two(1);
+}
+
+pub mod add_one {
+
+    pub fn add_one (x: u64) -> u64 { x + 1 }
+    #[cfg(test)]
+    pub mod tests {
+
+        use super::*;
+        use laboratory::{describe, it, expect, Suite};
+        pub fn suite() -> Suite {
+
+            describe("add_one()").specs(vec![
+
+                it("should return 1", |_| {
+                    expect(add_one(0)).to_equal(1)
+                }),
+
+                it("should return 2", |_| {
+                    expect(add_one(1)).to_equal(2)
+                })
+
+            ])
+
+        }
+
+    }
+
+}
+pub mod multiply_by_two {
+    pub fn multiply_by_two (x: u64) -> u64 { x * 2 }
+    #[cfg(test)]
+    pub mod tests {
+
+        use super::*;
+        use laboratory::{describe, it, expect, Suite};
+        pub fn suite() -> Suite {
+
+            describe("multiply_by_two()").specs(vec![
+
+                it("should return 2", |_| {
+                    expect(multiply_by_two(1)).to_equal(2)
+                }),
+
+                it("should return 4", |_| {
+                    expect(multiply_by_two(2)).to_equal(4)
+                })
+
+            ])
+
+        }
+
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use laboratory::{describe};
+
+    #[test]
+    fn test() {
+
+        describe("Package").suites(vec![
+
+            add_one::tests::suite(),
+            multiply_by_two::tests::suite()
+
+        ]).run();
+
+    }
+
+}
+
+```
+Result:
+```
+running 1 test
+
+
+
+  Package
+    add_one()
+       ✓  should return 1 (0ms)
+       ✓  should return 2 (0ms)
+    multiply_by_two()
+       ✓  should return 2 (0ms)
+       ✓  should return 4 (0ms)
+
+
+  ✓ 4 tests completed (0ms)
+
+
+
+
+test tests::test ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+```
+
+## Optional Reporting Styles: Spec, Minimum, JSON, and JSON-Pretty
+```rust
+fn main() {
+    add_one(0);
+    add_two(0);
+}
+
+fn add_one (x: u64) -> u64 { x + 1 }
+fn add_two (x: u64) -> u64 { x + 5 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use laboratory::{describe, it, expect};
+
+    #[test]
+    fn suite() {
+
+        describe("Package").suites(vec![
+
+            describe("add_one()").specs(vec![
+
+                it("should return 1", |_| {
+                    expect(add_one(0)).to_equal(1)
+                }),
+
+                it("should return 2", |_| {
+                    expect(add_one(1)).to_equal(2)
+                })
+
+            ]),
+
+            describe("add_two()").specs(vec![
+
+                it("should return 2", |_| {
+                    expect(add_two(0)).to_equal(2)
+                })
+
+            ])
+
+        ]).json_pretty().run();
+
+    }
+}
+```
+Result:
+```
+running 1 test
+
+{
+  "name": "Package",
+  "passing": 2,
+  "failing": 1,
+  "ignored": 0,
+  "child_suites": [
+    {
+      "name": "add_one()",
+      "passing": 2,
+      "failing": 0,
+      "ignored": 0,
+      "child_suites": [],
+      "child_tests": [
+        {
+          "name": "should return 1",
+          "full_name": "add_one() should return 1",
+          "pass": true,
+          "error_msg": null,
+          "duration": 0
+        },
+        {
+          "name": "should return 2",
+          "full_name": "add_one() should return 2",
+          "pass": true,
+          "error_msg": null,
+          "duration": 0
+        }
+      ],
+      "duration": 0
+    },
+    {
+      "name": "add_two()",
+      "passing": 0,
+      "failing": 1,
+      "ignored": 0,
+      "child_suites": [],
+      "child_tests": [
+        {
+          "name": "should return 2",
+          "full_name": "add_two() should return 2",
+          "pass": false,
+          "error_msg": "Expected 5 to equal 2",
+          "duration": 0
+        }
+      ],
+      "duration": 0
+    }
+  ],
+  "child_tests": [],
+  "duration": 0
+}
+
+
+test tests::suite ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+```
