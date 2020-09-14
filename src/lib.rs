@@ -1,3 +1,16 @@
+//! A simple, expressive unit-test framework for Rust
+//!
+//! # Features
+//! - before, before_each, after, after_each hooks
+//! - Different reporter options
+//! - Reports test durations
+//! - The use of custom assertion libraries
+//! - Exclude tests
+//! - Nested test suites
+//! - The use of state
+//! - Should panic testing
+//! - Console highlighting
+
 #![allow(dead_code)]
 #![allow(unused_imports)]
 #![allow(unreachable_patterns)]
