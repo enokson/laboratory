@@ -13,6 +13,7 @@ pub enum ReporterType {
     // Dot,
     Minimal,
     Json,
+    JsonPretty
     // Html
 }
 
@@ -187,6 +188,9 @@ impl Reporter {
 
     }
     pub fn json(suite_results: SuiteResult) -> String {
+        to_string(&suite_results).expect("Could not send to JSON")
+    }
+    pub fn json_pretty(suite_results: SuiteResult) -> String {
         to_string_pretty(&suite_results).expect("Could not send to JSON")
     }
     pub fn export_to_file(path: &str, report: String) {

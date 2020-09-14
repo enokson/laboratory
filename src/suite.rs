@@ -175,6 +175,10 @@ impl Suite {
         self.reporter_ = ReporterType::Json;
         self
     }
+    pub fn json_pretty(mut self) -> Self {
+        self.reporter_ = ReporterType::JsonPretty;
+        self
+    }
     pub fn export_to(mut self, path: &str) -> Self {
         self.export_ = Some(path.to_string());
         self
@@ -264,7 +268,8 @@ impl Suite {
                 match &self.reporter_ {
                     ReporterType::Spec => Reporter::spec(result.clone()),
                     ReporterType::Minimal => Reporter::min(result.clone()),
-                    ReporterType::Json => Reporter::json(result.clone())
+                    ReporterType::Json => Reporter::json(result.clone()),
+                    ReporterType::JsonPretty => Reporter::json_pretty(result.clone())
                 }
             },
             None => {

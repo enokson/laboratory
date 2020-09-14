@@ -14,7 +14,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="updated README.md">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/examples/reporting/json-pretty.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/json-reporter.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/reporting/json.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/minimal-reporter.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/reporting/minimal.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output.json" beforeDir="false" afterPath="$PROJECT_DIR$/output.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/reporter.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/reporter.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/suite.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/suite.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,6 +60,11 @@
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/examples/reporting" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration default="true" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="channel" value="DEFAULT" />
@@ -82,6 +93,7 @@
   </component>
   <component name="RustProjectSettings">
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+    <option name="version" value="2" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -92,6 +104,7 @@
       <option name="presentableId" value="Default" />
       <updated>1599969246259</updated>
       <workItem from="1599969247737" duration="656000" />
+      <workItem from="1600083638562" duration="973000" />
     </task>
     <task id="LOCAL-00001" summary="updated Cargo.toml">
       <created>1599971494349</created>
@@ -261,7 +274,21 @@
       <option name="project" value="LOCAL" />
       <updated>1600022725785</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="updated README.md">
+      <created>1600022786961</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1600022786961</updated>
+    </task>
+    <task id="LOCAL-00026" summary="updated README.md">
+      <created>1600022993357</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1600022993357</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -277,6 +304,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
@@ -313,30 +341,30 @@
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state x="699" y="326" width="516" height="396" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1046@0.0.1920.1046" timestamp="1599969886326" />
-    <state width="1874" height="470" key="GridCell.Tab.0.bottom" timestamp="1599977636324">
+    <state width="1874" height="470" key="GridCell.Tab.0.bottom" timestamp="1600056587815">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="1874" height="470" key="GridCell.Tab.0.bottom/0.0.1920.1046@0.0.1920.1046" timestamp="1599977636324" />
-    <state width="1874" height="470" key="GridCell.Tab.0.center" timestamp="1599977636323">
+    <state width="1874" height="470" key="GridCell.Tab.0.bottom/0.0.1920.1046@0.0.1920.1046" timestamp="1600056587815" />
+    <state width="1874" height="470" key="GridCell.Tab.0.center" timestamp="1600056587814">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="1874" height="470" key="GridCell.Tab.0.center/0.0.1920.1046@0.0.1920.1046" timestamp="1599977636323" />
-    <state width="1874" height="470" key="GridCell.Tab.0.left" timestamp="1599977636323">
+    <state width="1874" height="470" key="GridCell.Tab.0.center/0.0.1920.1046@0.0.1920.1046" timestamp="1600056587814" />
+    <state width="1874" height="470" key="GridCell.Tab.0.left" timestamp="1600056587813">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="1874" height="470" key="GridCell.Tab.0.left/0.0.1920.1046@0.0.1920.1046" timestamp="1599977636323" />
-    <state width="1874" height="470" key="GridCell.Tab.0.right" timestamp="1599977636324">
+    <state width="1874" height="470" key="GridCell.Tab.0.left/0.0.1920.1046@0.0.1920.1046" timestamp="1600056587813" />
+    <state width="1874" height="470" key="GridCell.Tab.0.right" timestamp="1600056587814">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state width="1874" height="470" key="GridCell.Tab.0.right/0.0.1920.1046@0.0.1920.1046" timestamp="1599977636324" />
+    <state width="1874" height="470" key="GridCell.Tab.0.right/0.0.1920.1046@0.0.1920.1046" timestamp="1600056587814" />
     <state x="770" y="207" width="374" height="633" key="RollbackChangesDialog" timestamp="1600010498131">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state x="770" y="207" width="374" height="633" key="RollbackChangesDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1600010498131" />
-    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1600022749106">
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1600022793964">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1046@0.0.1920.1046" timestamp="1600022749106" />
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1046@0.0.1920.1046" timestamp="1600022793964" />
     <state x="764" y="436" width="385" height="176" key="git4idea.remote.GitConfigureRemotesDialog" timestamp="1599969716873">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
