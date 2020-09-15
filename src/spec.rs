@@ -4,7 +4,6 @@ use serde::Serialize;
 use super::spec_result::SpecResult;
 use super::state::State;
 
-
 pub struct Spec {
     pub name: String,
     pub test: Box<dyn FnMut(&mut State) -> Result<(), String>>,

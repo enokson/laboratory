@@ -13,7 +13,7 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added unit tests">
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added comment to suppress false positive in ide">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/spec.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/spec.rs" afterDir="false" />
     </list>
@@ -122,7 +122,7 @@
       <workItem from="1600079595905" duration="2621000" />
       <workItem from="1600103415783" duration="2316000" />
       <workItem from="1600107951496" duration="20635000" />
-      <workItem from="1600184278217" duration="66000" />
+      <workItem from="1600184278217" duration="219000" />
     </task>
     <task id="LOCAL-00001" summary="updated Cargo.toml">
       <created>1599971494349</created>
@@ -446,7 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1600161068360</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="added comment to suppress false positive in ide">
+      <created>1600184422685</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1600184422685</updated>
+    </task>
+    <task id="LOCAL-00048" summary="added comment to suppress false positive in ide">
+      <created>1600184484641</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1600184484641</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -469,7 +483,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="fixed issue where the reporter was not accurately reporting the count" />
     <MESSAGE value="added minimal reporting feature" />
     <MESSAGE value="added json reporting feature" />
     <MESSAGE value="removed line" />
@@ -494,7 +507,8 @@
     <MESSAGE value="updated coverage.sh to only include --lib" />
     <MESSAGE value="updated coverage.sh to remove .gcda files" />
     <MESSAGE value="added unit tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="added unit tests" />
+    <MESSAGE value="added comment to suppress false positive in ide" />
+    <option name="LAST_COMMIT_MESSAGE" value="added comment to suppress false positive in ide" />
   </component>
   <component name="WindowStateProjectService">
     <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">
