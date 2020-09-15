@@ -1,4 +1,4 @@
-rm -r target/debug/examples
+#find target/debug | grep .gc | rm
 
 export CARGO_INCREMENTAL=0
 # when
@@ -6,9 +6,8 @@ export CARGO_INCREMENTAL=0
 export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off"
 export RUSTDOCFLAGS="-Cpanic=abort"
 
-cargo build
+cargo build --lib
 
-cargo test
-cargo test --examples
+cargo test --lib
 
-grcov ./target/debug/ -s . -t html --llvm --branch --ignore-not-existing -o ./target/debug/coverage/
+grcov ./target/debug/ -s . -t html --ignore ./examples/**/* --llvm --branch --ignore-not-existing -o ./target/debug/coverage/

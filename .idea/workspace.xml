@@ -13,10 +13,9 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="moved functions">
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added rm cmd to coverage.sh">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/coverage.sh" beforeDir="false" afterPath="$PROJECT_DIR$/coverage.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/failure.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/failure.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,7 +121,7 @@
       <workItem from="1600079533525" duration="56000" />
       <workItem from="1600079595905" duration="2621000" />
       <workItem from="1600103415783" duration="2316000" />
-      <workItem from="1600107951496" duration="4743000" />
+      <workItem from="1600107951496" duration="7328000" />
     </task>
     <task id="LOCAL-00001" summary="updated Cargo.toml">
       <created>1599971494349</created>
@@ -418,7 +417,14 @@
       <option name="project" value="LOCAL" />
       <updated>1600112501302</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="added rm cmd to coverage.sh">
+      <created>1600112829178</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1600112829178</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -441,7 +447,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="added skip_spec example" />
     <MESSAGE value="added spec_only example" />
     <MESSAGE value="fixed issue where tests where not being marked to ignore" />
     <MESSAGE value="fixed issue where tests where not being marked as ignored" />
@@ -466,7 +471,8 @@
     <MESSAGE value="commented should_panic.rs panic due to unknown errors" />
     <MESSAGE value="resolved should_panic.rs issue." />
     <MESSAGE value="moved functions" />
-    <option name="LAST_COMMIT_MESSAGE" value="moved functions" />
+    <MESSAGE value="added rm cmd to coverage.sh" />
+    <option name="LAST_COMMIT_MESSAGE" value="added rm cmd to coverage.sh" />
   </component>
   <component name="WindowStateProjectService">
     <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">
@@ -505,10 +511,10 @@
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state width="1874" height="470" key="GridCell.Tab.0.right/0.0.1920.1046@0.0.1920.1046" timestamp="1600056587814" />
-    <state x="770" y="207" width="374" height="633" key="RollbackChangesDialog" timestamp="1600079853965">
+    <state x="770" y="207" width="374" height="633" key="RollbackChangesDialog" timestamp="1600145490383">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state x="770" y="207" width="374" height="633" key="RollbackChangesDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1600079853965" />
+    <state x="770" y="207" width="374" height="633" key="RollbackChangesDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1600145490383" />
     <state x="456" y="159" key="SettingsEditor" timestamp="1600079691625">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
@@ -533,6 +539,10 @@
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state x="765" y="369" key="git4idea.ui.GitTagDialog/0.0.1920.1046@0.0.1920.1046" timestamp="1600105191882" />
+    <state x="622" y="239" key="run.anything.popup" timestamp="1600146325922">
+      <screen x="0" y="0" width="1920" height="1046" />
+    </state>
+    <state x="622" y="239" key="run.anything.popup/0.0.1920.1046@0.0.1920.1046" timestamp="1600146325922" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
