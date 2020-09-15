@@ -1,4 +1,10 @@
-#find target/debug | grep .gc | rm
+#!/bin/bash
+FILES=$(find target/debug | grep .gcda)
+echo $FILES
+for FILE in $FILES; do
+#  echo "removing $FILE"
+  rm $FILE
+done
 
 export CARGO_INCREMENTAL=0
 # when
@@ -10,4 +16,4 @@ cargo build --lib
 
 cargo test --lib
 
-grcov ./target/debug/ -s . -t html --ignore ./examples/**/* --llvm --branch --ignore-not-existing -o ./target/debug/coverage/
+grcov ./target/debug/ -s . -t html --llvm --branch --ignore-not-existing -o ./target/debug/coverage/
