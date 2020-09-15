@@ -64,8 +64,9 @@ impl Spec {
             // self.time_ended = Some(Instant::now());
             self.duration = Some(start_time.elapsed().as_millis())
         }
-
+    }
     pub fn export_results(&self, suite_name: &str) -> SpecResult {
         SpecResult::new(suite_name, &self.name, self.pass, &self.error_msg, self.time_started)
     }
+
 }
