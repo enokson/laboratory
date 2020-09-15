@@ -105,3 +105,15 @@ impl Clone for SpecResult {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn err_msg_spec() {
+        let r = SpecResult::new("name", "name", None, &None, None);
+        assert_eq!(r.get_err_msg(), "");
+    }
+
+}
