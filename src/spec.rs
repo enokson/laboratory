@@ -41,6 +41,8 @@ impl Spec {
         self.only_ = true;
         self
     }
+
+    //noinspection RsMatchCheck
     pub fn run(&mut self, state: &mut State) {
         let test: &mut dyn FnMut(&mut State) -> Result<(), String> = self.test.borrow_mut();
         if self.ignore == false {
@@ -52,17 +54,17 @@ impl Spec {
                 Err(message) => {
                     self.pass = Some(false);
                     self.error_msg = Some(message);
-                },
+                }/*,
                 _ => {
                     self.pass = Some(false);
                     self.error_msg = Some("something happened".to_string());
-                }
+                }*/
             }
             self.time_started = Some(start_time);
             // self.time_ended = Some(Instant::now());
             self.duration = Some(start_time.elapsed().as_millis())
         }
-    }
+
     pub fn export_results(&self, suite_name: &str) -> SpecResult {
         SpecResult::new(suite_name, &self.name, self.pass, &self.error_msg, self.time_started)
     }
