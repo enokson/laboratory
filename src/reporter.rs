@@ -1,12 +1,13 @@
-use super::suite::SuiteResult;
-use super::spec::SpecResult;
 use std::collections::HashMap;
-use console::style;
-use serde_json::{to_string, to_string_pretty};
-
 use std::path::Path;
 use std::fs::File;
 use std::io::Write;
+
+use console::style;
+use serde_json::{to_string, to_string_pretty};
+
+use super::suite_result::SuiteResult;
+use super::spec_result::SpecResult;
 
 pub enum ReporterType {
     Spec,

@@ -13,9 +13,17 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added rm cmd to coverage.sh">
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="updated coverage.sh to remove .gcda files">
+      <change afterPath="$PROJECT_DIR$/src/spec_result.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/state.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/suite_result.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/coverage.sh" beforeDir="false" afterPath="$PROJECT_DIR$/coverage.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/reporter.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/reporter.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/spec.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/spec.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/suite.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/suite.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,7 +129,7 @@
       <workItem from="1600079533525" duration="56000" />
       <workItem from="1600079595905" duration="2621000" />
       <workItem from="1600103415783" duration="2316000" />
-      <workItem from="1600107951496" duration="7328000" />
+      <workItem from="1600107951496" duration="18642000" />
     </task>
     <task id="LOCAL-00001" summary="updated Cargo.toml">
       <created>1599971494349</created>
@@ -424,7 +432,21 @@
       <option name="project" value="LOCAL" />
       <updated>1600112829178</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="updated coverage.sh to only include --lib">
+      <created>1600146724115</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1600146724115</updated>
+    </task>
+    <task id="LOCAL-00045" summary="updated coverage.sh to remove .gcda files">
+      <created>1600147777341</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1600147777341</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -447,8 +469,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="added spec_only example" />
-    <MESSAGE value="fixed issue where tests where not being marked to ignore" />
     <MESSAGE value="fixed issue where tests where not being marked as ignored" />
     <MESSAGE value="fixed issue where the reporter was not accurately reporting the count" />
     <MESSAGE value="added minimal reporting feature" />
@@ -472,7 +492,9 @@
     <MESSAGE value="resolved should_panic.rs issue." />
     <MESSAGE value="moved functions" />
     <MESSAGE value="added rm cmd to coverage.sh" />
-    <option name="LAST_COMMIT_MESSAGE" value="added rm cmd to coverage.sh" />
+    <MESSAGE value="updated coverage.sh to only include --lib" />
+    <MESSAGE value="updated coverage.sh to remove .gcda files" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated coverage.sh to remove .gcda files" />
   </component>
   <component name="WindowStateProjectService">
     <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">
