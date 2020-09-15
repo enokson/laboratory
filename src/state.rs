@@ -26,30 +26,3 @@ impl State {
         self.state = vec;
     }
 }
-
-#[cfg(test)]
-mod tests {
-
-    use serde::{Deserialize, Serialize};
-    use super::*;
-
-    #[derive(Deserialize, Serialize, Debug, PartialOrd, PartialEq)]
-    struct Foo {
-        count: i32
-    }
-
-    impl Foo {
-        pub fn new() -> Foo { Foo { count: 0 } }
-    }
-
-    #[test]
-    fn should_return_state_from_new() {
-        let mut state = State::new();
-        let vector: Vec<u8> = vec![];
-        assert_eq!(state.state, vector);
-        state.set_state(Foo::new());
-        let foo: Foo = state.get_state();
-        assert_eq!(foo, Foo { count: 0 });
-    }
-
-}

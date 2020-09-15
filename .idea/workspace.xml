@@ -13,8 +13,8 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="added some spaces">
-      <change beforePath="$PROJECT_DIR$/coverage.sh" beforeDir="false" afterPath="$PROJECT_DIR$/coverage.sh" afterDir="false" />
+    <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="unset rust flags after script runs">
+      <change beforePath="$PROJECT_DIR$/src/state.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/state.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,14 +121,7 @@
       <workItem from="1600079595905" duration="2621000" />
       <workItem from="1600103415783" duration="2316000" />
       <workItem from="1600107951496" duration="20635000" />
-      <workItem from="1600184278217" duration="358000" />
-    </task>
-    <task id="LOCAL-00001" summary="updated Cargo.toml">
-      <created>1599971494349</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1599971494349</updated>
+      <workItem from="1600184278217" duration="397000" />
     </task>
     <task id="LOCAL-00002" summary="removed serde_cbor">
       <created>1599971511330</created>
@@ -466,7 +459,14 @@
       <option name="project" value="LOCAL" />
       <updated>1600184508289</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="unset rust flags after script runs">
+      <created>1600184656776</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1600184656777</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -489,7 +489,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="added json reporting feature" />
     <MESSAGE value="removed line" />
     <MESSAGE value="added export_to_file feature" />
     <MESSAGE value="fixed typos" />
@@ -514,7 +513,8 @@
     <MESSAGE value="added unit tests" />
     <MESSAGE value="added comment to suppress false positive in ide" />
     <MESSAGE value="added some spaces" />
-    <option name="LAST_COMMIT_MESSAGE" value="added some spaces" />
+    <MESSAGE value="unset rust flags after script runs" />
+    <option name="LAST_COMMIT_MESSAGE" value="unset rust flags after script runs" />
   </component>
   <component name="WindowStateProjectService">
     <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">
