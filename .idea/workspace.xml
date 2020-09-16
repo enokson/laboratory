@@ -14,21 +14,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="removed test mod from state.rs">
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_9_16_20,_12_18_PM_[Default_Changelist]/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_9_16_20__12_18_PM__Default_Changelist_.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/coverage.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/spec_result.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/state.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/suite_result.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/failure.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/failure.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/should_panic.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/should_panic.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simple" beforeDir="false" afterPath="$PROJECT_DIR$/simple" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/reporter.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/reporter.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/spec.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/spec.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/suite.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/suite.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,20 +123,6 @@
       <workItem from="1600107951496" duration="20635000" />
       <workItem from="1600184278217" duration="862000" />
       <workItem from="1600242170450" duration="350000" />
-    </task>
-    <task id="LOCAL-00003" summary="updated licence, keywords, and categories">
-      <created>1599971798982</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1599971798982</updated>
-    </task>
-    <task id="LOCAL-00004" summary="updated readme">
-      <created>1599974111485</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1599974111485</updated>
     </task>
     <task id="LOCAL-00005" summary="fixed README.md">
       <created>1599974202954</created>
@@ -481,7 +453,21 @@
       <option name="project" value="LOCAL" />
       <updated>1600184687157</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="fixed issue with highlighting syntax in file output">
+      <created>1600259437336</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1600259437336</updated>
+    </task>
+    <task id="LOCAL-00053" summary="removed unused file">
+      <created>1600259467416</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1600259467416</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -504,8 +490,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="fixed typos" />
-    <MESSAGE value="re-spaced the test" />
     <MESSAGE value="added minimal-reporter.rs" />
     <MESSAGE value="Added json_pretty reporting feature" />
     <MESSAGE value="reorganized tests, added to_state feature" />
@@ -529,7 +513,9 @@
     <MESSAGE value="unset rust flags after script runs" />
     <MESSAGE value="removed test mod from state.rs" />
     <MESSAGE value="added to_string method" />
-    <option name="LAST_COMMIT_MESSAGE" value="added to_string method" />
+    <MESSAGE value="fixed issue with highlighting syntax in file output" />
+    <MESSAGE value="removed unused file" />
+    <option name="LAST_COMMIT_MESSAGE" value="removed unused file" />
   </component>
   <component name="WindowStateProjectService">
     <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">
