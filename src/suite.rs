@@ -24,6 +24,7 @@ pub struct Suite {
     state_: State,
     suites_: Vec<Suite>,
     specs_: Vec<Spec>,
+    stdout: bool,
     export_: Option<String>,
     inherit_state_: bool
 }
@@ -40,6 +41,7 @@ impl Suite {
             state_: State::new(),
             suites_: vec![],
             specs_: vec![],
+            stdout: true,
             export_: None,
             inherit_state_: false
         }
@@ -92,6 +94,10 @@ impl Suite {
     }
     pub fn export_to(mut self, path: &str) -> Self {
         self.export_ = Some(path.to_string());
+        self
+    }
+    pub fn no_stdout(mut self) -> Self {
+        self.stdout = false;
         self
     }
     pub fn to_state<'a, S: Deserialize<'a>>(&'a self) -> S {
@@ -201,13 +207,15 @@ impl Suite {
                 String::from("result not found")
             }
         };
+
         match &self.export_ {
             Some(path) => {
                 Reporter::export_to_file(&path, result);
             },
-            None => {
-                println!("\n{}\n\n", result);
-            }
+            None => { }
+        }
+        if self.stdout {
+            println!("\n{}\n\n", result);
         }
     }
 /*    fn get_completed_count(&self) -> u128 {
