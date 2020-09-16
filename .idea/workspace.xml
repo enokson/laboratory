@@ -14,9 +14,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="removed test mod from state.rs">
+      <change afterPath="$PROJECT_DIR$/simple" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/reporter.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/reporter.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/suite.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/suite.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +41,7 @@
     </option>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="develop" />
+        <entry key="$PROJECT_DIR$" value="fix/output" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -492,7 +494,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="added export_to_file feature" />
     <MESSAGE value="fixed typos" />
     <MESSAGE value="re-spaced the test" />
     <MESSAGE value="added minimal-reporter.rs" />
@@ -517,7 +518,8 @@
     <MESSAGE value="added some spaces" />
     <MESSAGE value="unset rust flags after script runs" />
     <MESSAGE value="removed test mod from state.rs" />
-    <option name="LAST_COMMIT_MESSAGE" value="removed test mod from state.rs" />
+    <MESSAGE value="added to_string method" />
+    <option name="LAST_COMMIT_MESSAGE" value="added to_string method" />
   </component>
   <component name="WindowStateProjectService">
     <state x="861" y="435" width="190" height="178" key="#Custom_Plugin_Repositories" timestamp="1600078749494">
