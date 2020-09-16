@@ -1,120 +1,18 @@
-use console::style;
-
 use std::borrow::{BorrowMut};
 use std::collections::HashMap;
-// use std::cell::RefCell;
-
-use super::spec::{Spec, SpecResult};
-use super::reporter::{ReporterType, Reporter};
 use std::time::Instant;
 use std::path::Path;
-
-use serde::{Serialize};
-// use serde_cbor::{to_vec, from_slice};
-// use ron::{to_string, from_str};
-use bincode::{serialize, deserialize};
-
-
-use serde::de::Deserialize;
 use std::thread::Thread;
+use console::style;
 
-pub type BitState = Vec<u8>;
+// use serde::de::Deserialize;
+use serde::{Deserialize, Serialize};
 
-pub struct State {
-    state: Vec<u8>
-}
-impl State {
-    pub fn new() -> State {
-        State { state: vec![] }
-    }
-    pub fn get_state<'a, T>(&'a self) -> T
-        where
-            T: Deserialize<'a>
-    {
-        deserialize(&self.state).expect("Could not deserialize state.")
-        // from_str(&self.state).expect("Could not convert from string")
-    }
-    pub fn set_state<T: Serialize>(& mut self, state: T) {
-        // self.state = to_string(&state).expect("Could not convert to String.");
-        self.state = serialize(&state).expect("Could not serialize state.");
-    }
-    pub fn get_raw_state(&self) -> Vec<u8> {
-        self.state.to_vec()
-    }
-    pub fn set_raw_state(&mut self, vec: Vec<u8>) {
-        self.state = vec;
-    }
-}
 
-#[derive(Serialize)]
-pub struct SuiteResult {
-    name: String,
-    passing: u64,
-    failing: u64,
-    ignored: u64,
-    child_suites: Vec<SuiteResult>,
-    child_tests: Vec<SpecResult>,
-    duration: u128
-}
-impl SuiteResult {
-    pub fn new(name: &str) -> SuiteResult {
-        SuiteResult {
-            name: name.to_string(),
-            passing: 0,
-            failing: 0,
-            ignored: 0,
-            child_suites: vec![],
-            child_tests: vec![],
-            duration: 0
-        }
-    }
-    pub fn add_spec_result (&mut self, spec: SpecResult) {
-        self.child_tests.push(spec);
-    }
-    pub fn updated_from_suite(&mut self, child_result_option: Option<SuiteResult>) {
-        match child_result_option {
-            Some(child_result) => {
-                self.passing += child_result.get_passing();
-                self.failing += child_result.get_failing();
-                self.ignored += child_result.get_ignored();
-                self.child_suites.push(child_result);
-            },
-            _ => {}
-        }
-
-    }
-    pub fn update_from_spec(&mut self, spec: SpecResult) {
-        self.passing += spec.update_passing();
-        self.failing += spec.update_failing();
-        self.ignored += spec.update_ignored();
-        self.child_tests.push(spec);
-    }
-    pub fn get_passing(&self) -> u64 { self.passing }
-    pub fn get_failing(&self) -> u64 { self.failing }
-    pub fn get_ignored(&self) -> u64 { self.ignored }
-    pub fn get_child_specs(&self) -> Vec<SpecResult> {
-        self.child_tests.clone()
-    }
-    pub fn get_child_suites(&self) -> Vec<SuiteResult> {
-        self.child_suites.clone()
-    }
-    pub fn get_name(&self) -> &str { &self.name }
-    pub fn get_duration(&self) -> &u128 { &self.duration }
-    pub fn set_duration(&mut self, duration: u128) { self.duration = duration }
-}
-impl Clone for SuiteResult {
-    fn clone(&self) -> SuiteResult {
-        SuiteResult {
-            name: self.name.clone(),
-            passing: self.passing.clone(),
-            failing: self.failing.clone(),
-            ignored: self.ignored.clone(),
-            child_suites: self.child_suites.clone(),
-            child_tests: self.child_tests.clone(),
-            duration: self.duration.clone()
-        }
-    }
-}
+use super::spec::Spec;
+use super::reporter::{ReporterType, Reporter};
+use super::state::State;
+use super::suite_result::SuiteResult;
 
 pub struct Suite {
     duration: u128,
@@ -300,48 +198,45 @@ impl Suite {
         }
     }
     fn report(&mut self) {
-        let result = match &self.result {
-            Some(result) => {
-                match &self.reporter_ {
-                    ReporterType::Spec => Reporter::spec(result.clone()),
-                    ReporterType::Minimal => Reporter::min(result.clone()),
-                    ReporterType::Json => Reporter::json(result.clone()),
-                    ReporterType::JsonPretty => Reporter::json_pretty(result.clone())
+
+        let get_output = |result: Option<SuiteResult>, reporter: &ReporterType, stdout: bool| -> String {
+
+            match result {
+                Some(result) => {
+                    match reporter {
+                        ReporterType::Spec => Reporter::spec(result.clone(), stdout),
+                        ReporterType::Minimal => Reporter::min(result.clone(), stdout),
+                        ReporterType::Json => Reporter::json(result.clone()),
+                        ReporterType::JsonPretty => Reporter::json_pretty(result.clone())
+                    }
+                },
+                None => {
+                    // no result found
+                    String::from("result not found")
                 }
-            },
-            None => {
-                // no result found
-                String::from("result not found")
             }
+
         };
+
+        self.report = get_output(self.result.clone(), &self.reporter_, false);
 
         match &self.export_ {
             Some(path) => {
-                Reporter::export_to_file(&path, &result);
+                // let result = get_output(false);
+                Reporter::export_to_file(&path, &self.report);
             },
             None => { }
         }
         if self.stdout {
+            let result = get_output(self.result.clone(), &self.reporter_, true);
             println!("\n{}\n\n", &result);
         }
-        self.report = result;
-    }
-    fn get_completed_count(&self) -> u128 {
-        let mut count: u128 = 0;
-        for spec in self.specs_.iter() {
-            if spec.ignore == false {
-                count += 1;
-            }
-        }
-        for suite in self.suites_.iter() {
-            count += suite.get_completed_count();
-        }
-        count
+
     }
 
     // GETTERS
     pub fn should_inherit(&self) -> bool { self.inherit_state_ }
-    pub fn should_ignore(&self) -> bool { self.ignore }
+    // pub fn should_ignore(&self) -> bool { self.ignore }
     pub fn get_state_raw(&self) -> Vec<u8> {
         self.state_.get_raw_state().to_vec()
     }

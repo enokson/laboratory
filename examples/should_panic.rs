@@ -15,8 +15,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test() {
-
+    fn should_panic() {
         describe("panic_at_the_disco()").specs(vec![
 
             it("should panic when passed true", |_| {
@@ -30,5 +29,6 @@ mod tests {
         ]).run();
 
     }
+
 
 }

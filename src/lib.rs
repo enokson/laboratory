@@ -190,12 +190,11 @@ mod tests {
         ])
     }
 
-
     #[test]
     fn test_all() {
 
         // simple spec pass
-        simple_suite_pass().spec().run();
+        simple_suite_pass().spec().export_to("./simple").run();
 
         // min
         simple_suite_pass().min().run();

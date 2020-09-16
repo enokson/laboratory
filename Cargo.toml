@@ -9,6 +9,7 @@ categories = [ "development-tools::testing", "development-tools::debugging", "de
 repository = "https://github.com/enokson/laboratory"
 homepage = "https://github.com/enokson/laboratory"
 license = "MIT"
+
 #publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

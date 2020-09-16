@@ -1,10 +1,11 @@
 
-// add_one should add one to any number, but a typo results in 6 being added
+// add_one should add one to any number,
+// but a typo results in 6 being added
 fn add_one (n: i32) -> i32 { n + 6 }
 
 fn add_two (n: i32) -> i32 { n + 2 }
 
-fn main () {
+fn main() {
     add_one(0);
     add_two(0);
 }
@@ -41,3 +42,4 @@ mod tests {
     }
 
 }
+
