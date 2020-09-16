@@ -193,7 +193,7 @@ impl Reporter {
     pub fn json_pretty(suite_results: SuiteResult) -> String {
         to_string_pretty(&suite_results).expect("Could not send to JSON")
     }
-    pub fn export_to_file(path: &str, report: String) {
+    pub fn export_to_file(path: &str, report: &str) {
         let mut file = File::create(path).expect("Could not create output file");
         file.write_all(report.as_bytes()).expect("Could not output to file");
     }
