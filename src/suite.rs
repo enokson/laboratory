@@ -21,6 +21,7 @@ pub struct Suite {
     name: String,
     reporter_: ReporterType,
     result: Option<SuiteResult>,
+    report: String,
     state_: State,
     suites_: Vec<Suite>,
     specs_: Vec<Spec>,
@@ -37,6 +38,7 @@ impl Suite {
             ignore: false,
             name,
             reporter_: ReporterType::Spec,
+            report: "".to_string(),
             result: None,
             state_: State::new(),
             suites_: vec![],
@@ -102,6 +104,9 @@ impl Suite {
     }
     pub fn to_state<'a, S: Deserialize<'a>>(&'a self) -> S {
         self.state_.get_state()
+    }
+    pub fn to_string(&self) -> String {
+        self.report.clone()
     }
 
     fn clone_result(&self) -> Option<SuiteResult> {
@@ -192,7 +197,7 @@ impl Suite {
             }
         }
     }
-    fn report(&self) {
+    fn report(&mut self) {
         let result = match &self.result {
             Some(result) => {
                 match &self.reporter_ {
@@ -210,13 +215,14 @@ impl Suite {
 
         match &self.export_ {
             Some(path) => {
-                Reporter::export_to_file(&path, result);
+                Reporter::export_to_file(&path, &result);
             },
             None => { }
         }
         if self.stdout {
-            println!("\n{}\n\n", result);
+            println!("\n{}\n\n", &result);
         }
+        self.report = result;
     }
 /*    fn get_completed_count(&self) -> u128 {
         let mut count: u128 = 0;

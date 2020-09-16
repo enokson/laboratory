@@ -15,7 +15,7 @@
   <component name="ChangeListManager">
     <list default="true" id="3d753cb2-5bad-4d3f-9888-7db6fe41d5e6" name="Default Changelist" comment="removed test mod from state.rs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/spec_result.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/spec_result.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/suite.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/suite.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +38,7 @@
     </option>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="feature/output" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -562,10 +562,10 @@
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
     <state x="456" y="159" key="SettingsEditor/0.0.1920.1046@0.0.1920.1046" timestamp="1600079691625" />
-    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1600161079391">
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1600240869953">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
-    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1046@0.0.1920.1046" timestamp="1600161079391" />
+    <state x="555" y="260" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1046@0.0.1920.1046" timestamp="1600240869953" />
     <state x="763" y="439" width="387" height="170" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1600075134664">
       <screen x="0" y="0" width="1920" height="1046" />
     </state>
