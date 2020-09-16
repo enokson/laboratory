@@ -198,44 +198,41 @@ impl Suite {
         }
     }
     fn report(&mut self) {
-        let result = match &self.result {
-            Some(result) => {
-                match &self.reporter_ {
-                    ReporterType::Spec => Reporter::spec(result.clone()),
-                    ReporterType::Minimal => Reporter::min(result.clone()),
-                    ReporterType::Json => Reporter::json(result.clone()),
-                    ReporterType::JsonPretty => Reporter::json_pretty(result.clone())
+
+        let get_output = |result: Option<SuiteResult>, reporter: &ReporterType, stdout: bool| -> String {
+
+            match result {
+                Some(result) => {
+                    match reporter {
+                        ReporterType::Spec => Reporter::spec(result.clone(), stdout),
+                        ReporterType::Minimal => Reporter::min(result.clone(), stdout),
+                        ReporterType::Json => Reporter::json(result.clone()),
+                        ReporterType::JsonPretty => Reporter::json_pretty(result.clone())
+                    }
+                },
+                None => {
+                    // no result found
+                    String::from("result not found")
                 }
-            },
-            None => {
-                // no result found
-                String::from("result not found")
             }
+
         };
+
+        self.report = get_output(self.result.clone(), &self.reporter_, false);
 
         match &self.export_ {
             Some(path) => {
-                Reporter::export_to_file(&path, &result);
+                // let result = get_output(false);
+                Reporter::export_to_file(&path, &self.report);
             },
             None => { }
         }
         if self.stdout {
+            let result = get_output(self.result.clone(), &self.reporter_, true);
             println!("\n{}\n\n", &result);
         }
-        self.report = result;
+
     }
-/*    fn get_completed_count(&self) -> u128 {
-        let mut count: u128 = 0;
-        for spec in self.specs_.iter() {
-            if spec.ignore == false {
-                count += 1;
-            }
-        }
-        for suite in self.suites_.iter() {
-            count += suite.get_completed_count();
-        }
-        count
-    }*/
 
     // GETTERS
     pub fn should_inherit(&self) -> bool { self.inherit_state_ }
