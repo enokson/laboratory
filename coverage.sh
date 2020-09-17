@@ -16,7 +16,7 @@ cargo build --lib
 
 cargo test --lib
 
-#grcov ./target/debug/ -s . -t html --llvm --branch --ignore-not-existing -o ./target/debug/coverage/
+grcov ./target/debug/ -s . -t html --llvm --branch --ignore-not-existing -o ./target/debug/coverage/
 
 unset RUSTFLAGS
 unset RUSTDOCFLAGS
