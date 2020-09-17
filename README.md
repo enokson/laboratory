@@ -1,7 +1,11 @@
 # laboratory
 A simple, expressive unit test framework for Rust
 
-![Rust](https://github.com/enokson/laboratory/workflows/Rust/badge.svg?branch=master)
+
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/enokson/laboratory/build/master?style=for-the-badge)
+![Crates.io](https://img.shields.io/crates/v/laboratory?style=for-the-badge)
+![Crates.io](https://img.shields.io/crates/l/laboratory?style=for-the-badge)
+
 
 ## Features
 * before, before_each, after, after_each hooks  
