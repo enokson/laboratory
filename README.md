@@ -15,7 +15,7 @@ A simple, expressive unit test framework for Rust
 * Exclude tests  
 * Nested test suites  
 * The use of state  
-* should panic testing  
+* "should panic" testing  
 * Console highlighting
 
 ## Installation
