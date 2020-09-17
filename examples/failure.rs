@@ -13,26 +13,38 @@ fn main() {
 #[cfg(test)]
 mod tests {
 
-    use laboratory::{describe,it,expect};
+    // let call in our functions
     use super::*;
 
+    // and now let's bring in our lab tools
+    use laboratory::{describe,it,expect};
+
+    // define our single rust test
     #[test]
     fn test() {
 
-        describe("Package").suites(vec![
+        // We have two different functions that we
+        // want to test in our crate. So, let's
+        // describe our crate and nest our functions
+        // under that umbrella.
+        describe("Crate").suites(vec![
 
             describe("add_one()").specs(vec![
 
-                it("should return 1 to when given 0", |_| {
+                it("should return 1 to when passed 0", |_| {
+
                     expect(add_one(0)).to_equal(1)
+
                 })
 
             ]),
 
             describe("add_two()").specs(vec![
 
-                it("should return 2 to when given 0", |_| {
+                it("should return 2 to when passed 0", |_| {
+
                     expect(add_two(0)).to_equal(2)
+
                 })
 
             ])
@@ -42,4 +54,3 @@ mod tests {
     }
 
 }
-

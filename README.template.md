@@ -36,59 +36,7 @@ mod tests {
 ### Testing a simple function "add_one()"
 ```rust
 // taken from examples/simple.rs
-fn main() {
-    add_one(0);
-}
-
-// Here we have one function that does
-// one thing: Adds one to whatever number
-// we pass to it.
-fn add_one (n: u64) -> u64 { n + 1 }
-
-#[cfg(test)]
-mod tests {
-
-    // lets pull our add_one function into scope
-    use super::*;
-
-    // now let's pull in our lab tools into scope
-    // to test our function
-    use laboratory::{describe, it, expect};
-
-    // From Rust's perspective we will only define
-    // one test, but inside this test we can define
-    // however many test we need.
-    #[test]
-    fn suite() {
-
-        // let's describe what our add_one function will do.
-        // Notice the method "specs" which takes a Vec as it's
-        // argument. Inside this vec is where we will define
-        // the tests related to add_one.
-        describe("add_one()").specs(vec![
-
-            // when describing what it should do, feel free to be
-            // as expressive as you would like.
-            it("should return 1 when passed 0", |_| {
-
-                // here we will use the default expect function
-                // that comes with laboratory.
-                // We expect the result of add_one(0) to equal 1
-                expect(add_one(0)).to_equal(1)
-
-            }),
-
-            // just as a sanity check, let's add a second test
-            it("should return 2 when passed 1", |_| {
-
-                expect(add_one(1)).to_equal(2)
-
-            })
-
-        ]).run();
-
-    }
-}
+//###SIMPLE###//
 ```
 
 Then run: 
@@ -119,99 +67,7 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 
 ## Nested suites
 ```rust
-
-// Here we will define a struct with
-// two members, an associated function,
-// and two methods.
-struct Foo {
-    line: String,
-    count: i32
-}
-impl Foo {
-    pub fn new() -> Foo {
-        Foo { line: String::new(), count: 0 }
-    }
-    pub fn append(&mut self, str: &str) {
-        self.line += str;
-    }
-    pub fn increase(&mut self) {
-        self.count += 1;
-    }
-}
-
-fn main () {
-    let mut foo = Foo::new();
-    foo.append("fizzbuzz");
-    foo.increase();
-}
-
-#[cfg(test)]
-mod tests {
-
-    // Pull the Foo struct into scope
-    use super::*;
-
-    // Now pull in the lab tools
-    use laboratory::{describe, it, expect};
-
-    // define single test
-    #[test]
-    fn test() {
-
-        // Now we can describe Foo.
-        // Notice the "suites" method that takes a Vec
-        // as its argument. This is where we can describe
-        // Foo's members and methods.
-        describe("Foo").suites(vec![
-
-            // Here we describe the "new" associated function
-            describe("#new()").specs(vec![
-
-                it("should return an instance of Foo with two members", |_| {
-
-                    let result = Foo::new();
-                    expect(result.bar).to_be(String::new())?;
-                    expect(result.baz).to_equal(0)
-
-                })
-
-            ]),
-
-            // Now we will describe the "append" method
-            describe("#append()").specs(vec![
-
-                it("should append fizzbuzz to Foo#bar", |_| {
-
-                    let mut foo = Foo::new();
-                    foo.append("fizzbuzz");
-                    expect(foo.bar).to_be("fizzbuzz".to_string())
-
-                })
-
-            ]),
-
-            // Finally, we will describe the "increase" method
-            describe("#increase()").specs(vec![
-
-                it("should increase Foo#baz by 1", |_| {
-
-                    let mut foo = Foo::new();
-                    foo.increase();
-                    expect(foo.baz).to_equal(1)
-
-                })
-
-            ])
-
-        ])
-        .run();
-
-    }
-
-}
-
-
-
+//###NESTED###//
 ```
 Result:
 ```textmate
@@ -241,63 +97,7 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ## Failed Tests
 ```rust
 // from examples/failure.rs
-
-// add_one should add one to any number,
-// but a typo results in 6 being added
-fn add_one (n: i32) -> i32 { n + 6 }
-
-fn add_two (n: i32) -> i32 { n + 2 }
-
-fn main() {
-    add_one(0);
-    add_two(0);
-}
-
-#[cfg(test)]
-mod tests {
-
-    // let call in our functions
-    use super::*;
-
-    // and now let's bring in our lab tools
-    use laboratory::{describe,it,expect};
-
-    // define our single rust test
-    #[test]
-    fn test() {
-
-        // We have two different functions that we
-        // want to test in our crate. So, let's
-        // describe our crate and nest our functions
-        // under that umbrella.
-        describe("Crate").suites(vec![
-
-            describe("add_one()").specs(vec![
-
-                it("should return 1 to when passed 0", |_| {
-
-                    expect(add_one(0)).to_equal(1)
-
-                })
-
-            ]),
-
-            describe("add_two()").specs(vec![
-
-                it("should return 2 to when passed 0", |_| {
-
-                    expect(add_two(0)).to_equal(2)
-
-                })
-
-            ])
-
-        ]).run();
-
-    }
-
-}
-
+//###FAILURE###//
 ```
 
 Result:
