@@ -261,7 +261,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn suite_skip() {
 
         fn add_one() -> i32 { 1 }
