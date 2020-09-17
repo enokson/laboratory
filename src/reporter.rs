@@ -156,6 +156,7 @@ impl Reporter {
             }
             ln += "\n\n";
             ln += &fail_ln;
+            ln.pop();
         }
         if stdout {
             ln +=  "\n\n";
@@ -242,6 +243,7 @@ impl Reporter {
 
             ln += "\n\n";
             ln += &fail_ln;
+            ln.pop();
         }
         if stdout {
             ln += "\n\n";
