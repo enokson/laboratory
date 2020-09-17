@@ -107,148 +107,361 @@ pub fn it_only<H>(name: &'static str, handle: H) -> Spec
 #[cfg(test)]
 mod tests {
 
-    use std::fs::remove_file;
+    use std::fs::{remove_file, read_to_string};
     use std::path::Path;
     use super::*;
 
-    #[derive(Serialize, Deserialize)]
-    struct Foo(i32);
+    #[test]
+    fn simple_pass() {
 
-    impl Foo {
-        pub fn new() -> Foo { Foo(0) }
-    }
+        fn return_one() -> i32 { 1 }
 
-    fn add_one(n: u64) -> u64 { n + 1 }
-    fn add_one_false(n: u64) -> u64 { n + 2 }
-    fn simple_spec_pass() -> Spec {
-        it("should return 1", |_| {
-            expect(add_one(0)).to_equal(1)?;
-            expect(add_one(0)).equals(1)?;
-            expect(add_one(0)).to_be(1)?;
-            expect(add_one(0)).to_not_equal(2)?;
-            expect(add_one(0)).to_not_be(2)?;
-            match expect(add_one(0)).to_not_equal(1) {
-                Ok(_) => Err("".to_string()),
-                Err(_) => Ok(())
-            }
-        })
-    }
-    fn simple_spec_fail() -> Spec {
-        it("should return 1", |_| { expect(add_one_false(0)).to_equal(1) })
-    }
-    fn spec_skip() -> Spec {
-        it_skip("should return 1", |_| {
-            expect(add_one(0)).to_equal(1)?;
-            expect(add_one(0)).equals(1)?;
-            expect(add_one(0)).to_be(1)?;
-            expect(add_one(0)).to_not_equal(2)?;
-            expect(add_one(0)).to_not_be(2)?;
-            match expect(add_one(0)).to_not_equal(1) {
-                Ok(_) => Err("".to_string()),
-                Err(_) => Ok(())
-            }
-        })
-    }
-    fn spec_only() -> Spec {
-        it_only("should return 1", |_| {
-            expect(add_one(0)).to_equal(1)?;
-            expect(add_one(0)).equals(1)?;
-            expect(add_one(0)).to_be(1)?;
-            expect(add_one(0)).to_not_equal(2)?;
-            expect(add_one(0)).to_not_be(2)?;
-            match expect(add_one(0)).to_not_equal(1) {
-                Ok(_) => Err("".to_string()),
-                Err(_) => Ok(())
-            }
-        })
-    }
-    fn simple_suite_pass() -> Suite {
-        describe("add_one()")
-            .specs(vec![ simple_spec_pass() ])
-    }
-    fn simple_suite_fail() -> Suite {
-        describe("add_one_false()").specs(vec![ simple_spec_fail() ])
-    }
-    fn simple_suite_skip() -> Suite {
-        simple_suite_pass().suites(vec![
-            describe_skip("add_two()").suites(vec![ simple_suite_pass() ])
-        ])
-    }
-    fn suite_skip_spec() -> Suite {
-        let mut skipped_spec = spec_skip();
-        skipped_spec.ignore = false;
-        simple_suite_pass().specs(vec![
-            simple_spec_pass(),
-            skipped_spec
-        ])
-    }
-    fn suite_with_only_spec() -> Suite {
-        simple_suite_pass().specs(vec![
-            simple_spec_pass(),
-            simple_spec_pass(),
-            spec_only()
-        ])
+        // simple spec pass
+        let result_str = describe("add_one()")
+            .specs(vec![
+
+                it("should return 1", |_| { expect(return_one()).to_equal(1) })
+
+
+            ])
+            // .export_to("./tests/results/simple")
+            .run()
+            .to_string();
+        let control = read_to_string("./tests/results/simple").expect("Could not find ./tests/results/simple");
+        assert_eq!(result_str, control)
     }
 
     #[test]
-    fn test_all() {
+    fn simple_fail() {
 
-        // simple spec pass
-        simple_suite_pass().spec().run();
+        fn add_one() -> i32 { 0 }
 
-        // min
-        simple_suite_pass().min().run();
+        let result_str = describe("add_one")
+            .specs(vec![
 
-        // json
-        simple_suite_pass().json().run();
+                it("should return 1", |_| {
 
-        // json pretty
-        simple_suite_pass().json_pretty().run();
+                    expect(add_one()).to_equal(1)
 
-        // export json
-        let output_path = "/tmp/laboratory-output.json";
-        simple_suite_pass().json().export_to(output_path).run();
-        remove_file(output_path);
+                })
 
-        // simple fail
-        simple_suite_fail().run();
-        simple_suite_fail().suites(vec![ simple_suite_pass() ]).min().run();
+            ])
+            .spec()
+            // .export_to("./tests/results/simple-fail")
+            .run()
+            .to_string();
 
-        // skip a nested suite
-        simple_suite_skip().run();
-
-        // skip a spec
-        suite_skip_spec().run();
-
-        // exclude all specs but one
-        suite_with_only_spec().run();
-
-        // suite with state and hooks
-        let _foo: Foo = simple_suite_pass().state(Foo::new())
-            .before_all(|state| {
-                let foo: Foo = state.get_state();
-                state.set_state(foo);
-            })
-            // .before_each(|_| {  })
-            // .after_each(|_| {  })
-            // .before_all(|_| {  })
-            .suites(vec![
-                simple_suite_pass().inherit_state()
-            ]).run().to_state();
-
-        // describe("panic").specs(vec![
-        //     it("should panic", |_| {
-        //         should_panic!(panic, || { panic!("i will panic") })?;
-        //         should_panic!(panic, || {  })
-        //     }),
-        //     it("should not panic", |_| {
-        //         should_not_panic!(panic, || {  })?;
-        //         should_not_panic!(panic, || { panic!("i will panic") })
-        //     })
-        // ]).run();
+        let control = read_to_string("./tests/results/simple-fail").expect("Could not find ./tests/results/simple-fail");
+        assert_eq!(result_str, control)
 
     }
 
+    #[test]
+    fn min() {
 
+        fn add_one() -> i32 { 1 }
+
+        const OUTPUT: &str = "./tests/results/min";
+        let result_str = describe("add_one")
+            .specs(vec![
+
+                it("should return 1", |_| {
+
+                    expect(add_one()).to_equal(1)
+
+                })
+
+            ])
+            .min()
+            // .export_to(OUTPUT)
+            .run()
+            .to_string();
+
+        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        assert_eq!(result_str, control)
+
+    }
+
+    #[test]
+    fn min_fail() {
+
+        fn return1() -> i32 { 0 }
+
+        const OUTPUT: &str = "./tests/results/min-fail";
+        let result_str = describe("return1")
+            .specs(vec![
+
+                it("should return 1", |_| {
+
+                    expect(return1()).to_equal(1)
+
+                })
+
+            ])
+            .min()
+            // .export_to(OUTPUT)
+            .run()
+            .to_string();
+
+        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        assert_eq!(result_str, control)
+
+    }
+
+    #[test]
+    fn json() {
+
+        fn add_one() -> i32 { 1 }
+
+        const OUTPUT: &str = "./tests/results/output-json.json";
+        let result_str = describe("add_one")
+            .specs(vec![
+
+                it("should return 1", |_| {
+
+                    expect(add_one()).to_equal(1)
+
+                })
+
+            ])
+            .json()
+            // .export_to(OUTPUT)
+            .run()
+            .to_string();
+
+        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        assert_eq!(result_str, control)
+
+    }
+
+    #[test]
+    fn json_pretty() {
+
+        fn add_one() -> i32 { 1 }
+
+        const OUTPUT: &str = "./tests/results/output-json-pretty.json";
+        let result_str = describe("add_one")
+            .specs(vec![
+
+                it("should return 1", |_| {
+
+                    expect(add_one()).to_equal(1)
+
+                })
+
+            ])
+            .json_pretty()
+            // .export_to(OUTPUT)
+            .run()
+            .to_string();
+
+        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        assert_eq!(result_str, control)
+
+    }
+
+    #[test]
+    #[ignore]
+    fn suite_skip() {
+
+        fn add_one() -> i32 { 1 }
+
+        fn return_two() -> i32 { 2 }
+
+        const OUTPUT: &str = "./tests/results/suite-skip";
+        let result_str = describe("Library")
+            .suites(vec![
+
+                describe_skip("add_one()")
+                    .specs(vec![
+
+                        it("should return 1", |_| {
+
+                            expect(add_one()).to_equal(1)
+
+                        })
+
+                    ]),
+
+                describe("return_two()")
+                    .specs(vec![
+
+                        it("should return 2", |_| {
+
+                            expect(return_two()).to_equal(2)
+
+                        })
+
+                    ])
+
+
+            ])
+            // .export_to(OUTPUT)
+            .run()
+            .to_string();
+
+        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        assert_eq!(result_str, control)
+
+    }
+
+    #[test]
+    fn spec_skip() {
+
+        fn add_one() -> i32 { 1 }
+
+        fn return_two() -> i32 { 2 }
+
+        const OUTPUT: &str = "./tests/results/spec-skip";
+        let result_str = describe("Library")
+            .suites(vec![
+
+                describe("add_one()")
+                    .specs(vec![
+
+                        it_skip("should return 1", |_| {
+
+                            expect(add_one()).to_equal(1)
+
+                        }),
+                        it("should return 1", |_| {
+
+                            expect(add_one()).to_equal(1)
+
+                        })
+
+                    ]),
+
+                describe("return_two()")
+                    .specs(vec![
+
+                        it("should return 2", |_| {
+
+                            expect(return_two()).to_equal(2)
+
+                        })
+
+                    ])
+
+
+            ])
+            .export_to(OUTPUT)
+            .run()
+            .to_string();
+
+        // let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        // assert_eq!(result_str, control)
+
+    }
+
+    #[test]
+    fn spec_only() {
+
+        fn add_one() -> i32 { 1 }
+
+        fn return_two() -> i32 { 2 }
+
+        const OUTPUT: &str = "./tests/results/spec-only";
+        let result_str = describe("Library")
+            .suites(vec![
+
+                describe("add_one()")
+                    .specs(vec![
+
+                        it_only("should return 1", |_| {
+
+                            expect(add_one()).to_equal(1)
+
+                        }),
+                        it("should return 1", |_| {
+
+                            expect(add_one()).to_equal(1)
+
+                        })
+
+                    ]),
+
+                describe("return_two()")
+                    .specs(vec![
+
+                        it("should return 2", |_| {
+
+                            expect(return_two()).to_equal(2)
+
+                        })
+
+                    ])
+
+
+            ])
+            // .export_to(OUTPUT)
+            .run()
+            .to_string();
+
+        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        assert_eq!(result_str, control)
+
+    }
+
+    #[test]
+    fn state_passing() {
+
+        #[derive(Deserialize, Serialize, Debug)]
+        struct Counter {
+            count: i32
+        }
+
+        impl Counter {
+            pub fn new() -> Counter { Counter { count: 0 } }
+        }
+
+        fn return_one() -> i32 { 1 }
+        fn return_two() -> i32 { 2 }
+
+        let counter: Counter = describe("Library")
+            .state(Counter::new())
+            .suites(vec![
+
+                describe("return_one()")
+                    .inherit_state()
+                    .specs(vec![
+
+                        it("should return 1", |suite| {
+                            let mut counter: Counter = suite.get_state();
+                            counter.count += 1;
+                            suite.set_state(counter);
+                            expect(return_one()).to_equal(1)
+
+                        }),
+                        it("should return 1 again", |suite| {
+
+                            let mut counter: Counter = suite.get_state();
+                            counter.count += 1;
+                            suite.set_state(counter);
+                            expect(return_one()).to_equal(1)
+
+                        })
+
+                    ]),
+
+                describe("return_two()")
+                    .specs(vec![
+
+                        it("should return 2", |_| {
+
+                            expect(return_two()).to_equal(2)
+
+                        })
+
+                    ])
+
+
+            ])
+            .run()
+            .to_state();
+
+        assert_eq!(counter.count, 2)
+
+    }
 
 }
