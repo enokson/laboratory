@@ -9,6 +9,118 @@ use serde_json::{to_string, to_string_pretty};
 use super::suite_result::SuiteResult;
 use super::spec_result::SpecResult;
 
+
+fn get_count(suite: &SuiteResult, count: &mut u64) -> u64 {
+    *count += suite.get_passing() + suite.get_failing() as u64;
+    // for child in suite.get_child_suites() {
+    //     get_count(&child, count);
+    // }
+    count.clone()
+}
+fn indent(indention: u32, mut ln: String) -> String {
+    for _i in 0..indention {
+        ln += " ";
+    }
+    ln
+}
+fn display_spec_err_msg(spec: &SpecResult, fail_id: &u64, stdout: bool, mut ln: String) -> String {
+    ln = indent(2, ln);
+    if stdout {
+        ln += &format!("{}) {}: ", style(fail_id).red(), spec.get_full_name());
+        ln += &style(spec.get_err_msg()).red().to_string();
+
+    } else {
+        ln += &format!("{}) {}: ", fail_id, spec.get_full_name());
+        ln += spec.get_err_msg();
+    }
+    ln += "\n";
+    ln
+}
+fn display_spec_line(spec: &SpecResult, indention: u32, stdout: bool, mut ln: String) -> String {
+    ln = indent(indention + 5, ln);
+    if stdout {
+        ln += &style('✓').green().to_string();
+    } else {
+        ln += "✓";
+    }
+    ln = indent(2, ln);
+    let sub_ln = format!("{} ({}ms)", spec.get_name(), spec.get_duration());
+    if stdout {
+        ln += &style(sub_ln).dim().to_string();
+    } else {
+        ln += &sub_ln
+    }
+    ln
+}
+fn display_spec_err_ln(spec: &SpecResult, indention: u32, fail_id: &u64, stdout: bool, mut ln: String) -> String {
+    ln = indent(indention + 5, ln);
+    ln += &format!("{}) {} ({}ms)", &fail_id, spec.get_name(), spec.get_duration());
+    if stdout {
+        ln = style(ln).red().to_string();
+    }
+    ln
+}
+fn display_spec_ignored_ln(spec: &SpecResult, indention: u32, stdout: bool, mut ln: String) -> String {
+    ln = indent(indention + 8, ln);
+    if stdout {
+        ln += &style(spec.get_name()).dim().to_string();
+    } else {
+        ln += spec.get_name()
+    }
+
+    // ln += &format!("{} ({}ms)", spec.get_name(), spec.get_duration());
+    ln
+}
+fn display_suite_line(suite: &SuiteResult, indention: u32, mut ln: String) -> String {
+    ln = indent(indention + 2, ln);
+    ln += suite.get_name();
+    ln += "\n";
+    ln
+}
+
+fn display_success_line(suite_results: &SuiteResult, stdout: bool, mut ln: String) -> String {
+    if stdout {
+        ln += &style('✓').green().to_string();
+        let sub_line = format!(" {} tests completed", get_count(&suite_results, &mut 0));
+        ln += &style(sub_line).green().to_string();
+        ln += &style(format!(" ({}ms)", suite_results.get_duration())).dim().to_string();
+    } else {
+        ln += "✓";
+        ln += &format!(" {} tests completed", get_count(&suite_results, &mut 0));
+        ln += &format!(" ({}ms)", suite_results.get_duration());
+    }
+    ln
+}
+fn display_error_lines(suite_results: &SuiteResult, failed_id: u64, fail_ln: String, stdout: bool, mut ln: String) -> String {
+    if stdout {
+        ln += &style(format!("✖ {} of {} tests failed", failed_id, get_count(&suite_results, &mut 0))).red().to_string();
+        ln += &style(":").dim().to_string();
+    } else {
+        ln += &format!("✖ {} of {} tests failed", failed_id, get_count(&suite_results, &mut 0));
+        ln += ":";
+    }
+    ln += "\n\n";
+    ln += &fail_ln;
+    ln.pop();
+    ln
+}
+fn display_test_result(suite_results: &SuiteResult, stdout: bool, mut ln: String, fail_ln: String, failed_id: u64) -> String {
+    if failed_id == 0 {
+        ln = display_success_line(&suite_results, stdout, ln);
+    } else {
+        ln = display_error_lines(&suite_results, failed_id, fail_ln, stdout, ln);
+    }
+    ln
+}
+
+fn add_padding(stdout: bool, ln: String) -> String {
+    if stdout {
+        format!("\n\n{}\n\n", ln)
+    } else {
+        format!("{}\n", ln)
+    }
+}
+
 pub enum ReporterType {
     Spec,
     // Dot,
@@ -22,237 +134,94 @@ pub struct Reporter;
 impl Reporter {
     pub fn spec(mut suite_results: SuiteResult, stdout: bool) -> String {
 
-        fn get_count(suite: &SuiteResult, count: &mut u64) -> u64 {
-            *count += suite.get_passing() + suite.get_failing() as u64;
-            // for child in suite.get_child_suites() {
-            //     get_count(&child, count);
-            // }
-            count.clone()
-        }
-        fn indent(indention: u32) -> String {
-            let mut ln = String::new();
-            for _i in 0..indention {
-                ln += " ";
-            }
-            ln
-        }
-        fn display_spec_line(spec: &SpecResult, indention: u32, stdout: bool) -> String {
-            let mut ln = String::new();
-            ln += &indent(indention + 5);
-            if stdout {
-                ln += &style('✓').green().to_string();
-            } else {
-                ln += "✓";
-            }
-            ln += &indent(2);
-            let sub_ln = format!("{} ({}ms)", spec.get_name(), spec.get_duration());
-            if stdout {
-                ln += &style(sub_ln).dim().to_string();
-            } else {
-                ln += &sub_ln
-            }
-
-            ln
-        }
-        fn display_spec_err_ln(spec: &SpecResult, indention: u32, fail_id: &u64, stdout: bool) -> String {
-            let mut ln = String::new();
-            ln += &indent(indention + 5);
-            ln += &format!("{}) {} ({}ms)", &fail_id, spec.get_name(), spec.get_duration());
-            if stdout {
-                ln = style(ln).red().to_string();
-            }
-            ln
-        }
-        fn display_spec_ignored_ln(spec: &SpecResult, indention: u32, stdout: bool) -> String {
-            let mut ln = String::new();
-            ln += &indent(indention + 8);
-            if stdout {
-                ln += &style(spec.get_name()).dim().to_string();
-            } else {
-                ln += spec.get_name()
-            }
-
-            // ln += &format!("{} ({}ms)", spec.get_name(), spec.get_duration());
-            ln
-        }
-        fn display_suite_line(suite: &SuiteResult, indention: u32) -> String {
-            let mut ln = String::new();
-            ln += &indent(indention + 2);
-            ln += suite.get_name();
-            ln += "\n";
-            ln
-        }
-        fn display_spec_err_msg(spec: &SpecResult, fail_id: &u64, stdout: bool) -> String {
-            let mut ln = String::new();
-            ln += &indent(2);
-            if stdout {
-                ln += &format!("{}) {}: ", style(fail_id).red(), spec.get_full_name());
-                ln += &style(spec.get_err_msg()).red().to_string();
-
-            } else {
-                ln += &format!("{}) {}: ", fail_id, spec.get_full_name());
-                ln += spec.get_err_msg();
-            }
-            ln += "\n";
-            ln
-        }
-        fn get_spec_lines(spec: &SpecResult, ln: &mut String, fail_ln: &mut String, failed_id: &mut u64, indention: u32, stdout: bool) {
+        fn get_spec_lines(spec: &SpecResult, indention: u32, stdout: bool, mut ln: String, mut fail_ln: String, mut failed_id: u64) -> (String, String, u64) {
             match spec.get_pass() {
                 Some(pass) => {
                     if pass {
-                        *ln += &display_spec_line(&spec, indention, stdout);
+                        ln = display_spec_line(&spec, indention, stdout, ln);
                     } else {
-                        *ln += &display_spec_err_ln(&spec, indention, &failed_id, stdout);
-                        *fail_ln += &display_spec_err_msg(&spec, &failed_id, stdout);
-                        *failed_id += 1;
+                        ln = display_spec_err_ln(&spec, indention, &failed_id, stdout, ln);
+                        fail_ln = display_spec_err_msg(&spec, &failed_id, stdout, fail_ln);
+                        failed_id += 1;
                     }
                 },
                 None => {
-                    *ln += &display_spec_ignored_ln(&spec, indention, stdout);
+                    ln = display_spec_ignored_ln(&spec, indention, stdout, ln);
                 }
             }
-            *ln += "\n"
+            ln += "\n";
+            (ln, fail_ln, failed_id)
         }
-        fn get_all_spec_lines_from_result(suite: &mut SuiteResult, ln: &mut String, fail_ln: &mut String, failed_id: &mut u64, indention: u32, stdout: bool) {
+        fn get_all_spec_lines_from_result(suite: &mut SuiteResult, indention: u32, stdout: bool, mut ln: String, mut fail_ln: String, mut failed_id: u64) -> (String, String, u64) {
             // *ln += "\n";
-            *ln += &display_suite_line(&suite, indention);
+            ln = display_suite_line(&suite, indention, ln);
             // *ln += "\n";
             for spec in suite.get_child_specs() {
-                get_spec_lines(&spec, ln, fail_ln, failed_id, indention, stdout);
+                let r = get_spec_lines(&spec, indention, stdout, ln, fail_ln, failed_id);
+                ln = r.0;
+                fail_ln = r.1;
+                failed_id = r.2;
             }
             for mut child_suite in suite.get_child_suites() {
-                get_all_spec_lines_from_result(&mut child_suite, ln, fail_ln, failed_id, indention + 2, stdout);
+                let r = get_all_spec_lines_from_result(&mut child_suite, indention + 2, stdout, ln, fail_ln, failed_id);
+                ln = r.0;
+                fail_ln = r.1;
+                failed_id = r.2;
             }
+            (ln, fail_ln, failed_id)
         }
 
         let mut ln = String::new();
-        let mut fail_ln = String::new();
-        let mut failed_id = 0;
-        if stdout {
-            ln += "\n\n";
-        }
-        get_all_spec_lines_from_result(&mut suite_results, &mut ln, &mut fail_ln, &mut failed_id, 0, stdout);
+        let fail_ln = String::new();
+        let failed_id = 0;
+        let r = get_all_spec_lines_from_result(&mut suite_results, 0, stdout, ln, fail_ln, failed_id);
+        ln = r.0;
         ln +=  "\n\n";
-        ln += &indent(2);
-        if failed_id == 0 {
-            if stdout {
-                ln += &style('✓').green().to_string();
-                let sub_line = format!(" {} tests completed", get_count(&suite_results, &mut 0));
-                ln += &style(sub_line).green().to_string();
-                ln += &style(format!(" ({}ms)", suite_results.get_duration())).dim().to_string();
-            } else {
-                ln += "✓";
-
-                ln += &format!(" {} tests completed", get_count(&suite_results, &mut 0));
-                ln += &format!(" ({}ms)", suite_results.get_duration());
-            }
-        } else {
-            if stdout {
-                ln += &style(format!("✖ {} of {} tests failed", failed_id, get_count(&suite_results, &mut 0))).red().to_string();
-                ln += &style(":").dim().to_string();
-            } else {
-                ln += &format!("✖ {} of {} tests failed", failed_id, get_count(&suite_results, &mut 0));
-                ln += ":";
-            }
-            ln += "\n\n";
-            ln += &fail_ln;
-            ln.pop();
-        }
-        if stdout {
-            ln +=  "\n\n";
-        } else {
-            ln += "\n";
-        }
-        ln
+        ln = indent(2, ln);
+        ln = display_test_result(&suite_results, stdout, ln, r.1, r.2);
+        add_padding(stdout, ln)
 
     }
     pub fn min(mut suite_results: SuiteResult, stdout: bool) -> String {
 
-        fn get_count(suite: &SuiteResult, count: &mut u64) -> u64 {
-            *count += suite.get_passing() + suite.get_failing() as u64;
-            count.clone()
-        }
-        fn indent(indention: u32) -> String {
-            let mut ln = String::new();
-            for _i in 0..indention {
-                ln += " ";
-            }
-            ln
-        }
-        fn display_spec_err_msg(spec: &SpecResult, fail_id: &u64, stdout: bool) -> String {
-            let mut ln = String::new();
-            ln += &indent(2);
-            if stdout {
-                ln += &format!("{}) {}: ", style(fail_id).red(), spec.get_full_name());
-                ln += &style(spec.get_err_msg()).red().to_string();
-            } else {
-                ln += &format!("{}) {}: ", fail_id, spec.get_full_name());
-                ln += spec.get_err_msg();
-            }
-            ln += "\n";
-            ln
-        }
-        fn get_spec_lines(spec: &SpecResult, fail_ln: &mut String, failed_id: &mut u64, stdout: bool) {
+        fn get_spec_lines(spec: &SpecResult, stdout: bool, fail_ln: String, failed_id: u64) -> (String, u64) {
             match spec.get_pass() {
                 Some(pass) => {
-                    if pass != true {
-                        *fail_ln += &display_spec_err_msg(&spec, &failed_id, stdout);
-                        *failed_id += 1;
+                    if !pass {
+                        ( display_spec_err_msg(&spec, &failed_id, stdout, fail_ln), failed_id + 1 )
+                    } else {
+                        ( fail_ln, failed_id )
                     }
                 },
-                None => { }
+                None => ( fail_ln, failed_id )
             }
         }
-        fn get_all_spec_lines_from_result(suite: &mut SuiteResult, ln: &mut String, fail_ln: &mut String, failed_id: &mut u64, indention: u32, stdout: bool) {
+        fn get_all_spec_lines_from_result(suite: &mut SuiteResult, indention: u32, stdout: bool, mut ln: String, mut fail_ln: String, mut failed_id: u64) -> (String, String, u64) {
             for spec in suite.get_child_specs() {
-                get_spec_lines(&spec, fail_ln, failed_id, stdout);
+                let r = get_spec_lines(&spec, stdout, fail_ln, failed_id);
+                fail_ln = r.0;
+                failed_id = r.1;
             }
             for mut child_suite in suite.get_child_suites() {
-                get_all_spec_lines_from_result(&mut child_suite, ln, fail_ln, failed_id, indention + 2, stdout);
+                let r = get_all_spec_lines_from_result(&mut child_suite, indention + 2, stdout, ln, fail_ln, failed_id);
+                ln = r.0;
+                fail_ln = r.1;
+                failed_id = r.2;
             }
+            (ln, fail_ln, failed_id)
         }
 
         let mut ln = String::new();
-        let mut fail_ln = String::new();
-        let mut failed_id = 0;
+        let fail_ln = String::new();
+        let failed_id = 0;
         if stdout {
             ln += "\n\n";
         }
-        get_all_spec_lines_from_result(&mut suite_results, &mut ln, &mut fail_ln, &mut failed_id, 0, stdout);
+        let r = get_all_spec_lines_from_result(&mut suite_results, 0, stdout, ln, fail_ln, failed_id);
         // ln +=  "\n\n";
-        ln += &indent(2);
-        if failed_id == 0 {
-            if stdout {
-                ln += &style('✓').green().to_string();
-                let sub_line = format!(" {} tests completed", get_count(&suite_results, &mut 0));
-                ln += &style(sub_line).green().to_string();
-                ln += &style(format!(" ({}ms)", suite_results.get_duration())).dim().to_string();
-            } else {
-                ln += "✓";
-                ln += &format!(" {} tests completed", get_count(&suite_results, &mut 0));
-                ln += &format!(" ({}ms)", suite_results.get_duration());
-            }
-        } else {
-            if stdout {
-                ln += &style(format!("✖ {} of {} tests failed", failed_id, get_count(&suite_results, &mut 0))).red().to_string();
-                ln += &style(":").dim().to_string();
-            } else {
-                ln += &format!("✖ {} of {} tests failed", failed_id, get_count(&suite_results, &mut 0));
-                ln += ":";
-            }
-
-            ln += "\n\n";
-            ln += &fail_ln;
-            ln.pop();
-        }
-        if stdout {
-            ln += "\n\n";
-        } else {
-            ln += "\n";
-        }
-
-        ln
-
+        ln = indent(2, r.0);
+        ln = display_test_result(&suite_results, stdout, ln, r.1, r.2,);
+        add_padding(stdout, ln)
     }
     pub fn json(suite_results: SuiteResult) -> String {
         to_string(&suite_results).expect("Could not send to JSON")
