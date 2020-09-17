@@ -180,7 +180,7 @@ impl Reporter {
         ln = indent(2, ln);
         ln = display_test_result(&suite_results, stdout, ln, r.1, r.2);
         add_padding(stdout, ln)
-
+        
     }
     pub fn min(mut suite_results: SuiteResult, stdout: bool) -> String {
 
@@ -222,6 +222,7 @@ impl Reporter {
         ln = indent(2, r.0);
         ln = display_test_result(&suite_results, stdout, ln, r.1, r.2,);
         add_padding(stdout, ln)
+
     }
     pub fn json(suite_results: SuiteResult) -> String {
         to_string(&suite_results).expect("Could not send to JSON")
