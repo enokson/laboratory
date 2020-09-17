@@ -71,7 +71,7 @@ mod tests {
             it("should return 1 when passed 0", |_| {
 
                 // here we will use the default expect function
-                // comes with laboratory.
+                // that comes with laboratory.
                 // We expect the result of add_one(0) to equal 1
                 expect(add_one(0)).to_equal(1)
 
