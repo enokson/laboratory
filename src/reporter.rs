@@ -1,6 +1,6 @@
 use std::collections::HashMap;
-use std::path::Path;
-use std::fs::File;
+use std::path::{Path};
+use std::fs::{create_dir_all, File};
 use std::io::Write;
 
 use console::style;
@@ -260,8 +260,16 @@ impl Reporter {
     pub fn json_pretty(suite_results: SuiteResult) -> String {
         to_string_pretty(&suite_results).expect("Could not send to JSON")
     }
-    pub fn export_to_file(path: &str, report: &str) {
-        let mut file = File::create(path).expect("Could not create output file");
+    pub fn export_to_file(output: &str, report: &str) {
+        match Path::new(output).parent() {
+            Some(parent) => {
+                if parent.exists() == false {
+                    create_dir_all(parent).expect(&format!("Could not create {:#?}", output));
+                }
+            },
+            None => { }
+        }
+        let mut file = File::create(output).expect("Could not create output file");
         file.write_all(report.as_bytes()).expect("Could not output to file");
     }
 }
