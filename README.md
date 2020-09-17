@@ -1,6 +1,8 @@
 # laboratory
 A simple, expressive unit test framework for Rust
 
+![Rust](https://github.com/enokson/laboratory/workflows/Rust/badge.svg?branch=master)
+
 ## Features
 * before, before_each, after, after_each hooks  
 * Different reporter options  
