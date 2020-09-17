@@ -111,10 +111,38 @@ mod tests {
     use std::path::Path;
     use super::*;
 
+    const EXPECTED_FOLDER: &str = "./tests/expected";
+    const OUTPUT_FOLDER: &str = "./tests/output";
+
+    fn get_output_path(test_name: &str) -> String {
+        let mut path = String::from(OUTPUT_FOLDER);
+        path += &format!("/{}", test_name);
+        path
+    }
+
+    fn get_expected_path(test_name: &str) -> String {
+        let mut path = String::from(EXPECTED_FOLDER);
+        path += &format!("/{}", test_name);
+        path
+    }
+
+    fn get_approval_file(test_name: &str) -> String {
+        read_to_string(get_expected_path(test_name))
+            .expect(&format!("Could not find {}", get_expected_path(test_name)))
+    }
+
+    #[test]
+    fn get_aprv_file() {
+        let result = get_expected_path("my-test");
+        assert_eq!("./tests/expected/my-test".to_string(), result);
+    }
+
     #[test]
     fn simple_pass() {
 
         fn return_one() -> i32 { 1 }
+
+        const TEST_NAME: &str = "simple";
 
         // simple spec pass
         let result_str = describe("add_one()")
@@ -124,10 +152,10 @@ mod tests {
 
 
             ])
-            // .export_to("./tests/results/simple")
+            .export_to(&get_output_path(TEST_NAME))
             .run()
             .to_string();
-        let control = read_to_string("./tests/results/simple").expect("Could not find ./tests/results/simple");
+        let control = get_approval_file(TEST_NAME);
         assert_eq!(result_str, control)
     }
 
@@ -135,6 +163,8 @@ mod tests {
     fn simple_fail() {
 
         fn add_one() -> i32 { 0 }
+
+        const TEST_NAME: &str = "simple_fail";
 
         let result_str = describe("add_one")
             .specs(vec![
@@ -147,11 +177,11 @@ mod tests {
 
             ])
             .spec()
-            // .export_to("./tests/results/simple-fail")
+            .export_to(&get_output_path(TEST_NAME))
             .run()
             .to_string();
 
-        let control = read_to_string("./tests/results/simple-fail").expect("Could not find ./tests/results/simple-fail");
+        let control = get_approval_file(TEST_NAME);
         assert_eq!(result_str, control)
 
     }
@@ -161,7 +191,7 @@ mod tests {
 
         fn add_one() -> i32 { 1 }
 
-        const OUTPUT: &str = "./tests/results/min";
+        const TEST_NAME: &str = "min";
         let result_str = describe("add_one")
             .specs(vec![
 
@@ -173,11 +203,11 @@ mod tests {
 
             ])
             .min()
-            // .export_to(OUTPUT)
+            .export_to(&get_output_path(TEST_NAME))
             .run()
             .to_string();
 
-        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        let control = get_approval_file(TEST_NAME);
         assert_eq!(result_str, control)
 
     }
@@ -187,7 +217,7 @@ mod tests {
 
         fn return1() -> i32 { 0 }
 
-        const OUTPUT: &str = "./tests/results/min-fail";
+        const TEST_NAME: &str = "min_fail";
         let result_str = describe("return1")
             .specs(vec![
 
@@ -199,11 +229,11 @@ mod tests {
 
             ])
             .min()
-            // .export_to(OUTPUT)
+            .export_to(&get_output_path(TEST_NAME))
             .run()
             .to_string();
 
-        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        let control = get_approval_file(TEST_NAME);
         assert_eq!(result_str, control)
 
     }
@@ -213,7 +243,7 @@ mod tests {
 
         fn add_one() -> i32 { 1 }
 
-        const OUTPUT: &str = "./tests/results/output-json.json";
+        const TEST_NAME: &str = "output_json.json";
         let result_str = describe("add_one")
             .specs(vec![
 
@@ -225,11 +255,11 @@ mod tests {
 
             ])
             .json()
-            // .export_to(OUTPUT)
+            .export_to(&get_output_path(TEST_NAME))
             .run()
             .to_string();
 
-        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        let control = get_approval_file(TEST_NAME);
         assert_eq!(result_str, control)
 
     }
@@ -239,7 +269,7 @@ mod tests {
 
         fn add_one() -> i32 { 1 }
 
-        const OUTPUT: &str = "./tests/results/output-json-pretty.json";
+        const TEST_NAME: &str = "output_json_pretty.json";
         let result_str = describe("add_one")
             .specs(vec![
 
@@ -251,11 +281,11 @@ mod tests {
 
             ])
             .json_pretty()
-            // .export_to(OUTPUT)
+            .export_to(&get_output_path(TEST_NAME))
             .run()
             .to_string();
 
-        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        let control = get_approval_file(TEST_NAME);
         assert_eq!(result_str, control)
 
     }
@@ -267,7 +297,7 @@ mod tests {
 
         fn return_two() -> i32 { 2 }
 
-        const OUTPUT: &str = "./tests/results/suite-skip";
+        const TEST_NAME: &str = "suite_skip";
         let result_str = describe("Library")
             .suites(vec![
 
@@ -295,11 +325,11 @@ mod tests {
 
 
             ])
-            // .export_to(OUTPUT)
+            .export_to(&get_output_path(TEST_NAME))
             .run()
             .to_string();
 
-        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        let control = get_approval_file(TEST_NAME);
         assert_eq!(result_str, control)
 
     }
@@ -311,7 +341,7 @@ mod tests {
 
         fn return_two() -> i32 { 2 }
 
-        const OUTPUT: &str = "./tests/results/spec-skip";
+        const TEST_NAME: &str = "spec_skip";
         let result_str = describe("Library")
             .suites(vec![
 
@@ -344,12 +374,12 @@ mod tests {
 
 
             ])
-            .export_to(OUTPUT)
+            .export_to(&get_output_path(TEST_NAME))
             .run()
             .to_string();
 
-        // let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
-        // assert_eq!(result_str, control)
+        let control = get_approval_file(TEST_NAME);
+        assert_eq!(result_str, control)
 
     }
 
@@ -360,7 +390,7 @@ mod tests {
 
         fn return_two() -> i32 { 2 }
 
-        const OUTPUT: &str = "./tests/results/spec-only";
+        const TEST_NAME: &str = "spec_only";
         let result_str = describe("Library")
             .suites(vec![
 
@@ -393,11 +423,11 @@ mod tests {
 
 
             ])
-            // .export_to(OUTPUT)
+            .export_to(&get_output_path(TEST_NAME))
             .run()
             .to_string();
 
-        let control = read_to_string(OUTPUT).expect(&format!("Could not find {}", OUTPUT));
+        let control = get_approval_file(TEST_NAME);
         assert_eq!(result_str, control)
 
     }
