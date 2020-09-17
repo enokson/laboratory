@@ -1,5 +1,11 @@
 /target
+
+#test output files
+/tests/output/
+
+#IDE stuff
 /.idea/workspace.xml
 /.idea/usage.statistics.xml
 /.idea/tasks.xml
 /.idea/shelf
+
