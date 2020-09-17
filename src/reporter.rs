@@ -243,7 +243,12 @@ impl Reporter {
             ln += "\n\n";
             ln += &fail_ln;
         }
-        ln += "\n\n";
+        if stdout {
+            ln += "\n\n";
+        } else {
+            ln += "\n";
+        }
+
         ln
 
     }
