@@ -17,7 +17,6 @@ pub use spec::Spec;
 use std::fmt::{Debug};
 pub use serde::{Deserialize, Serialize};
 
-
 #[macro_export]
 macro_rules! should_panic {
     ($name:expr, $handle: expr) => {
