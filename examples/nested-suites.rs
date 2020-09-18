@@ -48,9 +48,9 @@ mod tests {
 
                 it("should return an instance of Foo with two members", |_| {
 
-                    let result = Foo::new();
-                    expect(result.bar).to_be(String::new())?;
-                    expect(result.baz).to_equal(0)
+                    let foo = Foo::new();
+                    expect(foo.line).to_be(String::new())?;
+                    expect(foo.count).to_equal(0)
 
                 })
 
@@ -59,11 +59,11 @@ mod tests {
             // Now we will describe the "append" method
             describe("#append()").specs(vec![
 
-                it("should append fizzbuzz to Foo#bar", |_| {
+                it("should append \"fizzbuzz\" to Foo#line", |_| {
 
                     let mut foo = Foo::new();
                     foo.append("fizzbuzz");
-                    expect(foo.bar).to_be("fizzbuzz".to_string())
+                    expect(foo.line).to_be("fizzbuzz".to_string())
 
                 })
 
@@ -72,11 +72,11 @@ mod tests {
             // Finally, we will describe the "increase" method
             describe("#increase()").specs(vec![
 
-                it("should increase Foo#baz by 1", |_| {
+                it("should increase Foo#count by 1", |_| {
 
                     let mut foo = Foo::new();
                     foo.increase();
-                    expect(foo.baz).to_equal(1)
+                    expect(foo.count).to_equal(1)
 
                 })
 

@@ -36,7 +36,7 @@ mod tests {
 ## Getting Started
 ### Testing a simple function "add_one()"
 ```rust
-// taken from examples/simple.rs
+// from examples/simple.rs
 fn main() {
     add_one(0);
 }
@@ -99,13 +99,14 @@ $ cargo test -- --nocapture
 
 Result:  
 ```
+
 running 1 test
 
 
 
   add_one()
-     ✓  should return 1 (0ms)
-     ✓  should return 2 (0ms)
+     ✓  should return 1 when passed 0 (0ms)
+     ✓  should return 2 when passed 1 (0ms)
 
 
   ✓ 2 tests completed (0ms)
@@ -116,11 +117,13 @@ running 1 test
 test tests::suite ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
 
 ## Nested suites
 ```rust
-// taken from examples/nested-suites.rs
+// from examples/nested-suites.rs
 
 // Here we will define a struct with
 // two members, an associated function,
@@ -171,9 +174,9 @@ mod tests {
 
                 it("should return an instance of Foo with two members", |_| {
 
-                    let result = Foo::new();
-                    expect(result.bar).to_be(String::new())?;
-                    expect(result.baz).to_equal(0)
+                    let foo = Foo::new();
+                    expect(foo.line).to_be(String::new())?;
+                    expect(foo.count).to_equal(0)
 
                 })
 
@@ -182,11 +185,11 @@ mod tests {
             // Now we will describe the "append" method
             describe("#append()").specs(vec![
 
-                it("should append fizzbuzz to Foo#bar", |_| {
+                it("should append \"fizzbuzz\" to Foo#line", |_| {
 
                     let mut foo = Foo::new();
                     foo.append("fizzbuzz");
-                    expect(foo.bar).to_be("fizzbuzz".to_string())
+                    expect(foo.line).to_be("fizzbuzz".to_string())
 
                 })
 
@@ -195,11 +198,11 @@ mod tests {
             // Finally, we will describe the "increase" method
             describe("#increase()").specs(vec![
 
-                it("should increase Foo#baz by 1", |_| {
+                it("should increase Foo#count by 1", |_| {
 
                     let mut foo = Foo::new();
                     foo.increase();
-                    expect(foo.baz).to_equal(1)
+                    expect(foo.count).to_equal(1)
 
                 })
 
@@ -216,18 +219,19 @@ mod tests {
 
 ```
 Result:
-```textmate
+```text
+
 running 1 test
 
 
 
   Foo
     #new()
-       ✓  should return foo with two members (0ms)
+       ✓  should return an instance of Foo with two members (0ms)
     #append()
-       ✓  should append fizzbuzz to Foo#bar (0ms)
+       ✓  should append "fizzbuzz" to Foo#line (0ms)
     #increase()
-       ✓  should increase Foo#baz by 1 (0ms)
+       ✓  should increase Foo#count by 1 (0ms)
 
 
   ✓ 3 tests completed (0ms)
@@ -238,6 +242,8 @@ running 1 test
 test tests::test ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
 
 ## Failed Tests
@@ -303,23 +309,22 @@ mod tests {
 ```
 
 Result:
-```textmate
+```text
 
 running 1 test
 
 
 
-  Package
+  Crate
     add_one()
-       0) should return 1 to when given 0 (0ms)
+       0) should return 1 to when passed 0 (0ms)
     add_two()
-       ✓  should return 2 to when given 0 (0ms)
+       ✓  should return 2 to when passed 0 (0ms)
 
 
   ✖ 1 of 2 tests failed:
 
-  0) add_one() should return 1 to when given 0: Expected 6 to equal 1
-
+  0) add_one() should return 1 to when passed 0: Expected 6 to equal 1
 
 
 
@@ -328,10 +333,12 @@ test tests::test ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 
+
 ```
 
 ## Hooks
 ```rust
+// from examples/hooks.rs
 
 fn no_op() -> bool { true  }
 
@@ -372,7 +379,8 @@ mod tests {
 
 ```
 Result:
-```
+```text
+
 running 1 test
 
 
@@ -398,10 +406,13 @@ running 1 test
 test tests::test ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
 
 ## Using State
 ```rust
+// from examples/state.rs
 
 fn no_op() -> bool { true  }
 fn add_one(n: i32) -> i32 { n + 1 }
@@ -547,7 +558,8 @@ mod tests {
 
 ```
 Result:
-```
+```text
+
 running 1 test
 
 
@@ -580,11 +592,13 @@ Counter {
 test tests::test ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
 
 ## Testing Large Packages Divided by Modules
 ```rust
-
+// from examples/importing-tests.rs
 fn main() {
     add_one::add_one(0);
     multiply_by_two::multiply_by_two(1);
@@ -593,7 +607,6 @@ fn main() {
 pub mod add_one {
 
     pub fn add_one (x: u64) -> u64 { x + 1 }
-
     #[cfg(test)]
     pub mod tests {
 
@@ -618,6 +631,7 @@ pub mod add_one {
     }
 
 }
+
 pub mod multiply_by_two {
 
     pub fn multiply_by_two (x: u64) -> u64 { x * 2 }
@@ -667,7 +681,8 @@ mod tests {
 
 ```
 Result:
-```
+```text
+
 running 1 test
 
 
@@ -689,10 +704,13 @@ running 1 test
 test tests::test ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
 
 ## Optional Reporting Styles: Spec, Minimum, JSON, and JSON-Pretty
 ```rust
+// from examples/reporting-json-pretty.rs
 fn main() {
     add_one(0);
     add_two(0);
@@ -738,7 +756,8 @@ mod tests {
 }
 ```
 Result:
-```
+```text
+
 running 1 test
 
 {
@@ -797,4 +816,6 @@ running 1 test
 test tests::suite ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
