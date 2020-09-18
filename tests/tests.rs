@@ -383,3 +383,27 @@ fn state_passing() {
     assert_eq!(counter.count, 2)
 
 }
+
+#[test]
+fn return_result() {
+
+    fn add_one(n: i32) -> i32 { n + 1 }
+    let test_result = describe("add_one()").specs(vec![
+
+        it("should return 1", |_| {
+
+            expect(add_one(0)).to_equal(1)
+
+        }),
+
+        it("should return 2", |_| {
+
+            expect(add_one(0)).to_equal(2)
+
+        })
+
+    ]).run().to_result();
+
+    assert_eq!(test_result, Err("1 of 2 tests failed".to_string()))
+
+}
