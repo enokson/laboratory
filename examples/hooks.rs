@@ -18,7 +18,7 @@ mod tests {
         // perform actions before and after our tests.
         // The actions we to run in this scenario is simply
         // outputting to to stdout.
-        describe("no_op")
+        describe("always_return_true")
 
             // We want to run this action before all
             // all tests in this suite is ran. This action
@@ -50,11 +50,11 @@ mod tests {
 
             }).specs(vec![
 
-                it("should do nothing", |_| {
+                it("should return true", |_| {
                     expect(always_return_true()).to_be(true)
                 }),
 
-                it("should do nothing again", |_| {
+                it("should return true again", |_| {
                     expect(always_return_true()).to_be(true)
                 })
 

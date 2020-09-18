@@ -58,7 +58,7 @@ mod tests {
             state.set_state(counter);
         }
 
-        // In this is example we want to return the state
+        // In this example we want to return the state
         // after all the tests are ran so that we can echo the
         // the final result to stdout.
         let state: Counter = describe("My Crate")
@@ -66,7 +66,7 @@ mod tests {
             // We can give the suite the initial state by
             // using the state method, but we could very well
             // skip using the state method and define the state
-            // in the before_all or even the before_each hook.
+            // in the before_all or even in the before_each hook.
             .state(Counter::new("Parent Level"))
 
             // Now we will define our hooks
