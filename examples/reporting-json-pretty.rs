@@ -1,6 +1,7 @@
+
 fn main() {
-    add_one(0);
-    add_two(0);
+    let _one = add_one(0);
+    let _two = add_two(0);
 }
 
 fn add_one (x: u64) -> u64 { x + 1 }
@@ -15,7 +16,9 @@ mod tests {
     #[test]
     fn suite() {
 
-        describe("Package").suites(vec![
+        // To export to json-pretty we will simply call
+        // the json_pretty method on the suite.
+        describe("My Crate").suites(vec![
 
             describe("add_one()").specs(vec![
 

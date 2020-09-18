@@ -10,6 +10,7 @@ A simple, expressive unit test framework for Rust
 ## Features
 * before, before_each, after, after_each hooks  
 * Different reporter options  
+* Different outputs such as to_string and to_result (for continuous integration tests)
 * Reports test durations  
 * The use of custom assertion libraries  
 * Exclude tests  
@@ -33,9 +34,9 @@ mod tests {
 ```
 
 ## Getting Started
-### Testing a simple function "add_one()"
+### Testing a simple function
 ```rust
-// taken from examples/simple.rs
+// from examples/simple.rs
 fn main() {
     add_one(0);
 }
@@ -98,13 +99,14 @@ $ cargo test -- --nocapture
 
 Result:  
 ```
+
 running 1 test
 
 
 
   add_one()
-     ✓  should return 1 (0ms)
-     ✓  should return 2 (0ms)
+     ✓  should return 1 when passed 0 (0ms)
+     ✓  should return 2 when passed 1 (0ms)
 
 
   ✓ 2 tests completed (0ms)
@@ -115,11 +117,13 @@ running 1 test
 test tests::suite ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
 
 ## Nested suites
 ```rust
-// taken from examples/nested-suites.rs
+// from examples/nested-suites.rs
 
 // Here we will define a struct with
 // two members, an associated function,
@@ -170,9 +174,9 @@ mod tests {
 
                 it("should return an instance of Foo with two members", |_| {
 
-                    let result = Foo::new();
-                    expect(result.bar).to_be(String::new())?;
-                    expect(result.baz).to_equal(0)
+                    let foo = Foo::new();
+                    expect(foo.line).to_be(String::new())?;
+                    expect(foo.count).to_equal(0)
 
                 })
 
@@ -181,11 +185,11 @@ mod tests {
             // Now we will describe the "append" method
             describe("#append()").specs(vec![
 
-                it("should append fizzbuzz to Foo#bar", |_| {
+                it("should append \"fizzbuzz\" to Foo#line", |_| {
 
                     let mut foo = Foo::new();
                     foo.append("fizzbuzz");
-                    expect(foo.bar).to_be("fizzbuzz".to_string())
+                    expect(foo.line).to_be("fizzbuzz".to_string())
 
                 })
 
@@ -194,11 +198,11 @@ mod tests {
             // Finally, we will describe the "increase" method
             describe("#increase()").specs(vec![
 
-                it("should increase Foo#baz by 1", |_| {
+                it("should increase Foo#count by 1", |_| {
 
                     let mut foo = Foo::new();
                     foo.increase();
-                    expect(foo.baz).to_equal(1)
+                    expect(foo.count).to_equal(1)
 
                 })
 
@@ -215,18 +219,19 @@ mod tests {
 
 ```
 Result:
-```textmate
+```text
+
 running 1 test
 
 
 
   Foo
     #new()
-       ✓  should return foo with two members (0ms)
+       ✓  should return an instance of Foo with two members (0ms)
     #append()
-       ✓  should append fizzbuzz to Foo#bar (0ms)
+       ✓  should append "fizzbuzz" to Foo#line (0ms)
     #increase()
-       ✓  should increase Foo#baz by 1 (0ms)
+       ✓  should increase Foo#count by 1 (0ms)
 
 
   ✓ 3 tests completed (0ms)
@@ -237,6 +242,8 @@ running 1 test
 test tests::test ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
 
 ## Failed Tests
@@ -302,23 +309,22 @@ mod tests {
 ```
 
 Result:
-```textmate
+```text
 
 running 1 test
 
 
 
-  Package
+  Crate
     add_one()
-       0) should return 1 to when given 0 (0ms)
+       0) should return 1 to when passed 0 (0ms)
     add_two()
-       ✓  should return 2 to when given 0 (0ms)
+       ✓  should return 2 to when passed 0 (0ms)
 
 
   ✖ 1 of 2 tests failed:
 
-  0) add_one() should return 1 to when given 0: Expected 6 to equal 1
-
+  0) add_one() should return 1 to when passed 0: Expected 6 to equal 1
 
 
 
@@ -327,43 +333,73 @@ test tests::test ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 
+
 ```
 
 ## Hooks
 ```rust
+// from examples/hooks.rs
 
-fn no_op() -> bool { true  }
+fn always_return_true() -> bool { true  }
 
-fn main() { no_op(); }
+fn main() {
+    always_return_true();
+}
 
 #[cfg(test)]
 mod tests {
 
-    use super::no_op;
+    use super::always_return_true;
     use laboratory::{describe, it, expect};
 
     #[test]
     fn test() {
 
-        describe("no_op").before_all(|_| {
-            println!("\n\n  before hook called");
-        }).before_each(|_| {
-            println!("  before_each hook called");
-        }).after_each(|_| {
-            println!("  after_each hook called");
-        }).after_all(|_| {
-            println!("  after_all hook called");
-        }).specs(vec![
+        // In this suite we want to use hooks to
+        // perform actions before and after our tests.
+        // The actions we to run in this scenario is simply
+        // outputting to to stdout.
+        describe("always_return_true")
 
-            it("should do nothing", |_| {
-                expect(no_op()).to_be(true)
-            }),
+            // We want to run this action before all
+            // all tests in this suite is ran. This action
+            // will only be ran once.
+            .before_all(|_| {
 
-            it("should do nothing again", |_| {
-                expect(no_op()).to_be(true)
+                println!("\n\n  before hook called");
+
             })
 
-        ]).run();
+            // We want to run this action just before every test
+            // in this suite. Since we have two tests this action
+            // will be ran twice.
+            .before_each(|_| {
+
+                println!("  before_each hook called");
+
+            })
+
+            // likewise, we also have actions we want to run
+            // after our tests.
+            .after_each(|_| {
+
+                println!("  after_each hook called");
+
+            }).after_all(|_| {
+
+                println!("  after_all hook called");
+
+            }).specs(vec![
+
+                it("should return true", |_| {
+                    expect(always_return_true()).to_be(true)
+                }),
+
+                it("should return true again", |_| {
+                    expect(always_return_true()).to_be(true)
+                })
+
+            ]).run();
 
     }
 
@@ -371,7 +407,8 @@ mod tests {
 
 ```
 Result:
-```
+```text
+
 running 1 test
 
 
@@ -384,9 +421,9 @@ running 1 test
 
 
 
-  no_op
-     ✓  should do nothing (0ms)
-     ✓  should do nothing again (0ms)
+  always_return_true
+     ✓  should return true (0ms)
+     ✓  should return true again (0ms)
 
 
   ✓ 2 tests completed (0ms)
@@ -397,18 +434,22 @@ running 1 test
 test tests::test ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
 
 ## Using State
 ```rust
+// from examples/state.rs
 
-fn no_op() -> bool { true  }
+fn always_return_true() -> bool { true  }
 fn add_one(n: i32) -> i32 { n + 1 }
 fn add_two(n: i32) -> i32 { n + 2 }
 
 fn main() {
-    no_op();
-    add_one(0);
+    let _true = always_return_true();
+    let _one = add_one(0);
+    let _two = add_two(0);
 }
 
 #[cfg(test)]
@@ -417,124 +458,139 @@ mod tests {
     use super::*;
     use laboratory::{describe, it, expect, Deserialize, Serialize, State};
     use std::fmt::{Debug};
-    use crate::add_one;
 
     // We want a counter to count each time a hook or test is called
-    // Any state we want to use in the suite must be able to be serialized and deserialized by serde
+    // Note that any state we want to use in the suite
+    // must be able to be serialized and deserialized by serde.
+
     #[derive(Deserialize, Serialize, Debug)]
     struct Counter {
-        // the counter will hold a member for each category
-        pub before_all_hit_count: u8,
-        pub before_each_hit_count: u8,
-        pub after_each_hit_count: u8,
-        pub after_all_hit_count: u8,
-        pub test_hit_count: u8
+        suite: String, // the name of the suite
+        call_count: u8 // the number of times a hook or test was called
     }
+
     impl Counter {
-        fn new() -> Counter {
+        fn new(suite: &str) -> Counter {
             Counter {
-                before_all_hit_count: 0,
-                before_each_hit_count: 0,
-                after_each_hit_count: 0,
-                after_all_hit_count: 0,
-                test_hit_count: 0
+                suite: String::from(suite),
+                call_count: 0
             }
+        }
+        fn update(&mut self) {
+            self.call_count += 1;
+            println!("  {} hit count: {}", self.suite, self.call_count);
         }
     }
 
     #[test]
     fn test() {
 
-        fn update_before_all(state: &mut State) {
+        // Here we will define a function to handle all the hook calls
+        fn hook_handle(state: &mut State) {
+
+            // We need to call the get_state method in order to get the counter.
+            // We also we to tell the Rust compiler what
+            // type the result of get_state will be which
+            // in this case is the counter.
             let mut counter: Counter = state.get_state();
-            counter.before_all_hit_count += 1;
-            state.set_state(counter);
-        }
-        fn update_before_each(state: &mut State) {
-            let mut counter: Counter = state.get_state();
-            counter.before_each_hit_count += 1;
-            state.set_state(counter);
-        }
-        fn update_after_each(state: &mut State) {
-            let mut counter: Counter = state.get_state();
-            counter.after_each_hit_count += 1;
-            state.set_state(counter);
-        }
-        fn update_after_all(state: &mut State) {
-            let mut counter: Counter = state.get_state();
-            counter.after_all_hit_count += 1;
-            // println!("\n\n{:#?}", &counter);
-            state.set_state(counter);
-        }
-        fn update_test(state: &mut State) {
-            let mut counter: Counter = state.get_state();
-            counter.test_hit_count += 1;
+
+            // Now we will call the update method on Counter
+            counter.update();
+
+            // And if we want to update the state we need to call set_state
             state.set_state(counter);
         }
 
-        let state: Counter = describe("no_op")
-            .state(Counter::new())
-            .before_all(update_before_all)
-            .before_each(update_before_each)
-            .after_each(update_after_each)
-            .after_all(update_after_all)
+        // In this example we want to return the state
+        // after all the tests are ran so that we can echo the
+        // the final result to stdout.
+        let state: Counter = describe("My Crate")
+
+            // We can give the suite the initial state by
+            // using the state method, but we could very well
+            // skip using the state method and define the state
+            // in the before_all or even in the before_each hook.
+            .state(Counter::new("Parent Level"))
+
+            // Now we will define our hooks
+            .before_all(hook_handle)
+            .before_each(hook_handle)
+            .after_each(hook_handle)
+            .after_all(hook_handle)
+
             .suites(vec![
 
-                // this suite will inherit the parent suite's state
+                // this suite will inherit the parent's state
                 describe("add_one()")
-                    .before_all(update_before_all)
-                    .before_each(update_before_each)
-                    .after_each(update_after_each)
-                    .after_all(update_after_all)
+
+                    // Here is the set of hooks for the child suite
+                    .before_all(hook_handle)
+                    .before_each(hook_handle)
+                    .after_each(hook_handle)
+                    .after_all(hook_handle)
+
+
                     .specs(vec![
 
                         it("should return 1", |state| {
-                            update_test(state);
+                            hook_handle(state);
                             expect(add_one(0)).to_be(1)
                         }),
 
                         it("should return 2", |state| {
-                            update_test(state);
+                            hook_handle(state);
                             expect(add_one(1)).to_be(2)
                         })
 
                     ])
                     .inherit_state(),
 
-                // it will use its own state
+                // This suite will use its own state
                 describe("add_two()")
-                    .state(Counter::new())
-                    .before_all(update_before_all)
-                    .before_each(update_before_each)
-                    .after_each(update_after_each)
-                    .after_all(update_after_all)
+
+                    // since this suite will not inherit state
+                    // from the parent we will give it a new one.
+                    .state(Counter::new("Child Level"))
+
+                    // Here is the set of hooks for the second child suite
+                    .before_all(hook_handle)
+                    .before_each(hook_handle)
+                    .after_each(hook_handle)
+                    .after_all(hook_handle)
                     .specs(vec![
 
                         it("should return 2", |state| {
-                            update_test(state);
+                            hook_handle(state);
                             expect(add_two(0)).to_be(2)
                         }),
 
                         it("should return 4", |state| {
-                            update_test(state);
+                            hook_handle(state);
                             expect(add_two(2)).to_be(4)
                         })
 
+                    ]),
+
+                // this suite will also inherit the parent's state
+                describe("always_return_true()")
+
+                    // Here is the set of hooks for the child suite
+                    .before_all(hook_handle)
+                    .before_each(hook_handle)
+                    .after_each(hook_handle)
+                    .after_all(hook_handle)
+
+
+                    .specs(vec![
+
+                        it("should always return true", |state| {
+                            hook_handle(state);
+                            expect(add_one(0)).to_be(1)
+                        })
+
                     ])
+                    .inherit_state()
 
-
-            ])
-            .specs(vec![
-
-                it("should do nothing", |state| {
-                    update_test(state);
-                    expect(no_op()).to_be(true)
-                }),
-
-                it("should do nothing again", |state| {
-                    update_test(state);
-                    expect(no_op()).to_be(true)
-                })
 
             ]).run().to_state();
 
@@ -546,58 +602,91 @@ mod tests {
 
 ```
 Result:
-```
+```text
+
 running 1 test
+  Parent Level hit count: 1
+  Parent Level hit count: 2
+  Parent Level hit count: 3
+  Parent Level hit count: 4
+  Parent Level hit count: 5
+  Parent Level hit count: 6
+  Parent Level hit count: 7
+  Parent Level hit count: 8
+  Parent Level hit count: 9
+  Child Level hit count: 1
+  Child Level hit count: 2
+  Child Level hit count: 3
+  Child Level hit count: 4
+  Child Level hit count: 5
+  Child Level hit count: 6
+  Child Level hit count: 7
+  Child Level hit count: 8
+  Parent Level hit count: 10
+  Parent Level hit count: 11
+  Parent Level hit count: 12
+  Parent Level hit count: 13
+  Parent Level hit count: 14
+  Parent Level hit count: 15
 
 
 
-  no_op
-     ✓  should do nothing (0ms)
-     ✓  should do nothing again (0ms)
+  My Crate
     add_one()
        ✓  should return 1 (0ms)
        ✓  should return 2 (0ms)
     add_two()
        ✓  should return 2 (0ms)
        ✓  should return 4 (0ms)
+    always_return_true()
+       ✓  should always return true (0ms)
 
 
-  ✓ 6 tests completed (0ms)
+  ✓ 5 tests completed (0ms)
 
 
 
 
 Counter {
-    before_all_hit_count: 2,
-    before_each_hit_count: 4,
-    after_each_hit_count: 4,
-    after_all_hit_count: 2,
-    test_hit_count: 4,
+    suite: "Parent Level",
+    call_count: 15,
 }
 
 
 test tests::test ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
 
 ## Testing Large Packages Divided by Modules
 ```rust
+// from examples/importing-tests.rs
 
 fn main() {
     add_one::add_one(0);
     multiply_by_two::multiply_by_two(1);
 }
 
+// In this crate we have two
+// public modules: add_one, and multiply_by_two
+
 pub mod add_one {
 
+    // here is a function that we want to test
     pub fn add_one (x: u64) -> u64 { x + 1 }
+
 
     #[cfg(test)]
     pub mod tests {
 
         use super::*;
         use laboratory::{describe, it, expect, Suite};
+
+        // here is where we will define our suite.
+        // Notice that this function returns a Suite struct.
+        // Also notice that no other methods are called on this suite.
         pub fn suite() -> Suite {
 
             describe("add_one()").specs(vec![
@@ -617,8 +706,11 @@ pub mod add_one {
     }
 
 }
+
+// here is our second module
 pub mod multiply_by_two {
 
+    // ...and the function we want to test
     pub fn multiply_by_two (x: u64) -> u64 { x * 2 }
 
     #[cfg(test)]
@@ -626,6 +718,8 @@ pub mod multiply_by_two {
 
         use super::*;
         use laboratory::{describe, it, expect, Suite};
+
+        // Again, we will define a function that returns a Suite struct
         pub fn suite() -> Suite {
 
             describe("multiply_by_two()").specs(vec![
@@ -645,20 +739,33 @@ pub mod multiply_by_two {
     }
 }
 
+// Now here is where we will import and run our
+// tests under one umbrella of the crate.
 #[cfg(test)]
 mod tests {
+
+    // pull our modules into scope
     use super::*;
+
+    // pull in our lab tools
     use laboratory::{describe};
 
     #[test]
     fn test() {
 
-        describe("Package").suites(vec![
+        // Describe the crate.
+        describe("My Crate")
+            .suites(vec![
 
-            add_one::tests::suite(),
-            multiply_by_two::tests::suite()
+                // now we will call our functions that simply
+                // returns a Suite struct.
+                add_one::tests::suite(),
+                multiply_by_two::tests::suite()
 
-        ]).run();
+            ])
+
+            // Now we can run our tests with any other options
+            .run();
 
     }
 
@@ -666,12 +773,13 @@ mod tests {
 
 ```
 Result:
-```
+```text
+
 running 1 test
 
 
 
-  Package
+  My Crate
     add_one()
        ✓  should return 1 (0ms)
        ✓  should return 2 (0ms)
@@ -688,13 +796,17 @@ running 1 test
 test tests::test ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
 
 ## Optional Reporting Styles: Spec, Minimum, JSON, and JSON-Pretty
 ```rust
+// from examples/reporting-json-pretty.rs
+
 fn main() {
-    add_one(0);
-    add_two(0);
+    let _one = add_one(0);
+    let _two = add_two(0);
 }
 
 fn add_one (x: u64) -> u64 { x + 1 }
@@ -709,7 +821,9 @@ mod tests {
     #[test]
     fn suite() {
 
-        describe("Package").suites(vec![
+        // To export to json-pretty we will simply call
+        // the json_pretty method on the suite.
+        describe("My Crate").suites(vec![
 
             describe("add_one()").specs(vec![
 
@@ -737,11 +851,12 @@ mod tests {
 }
 ```
 Result:
-```
+```text
+
 running 1 test
 
 {
-  "name": "Package",
+  "name": "My Crate",
   "passing": 2,
   "failing": 1,
   "ignored": 0,
@@ -796,4 +911,6 @@ running 1 test
 test tests::suite ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
 ```
