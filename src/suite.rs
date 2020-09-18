@@ -108,7 +108,20 @@ impl Suite {
     pub fn to_string(&self) -> String {
         self.report.clone()
     }
-
+    pub fn to_result(&self) -> Result<(), String> {
+        match &self.result {
+            Some(result) => {
+                let failing_tests = result.get_failing();
+                if failing_tests == 0 {
+                    Ok(())
+                } else {
+                    let total_tests = result.get_passing() + failing_tests;
+                    Err(format!("{} of {} tests failed", failing_tests, total_tests))
+                }
+            },
+            None => Err("Results for the suite was not found".to_string())
+        }
+    }
     fn clone_result(&self) -> Option<SuiteResult> {
         match &self.result {
             Some(result) => Some(result.clone()),
