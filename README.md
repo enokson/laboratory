@@ -359,7 +359,7 @@ mod tests {
         // perform actions before and after our tests.
         // The actions we to run in this scenario is simply
         // outputting to to stdout.
-        describe("no_op")
+        describe("always_return_true")
 
             // We want to run this action before all
             // all tests in this suite is ran. This action
@@ -391,11 +391,11 @@ mod tests {
 
             }).specs(vec![
 
-                it("should do nothing", |_| {
+                it("should return true", |_| {
                     expect(always_return_true()).to_be(true)
                 }),
 
-                it("should do nothing again", |_| {
+                it("should return true again", |_| {
                     expect(always_return_true()).to_be(true)
                 })
 
@@ -421,9 +421,9 @@ running 1 test
 
 
 
-  no_op
-     ✓  should do nothing (0ms)
-     ✓  should do nothing again (0ms)
+  always_return_true
+     ✓  should return true (0ms)
+     ✓  should return true again (0ms)
 
 
   ✓ 2 tests completed (0ms)
@@ -501,7 +501,7 @@ mod tests {
             state.set_state(counter);
         }
 
-        // In this is example we want to return the state
+        // In this example we want to return the state
         // after all the tests are ran so that we can echo the
         // the final result to stdout.
         let state: Counter = describe("My Crate")
@@ -509,7 +509,7 @@ mod tests {
             // We can give the suite the initial state by
             // using the state method, but we could very well
             // skip using the state method and define the state
-            // in the before_all or even the before_each hook.
+            // in the before_all or even in the before_each hook.
             .state(Counter::new("Parent Level"))
 
             // Now we will define our hooks
