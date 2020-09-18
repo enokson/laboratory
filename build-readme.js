@@ -25,7 +25,6 @@ const appendExampleResult = (tagName, exampleName) => readme => {
     })
 }
 
-
 (pipeAsyncFunctions(
     () => console.log("building readme"),
     () => fs.readFile('./README.template.md', 'utf-8'),
