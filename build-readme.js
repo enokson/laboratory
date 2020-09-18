@@ -1,28 +1,54 @@
 const fs = require('fs').promises;
+const child_process = require('child_process')
 
-const example = tag => (src, dest) => dest.replace(tag, src)
-const appendHeaderAndFooter = str => {
-    return "running 1 test\n\n\n\n" + str + "\n\n\n\ntest tests::suite ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out"
+const pipeAsyncFunctions = (...fns) => arg => fns.reduce((p, f) => p.then(f), Promise.resolve(arg));
+
+const appendExample = (tagName, filePath) => readme => {
+    return fs.readFile(filePath, 'utf-8').then(data => {
+        return readme.replace(tagName, data)
+    }).catch(() => readme)
 }
+const appendExampleResult = (tagName, exampleName) => readme => {
 
-const simple = example('//###SIMPLE###//')
-
-
-const failure = example('//###FAILURE###//')
-const nested = example('//###NESTED###//')
-
-const readFile = (name, path) => obj => {
-    return fs.readFile(path, 'utf8').then(data => {
-        return Object.assign(obj, { [name]: data })
+    return new Promise((resolve, reject) => {
+        child_process.exec(`cargo test --example ${exampleName} -- --nocapture`, (error, stout, sterr) => {
+          if (error) {
+              reject(error)
+          } else if (stout) {
+              resolve(readme.replace(tagName, stout))
+          } else if (sterr) {
+              resolve(readme.replace(tagName, sterr))
+          } else {
+              resolve(readme)
+          }
+        })
     })
 }
 
-readFile('readme', 'README.template.md')({})
-    .then(readFile('simple', './examples/simple.rs'))
-    .then(readFile('nested', './examples/nested-suites.rs'))
-    .then(readFile('failure', './examples/failure.rs'))
-    .then(obj => fs.writeFile('README.md',
-        nested(obj.nested,
-            failure(obj.failure,
-                simple(obj.simple, obj.readme)))))
+(pipeAsyncFunctions(
+    () => console.log("building readme"),
+    () => fs.readFile('./README.template.md', 'utf-8'),
 
+    appendExample('//###SIMPLE###//', './examples/simple.rs'),
+    appendExampleResult('//###SIMPLE-RESULT###//', 'simple'),
+
+    appendExample('//###NESTED###//', './examples/nested-suites.rs'),
+    appendExampleResult('//###NESTED-RESULT###//', 'nested-suites'),
+
+    appendExample('//###FAILURE###//', './examples/failure.rs'),
+    appendExampleResult('//###FAILURE-RESULT###//', 'failure'),
+
+    appendExample('//###HOOKS###//', './examples/hooks.rs'),
+    appendExampleResult('//###HOOKS-RESULT###//', 'hooks'),
+
+    appendExample('//###STATE###//', './examples/state.rs'),
+    appendExampleResult('//###STATE-RESULT###//', 'state'),
+
+    appendExample('//###IMPORT###//', './examples/importing-tests.rs'),
+    appendExampleResult('//###IMPORT-RESULT###//', 'importing-tests'),
+
+    appendExample('//###REPORT###//', './examples/reporting-json-pretty.rs'),
+    appendExampleResult('//###REPORT-RESULT###//', 'reporting-json-pretty'),
+
+    str => fs.writeFile('./README.md', str)
+))().catch(console.log)
