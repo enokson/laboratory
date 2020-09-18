@@ -34,7 +34,7 @@ mod tests {
 ```
 
 ## Getting Started
-### Testing a simple function "add_one()"
+### Testing a simple function
 ```rust
 // from examples/simple.rs
 fn main() {
