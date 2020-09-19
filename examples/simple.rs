@@ -47,7 +47,7 @@ mod tests {
 
             })
 
-        ]).run();
+        ]).in_nanoseconds().run();
 
     }
 }

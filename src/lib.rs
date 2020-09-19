@@ -10,7 +10,8 @@ mod state;
 mod suite_result;
 mod spec_result;
 
-pub use suite::{Suite};
+pub use suite::{Suite, DurationPrecision};
+pub use suite_result::SuiteResult;
 pub use state::State;
 pub use assertion::Expect;
 pub use spec::Spec;

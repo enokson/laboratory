@@ -10,8 +10,14 @@
       "full_name": "add_one should return 1",
       "pass": true,
       "error_msg": null,
-      "duration": 0
+      "duration": {
+        "secs": 0,
+        "nanos": 654
+      }
     }
   ],
-  "duration": 0
+  "duration": {
+    "secs": 0,
+    "nanos": 12682
+  }
 }

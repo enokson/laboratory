@@ -9,9 +9,9 @@ A simple, expressive unit test framework for Rust
 
 ## Features
 * before, before_each, after, after_each hooks  
-* Different reporter options  
+* Different reporter options: spec, minimal, json, json-pretty  
 * Different outputs such as to_string and to_result (for continuous integration tests)
-* Reports test durations  
+* Reports test durations in: nanoseconds, microseconds, milliseconds and seconds  
 * The use of custom assertion libraries  
 * Exclude tests  
 * Nested test suites  
@@ -86,7 +86,7 @@ mod tests {
 
             })
 
-        ]).run();
+        ]).in_nanoseconds().run();
 
     }
 }
@@ -105,11 +105,11 @@ running 1 test
 
 
   add_one()
-     ✓  should return 1 when passed 0 (0ms)
-     ✓  should return 2 when passed 1 (0ms)
+     ✓  should return 1 when passed 0 (607ns)
+     ✓  should return 2 when passed 1 (118ns)
 
 
-  ✓ 2 tests completed (0ms)
+  ✓ 2 tests completed (725ns)
 
 
 
@@ -208,8 +208,7 @@ mod tests {
 
             ])
 
-        ])
-        .run();
+        ]).in_microseconds().run();
 
     }
 
@@ -227,14 +226,14 @@ running 1 test
 
   Foo
     #new()
-       ✓  should return an instance of Foo with two members (0ms)
+       ✓  should return an instance of Foo with two members (0μs)
     #append()
-       ✓  should append "fizzbuzz" to Foo#line (0ms)
+       ✓  should append "fizzbuzz" to Foo#line (1μs)
     #increase()
-       ✓  should increase Foo#count by 1 (0ms)
+       ✓  should increase Foo#count by 1 (0μs)
 
 
-  ✓ 3 tests completed (0ms)
+  ✓ 3 tests completed (2μs)
 
 
 
@@ -873,17 +872,26 @@ running 1 test
           "full_name": "add_one() should return 1",
           "pass": true,
           "error_msg": null,
-          "duration": 0
+          "duration": {
+            "secs": 0,
+            "nanos": 447
+          }
         },
         {
           "name": "should return 2",
           "full_name": "add_one() should return 2",
           "pass": true,
           "error_msg": null,
-          "duration": 0
+          "duration": {
+            "secs": 0,
+            "nanos": 139
+          }
         }
       ],
-      "duration": 0
+      "duration": {
+        "secs": 0,
+        "nanos": 586
+      }
     },
     {
       "name": "add_two()",
@@ -897,14 +905,23 @@ running 1 test
           "full_name": "add_two() should return 2",
           "pass": false,
           "error_msg": "Expected 5 to equal 2",
-          "duration": 0
+          "duration": {
+            "secs": 0,
+            "nanos": 726
+          }
         }
       ],
-      "duration": 0
+      "duration": {
+        "secs": 0,
+        "nanos": 726
+      }
     }
   ],
   "child_tests": [],
-  "duration": 0
+  "duration": {
+    "secs": 0,
+    "nanos": 1312
+  }
 }
 
 

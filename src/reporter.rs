@@ -2,13 +2,14 @@ use std::collections::HashMap;
 use std::path::{Path};
 use std::fs::{create_dir_all, File};
 use std::io::Write;
+use std::time::Duration;
 
 use console::style;
 use serde_json::{to_string, to_string_pretty};
 
+use super::suite::DurationPrecision;
 use super::suite_result::SuiteResult;
 use super::spec_result::SpecResult;
-
 
 fn get_count(suite: &SuiteResult, count: &mut u64) -> u64 {
     *count += suite.get_passing() + suite.get_failing() as u64;
@@ -36,7 +37,15 @@ fn display_spec_err_msg(spec: &SpecResult, fail_id: &u64, stdout: bool, mut ln: 
     ln += "\n";
     ln
 }
-fn display_spec_line(spec: &SpecResult, indention: u32, stdout: bool, mut ln: String) -> String {
+fn get_duration(duration: &Duration, precision: &DurationPrecision) -> String {
+    match precision {
+        DurationPrecision::Mil => format!("{}ms", duration.as_millis()),
+        DurationPrecision::Micro => format!("{}μs", duration.as_micros()),
+        DurationPrecision::Nano => format!("{}ns", duration.as_nanos()),
+        DurationPrecision::Sec => format!("{}sec", duration.as_secs())
+    }
+}
+fn display_spec_line(spec: &SpecResult, indention: u32, stdout: bool, precision: &DurationPrecision, mut ln: String) -> String {
     ln = indent(indention + 5, ln);
     if stdout {
         ln += &style('✓').green().to_string();
@@ -44,7 +53,7 @@ fn display_spec_line(spec: &SpecResult, indention: u32, stdout: bool, mut ln: St
         ln += "✓";
     }
     ln = indent(2, ln);
-    let sub_ln = format!("{} ({}ms)", spec.get_name(), spec.get_duration());
+    let sub_ln = format!("{} ({})", spec.get_name(), get_duration(spec.get_duration(), precision));
     if stdout {
         ln += &style(sub_ln).dim().to_string();
     } else {
@@ -52,9 +61,9 @@ fn display_spec_line(spec: &SpecResult, indention: u32, stdout: bool, mut ln: St
     }
     ln
 }
-fn display_spec_err_ln(spec: &SpecResult, indention: u32, fail_id: &u64, stdout: bool, mut ln: String) -> String {
+fn display_spec_err_ln(spec: &SpecResult, indention: u32, fail_id: &u64, stdout: bool, precision: &DurationPrecision, mut ln: String) -> String {
     ln = indent(indention + 5, ln);
-    ln += &format!("{}) {} ({}ms)", &fail_id, spec.get_name(), spec.get_duration());
+    ln += &format!("{}) {} ({})", &fail_id, spec.get_name(), get_duration(spec.get_duration(), precision));
     if stdout {
         ln = style(ln).red().to_string();
     }
@@ -78,16 +87,16 @@ fn display_suite_line(suite: &SuiteResult, indention: u32, mut ln: String) -> St
     ln
 }
 
-fn display_success_line(suite_results: &SuiteResult, stdout: bool, mut ln: String) -> String {
+fn display_success_line(suite_results: &SuiteResult, stdout: bool, precision: &DurationPrecision, mut ln: String) -> String {
     if stdout {
         ln += &style('✓').green().to_string();
         let sub_line = format!(" {} tests completed", get_count(&suite_results, &mut 0));
         ln += &style(sub_line).green().to_string();
-        ln += &style(format!(" ({}ms)", suite_results.get_duration())).dim().to_string();
+        ln += &style(format!(" ({})", get_duration(&suite_results.get_duration(), precision))).dim().to_string();
     } else {
         ln += "✓";
         ln += &format!(" {} tests completed", get_count(&suite_results, &mut 0));
-        ln += &format!(" ({}ms)", suite_results.get_duration());
+        ln += &format!(" ({})", get_duration(&suite_results.get_duration(), precision));
     }
     ln
 }
@@ -104,9 +113,9 @@ fn display_error_lines(suite_results: &SuiteResult, failed_id: u64, fail_ln: Str
     ln.pop();
     ln
 }
-fn display_test_result(suite_results: &SuiteResult, stdout: bool, mut ln: String, fail_ln: String, failed_id: u64) -> String {
+fn display_test_result(suite_results: &SuiteResult, stdout: bool, mut ln: String, fail_ln: String, failed_id: u64, precision: &DurationPrecision) -> String {
     if failed_id == 0 {
-        ln = display_success_line(&suite_results, stdout, ln);
+        ln = display_success_line(&suite_results, stdout, precision, ln);
     } else {
         ln = display_error_lines(&suite_results, failed_id, fail_ln, stdout, ln);
     }
@@ -132,15 +141,16 @@ pub enum ReporterType {
 
 pub struct Reporter;
 impl Reporter {
-    pub fn spec(mut suite_results: SuiteResult, stdout: bool) -> String {
+    pub fn spec(mut suite_results: SuiteResult, stdout: bool, precision: &DurationPrecision) -> String {
 
-        fn get_spec_lines(spec: &SpecResult, indention: u32, stdout: bool, mut ln: String, mut fail_ln: String, mut failed_id: u64) -> (String, String, u64) {
+        fn get_spec_lines(spec: &SpecResult, indention: u32, stdout: bool, mut ln: String,
+                          mut fail_ln: String, mut failed_id: u64, precision: &DurationPrecision) -> (String, String, u64) {
             match spec.get_pass() {
                 Some(pass) => {
                     if pass {
-                        ln = display_spec_line(&spec, indention, stdout, ln);
+                        ln = display_spec_line(&spec, indention, stdout, precision, ln);
                     } else {
-                        ln = display_spec_err_ln(&spec, indention, &failed_id, stdout, ln);
+                        ln = display_spec_err_ln(&spec, indention, &failed_id, stdout, precision, ln);
                         fail_ln = display_spec_err_msg(&spec, &failed_id, stdout, fail_ln);
                         failed_id += 1;
                     }
@@ -152,18 +162,19 @@ impl Reporter {
             ln += "\n";
             (ln, fail_ln, failed_id)
         }
-        fn get_all_spec_lines_from_result(suite: &mut SuiteResult, indention: u32, stdout: bool, mut ln: String, mut fail_ln: String, mut failed_id: u64) -> (String, String, u64) {
+        fn get_all_spec_lines_from_result(suite: &mut SuiteResult, indention: u32, stdout: bool,
+                                          mut ln: String, mut fail_ln: String, mut failed_id: u64, precision: &DurationPrecision) -> (String, String, u64) {
             // *ln += "\n";
             ln = display_suite_line(&suite, indention, ln);
             // *ln += "\n";
             for spec in suite.get_child_specs() {
-                let r = get_spec_lines(&spec, indention, stdout, ln, fail_ln, failed_id);
+                let r = get_spec_lines(&spec, indention, stdout, ln, fail_ln, failed_id, &precision);
                 ln = r.0;
                 fail_ln = r.1;
                 failed_id = r.2;
             }
             for mut child_suite in suite.get_child_suites() {
-                let r = get_all_spec_lines_from_result(&mut child_suite, indention + 2, stdout, ln, fail_ln, failed_id);
+                let r = get_all_spec_lines_from_result(&mut child_suite, indention + 2, stdout, ln, fail_ln, failed_id, &precision);
                 ln = r.0;
                 fail_ln = r.1;
                 failed_id = r.2;
@@ -174,15 +185,15 @@ impl Reporter {
         let mut ln = String::new();
         let fail_ln = String::new();
         let failed_id = 0;
-        let r = get_all_spec_lines_from_result(&mut suite_results, 0, stdout, ln, fail_ln, failed_id);
+        let r = get_all_spec_lines_from_result(&mut suite_results, 0, stdout, ln, fail_ln, failed_id, precision);
         ln = r.0;
         ln +=  "\n\n";
         ln = indent(2, ln);
-        ln = display_test_result(&suite_results, stdout, ln, r.1, r.2);
+        ln = display_test_result(&suite_results, stdout, ln, r.1, r.2, precision);
         add_padding(stdout, ln)
         
     }
-    pub fn min(mut suite_results: SuiteResult, stdout: bool) -> String {
+    pub fn min(mut suite_results: SuiteResult, stdout: bool, precision: &DurationPrecision) -> String {
 
         fn get_spec_lines(spec: &SpecResult, stdout: bool, fail_ln: String, failed_id: u64) -> (String, u64) {
             match spec.get_pass() {
@@ -220,7 +231,7 @@ impl Reporter {
         let r = get_all_spec_lines_from_result(&mut suite_results, 0, stdout, ln, fail_ln, failed_id);
         // ln +=  "\n\n";
         ln = indent(2, r.0);
-        ln = display_test_result(&suite_results, stdout, ln, r.1, r.2,);
+        ln = display_test_result(&suite_results, stdout, ln, r.1, r.2, precision);
         add_padding(stdout, ln)
 
     }

@@ -1,6 +1,6 @@
 use std::borrow::{BorrowMut};
 use std::collections::HashMap;
-use std::time::Instant;
+use std::time::{Instant, Duration};
 use std::path::Path;
 use std::thread::Thread;
 use console::style;
@@ -14,8 +14,16 @@ use super::reporter::{ReporterType, Reporter};
 use super::state::State;
 use super::suite_result::SuiteResult;
 
+pub enum DurationPrecision {
+    Micro,
+    Mil,
+    Nano,
+    Sec
+}
+
 pub struct Suite {
-    duration: u128,
+    duration: Duration,
+    duration_precision: DurationPrecision,
     hooks: HashMap<String, Box<dyn Fn(&mut State)>>,
     pub ignore: bool,
     name: String,
@@ -29,11 +37,13 @@ pub struct Suite {
     export_: Option<String>,
     inherit_state_: bool
 }
+
 impl Suite {
 
     pub fn new(name: String) -> Suite {
         Suite {
-            duration: 0,
+            duration: Duration::new(0,0),
+            duration_precision: DurationPrecision::Mil,
             hooks: HashMap::new(),
             ignore: false,
             name,
@@ -49,9 +59,7 @@ impl Suite {
         }
     }
     pub fn run(mut self) -> Self {
-        let start_time = Instant::now();
         self.run_(0);
-        self.duration = start_time.elapsed().as_millis();
         self
     }
     pub fn specs(mut self, tests: Vec<Spec>) -> Self {
@@ -122,6 +130,25 @@ impl Suite {
             None => Err("Results for the suite was not found".to_string())
         }
     }
+
+    // change duration precision
+    pub fn in_milliseconds(mut self) -> Self {
+        self.duration_precision = DurationPrecision::Mil;
+        self
+    }
+    pub fn in_microseconds(mut self) -> Self {
+        self.duration_precision = DurationPrecision::Micro;
+        self
+    }
+    pub fn in_nanoseconds(mut self) -> Self {
+        self.duration_precision = DurationPrecision::Nano;
+        self
+    }
+    pub fn in_seconds(mut self) -> Self {
+        self.duration_precision = DurationPrecision::Sec;
+        self
+    }
+
     fn clone_result(&self) -> Option<SuiteResult> {
         match &self.result {
             Some(result) => Some(result.clone()),
@@ -131,7 +158,6 @@ impl Suite {
     fn run_(&mut self, nest_count: u32) {
 
         let mut result = SuiteResult::new(&self.name);
-        let start_time = Instant::now();
         self.execute_hook("before all");
         let len = self.specs_.len();
         let mut only_id = None;
@@ -193,7 +219,8 @@ impl Suite {
         }
         self.set_state_raw(&raw_state);
         self.execute_hook("after all");
-        result.set_duration(start_time.elapsed().as_millis());
+        // result.set_duration(start_time.elapsed());
+
         self.result = Some(result);
         if nest_count == 0 {
             self.report();
@@ -207,13 +234,13 @@ impl Suite {
     }
     fn report(&mut self) {
 
-        let get_output = |result: Option<SuiteResult>, reporter: &ReporterType, stdout: bool| -> String {
+        let get_output = |result: Option<SuiteResult>, reporter: &ReporterType, stdout: bool, precision: &DurationPrecision| -> String {
 
             match result {
                 Some(result) => {
                     match reporter {
-                        ReporterType::Spec => Reporter::spec(result, stdout),
-                        ReporterType::Minimal => Reporter::min(result, stdout),
+                        ReporterType::Spec => Reporter::spec(result, stdout, precision),
+                        ReporterType::Minimal => Reporter::min(result, stdout, precision),
                         ReporterType::Json => Reporter::json(result),
                         ReporterType::JsonPretty => Reporter::json_pretty(result)
                     }
@@ -226,7 +253,7 @@ impl Suite {
 
         };
 
-        self.report = get_output(self.result.clone(), &self.reporter_, false);
+        self.report = get_output(self.result.clone(), &self.reporter_, false, &self.duration_precision);
 
         match &self.export_ {
             Some(path) => {
@@ -236,7 +263,7 @@ impl Suite {
             None => { }
         }
         if self.stdout {
-            let result = get_output(self.result.clone(), &self.reporter_, true);
+            let result = get_output(self.result.clone(), &self.reporter_, true, &self.duration_precision);
             println!("\n{}\n\n", &result);
         }
 
@@ -248,6 +275,7 @@ impl Suite {
     pub fn get_state_raw(&self) -> Vec<u8> {
         self.state_.get_raw_state().to_vec()
     }
+    pub fn get_precision(&self) -> &DurationPrecision { &self.duration_precision }
 
     // SETTERS
     pub fn set_state_raw(&mut self, state: &Vec<u8>) {
