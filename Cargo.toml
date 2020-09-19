@@ -1,6 +1,6 @@
 [package]
 name = "laboratory"
-description = "A unit test framework for Rust"
+description = "A simple, expressive unit test framework for Rust"
 version = "1.2.0"
 authors = ["Joshua Enokson <kilograhm@pm.me>"]
 edition = "2018"
