@@ -27,14 +27,11 @@ impl SuiteResult {
     //     self.child_tests.push(spec);
     // }
     pub fn updated_from_suite(&mut self, child_result_option: Option<SuiteResult>) {
-        match child_result_option {
-            Some(child_result) => {
-                self.passing += child_result.get_passing();
-                self.failing += child_result.get_failing();
-                self.ignored += child_result.get_ignored();
-                self.child_suites.push(child_result);
-            },
-            _ => {}
+        if let Some(child_result) = child_result_option {
+            self.passing += child_result.get_passing();
+            self.failing += child_result.get_failing();
+            self.ignored += child_result.get_ignored();
+            self.child_suites.push(child_result);
         }
 
     }
@@ -61,12 +58,12 @@ impl Clone for SuiteResult {
     fn clone(&self) -> SuiteResult {
         SuiteResult {
             name: self.name.clone(),
-            passing: self.passing.clone(),
-            failing: self.failing.clone(),
-            ignored: self.ignored.clone(),
+            passing: self.passing,
+            failing: self.failing,
+            ignored: self.ignored,
             child_suites: self.child_suites.clone(),
             child_tests: self.child_tests.clone(),
-            duration: self.duration.clone()
+            duration: self.duration
         }
     }
 }

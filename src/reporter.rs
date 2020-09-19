@@ -15,7 +15,7 @@ fn get_count(suite: &SuiteResult, count: &mut u64) -> u64 {
     // for child in suite.get_child_suites() {
     //     get_count(&child, count);
     // }
-    count.clone()
+    *count
 }
 fn indent(indention: u32, mut ln: String) -> String {
     for _i in 0..indention {
@@ -231,13 +231,10 @@ impl Reporter {
         to_string_pretty(&suite_results).expect("Could not send to JSON")
     }
     pub fn export_to_file(output: &str, report: &str) {
-        match Path::new(output).parent() {
-            Some(parent) => {
-                if parent.exists() == false {
-                    create_dir_all(parent).expect(&format!("Could not create {:#?}", output));
-                }
-            },
-            None => { }
+        if let Some(parent) = Path::new(output).parent() {
+            if !parent.exists() {
+                create_dir_all(parent).unwrap_or_else(|_| panic!("Could not create {:#?}", output));
+            }
         }
         let mut file = File::create(output).expect("Could not create output file");
         file.write_all(report.as_bytes()).expect("Could not output to file");

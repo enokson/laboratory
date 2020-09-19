@@ -44,7 +44,7 @@ impl Spec {
     //noinspection RsMatchCheck
     pub fn run(&mut self, state: &mut State) {
         let test: &mut dyn FnMut(&mut State) -> Result<(), String> = self.test.borrow_mut();
-        if self.ignore == false {
+        if !self.ignore {
             let start_time = Instant::now();
             match (test)(state) {
                 Ok(_) => {

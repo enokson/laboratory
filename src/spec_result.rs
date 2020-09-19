@@ -19,7 +19,7 @@ impl SpecResult {
         err_msg: &Option<String>,
         time_started: Option<Instant>) -> SpecResult {
         let pass = match pass {
-            Some(result) => Some(result.clone()),
+            Some(result) => Some(result),
             None => None
         };
         let error_msg = match err_msg {
@@ -32,7 +32,7 @@ impl SpecResult {
         };
         SpecResult {
             name: name.to_string(),
-            full_name: format!("{} {}", suite_name.clone(), name.clone()),
+            full_name: format!("{} {}", suite_name, name),
             pass,
             error_msg,
             duration,
@@ -89,7 +89,7 @@ impl SpecResult {
 impl Clone for SpecResult {
     fn clone (&self) -> SpecResult {
         let pass = match &self.pass {
-            Some(result) => Some(result.clone()),
+            Some(result) => Some(*result),
             None => None
         };
         let error_msg = match &self.error_msg {
@@ -101,7 +101,7 @@ impl Clone for SpecResult {
             full_name: self.full_name.clone(),
             pass,
             error_msg,
-            duration: self.duration.clone(),
+            duration: self.duration,
         }
     }
 }
