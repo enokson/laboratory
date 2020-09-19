@@ -201,13 +201,8 @@ impl Suite {
 
     }
     fn execute_hook(&mut self, hook_name: &str) {
-        match self.hooks.get(hook_name) {
-            Some(hook) => {
-                (hook)(&mut self.state_);
-            },
-            None => {
-
-            }
+        if let Some(hook) = self.hooks.get(hook_name) {
+            (hook)(&mut self.state_);
         }
     }
     fn report(&mut self) {
@@ -217,10 +212,10 @@ impl Suite {
             match result {
                 Some(result) => {
                     match reporter {
-                        ReporterType::Spec => Reporter::spec(result.clone(), stdout),
-                        ReporterType::Minimal => Reporter::min(result.clone(), stdout),
-                        ReporterType::Json => Reporter::json(result.clone()),
-                        ReporterType::JsonPretty => Reporter::json_pretty(result.clone())
+                        ReporterType::Spec => Reporter::spec(result, stdout),
+                        ReporterType::Minimal => Reporter::min(result, stdout),
+                        ReporterType::Json => Reporter::json(result),
+                        ReporterType::JsonPretty => Reporter::json_pretty(result)
                     }
                 },
                 None => {
