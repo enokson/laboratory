@@ -82,8 +82,7 @@ mod tests {
 
             ])
 
-        ])
-        .run();
+        ]).in_microseconds().run();
 
     }
 

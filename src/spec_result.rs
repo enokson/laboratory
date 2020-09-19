@@ -1,7 +1,7 @@
 use std::time::{Instant, Duration};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct SpecResult {
     name: String,
     full_name: String,
@@ -9,7 +9,7 @@ pub struct SpecResult {
     error_msg: Option<String>,
     // pub time_started: String,
     // pub time_ended: String,
-    duration: u128
+    duration: Duration
 }
 impl SpecResult {
     pub fn new(
@@ -19,7 +19,7 @@ impl SpecResult {
         err_msg: &Option<String>,
         time_started: Option<Instant>) -> SpecResult {
         let pass = match pass {
-            Some(result) => Some(result.clone()),
+            Some(result) => Some(result),
             None => None
         };
         let error_msg = match err_msg {
@@ -27,12 +27,12 @@ impl SpecResult {
             None => None
         };
         let duration = match time_started {
-            Some(instant) => instant.elapsed().as_millis(),
-            None => 0
+            Some(instant) => instant.elapsed(),
+            None => Duration::new(0,0)
         };
         SpecResult {
             name: name.to_string(),
-            full_name: format!("{} {}", suite_name.clone(), name.clone()),
+            full_name: format!("{} {}", suite_name, name),
             pass,
             error_msg,
             duration,
@@ -74,7 +74,7 @@ impl SpecResult {
     pub fn get_name(&self) -> &str {
         &self.name
     }
-    pub fn get_duration(&self) -> &u128 {
+    pub fn get_duration(&self) -> &Duration {
         &self.duration
     }
     pub fn get_full_name(&self) -> &str { &self.full_name }
@@ -89,7 +89,7 @@ impl SpecResult {
 impl Clone for SpecResult {
     fn clone (&self) -> SpecResult {
         let pass = match &self.pass {
-            Some(result) => Some(result.clone()),
+            Some(result) => Some(*result),
             None => None
         };
         let error_msg = match &self.error_msg {
@@ -101,7 +101,7 @@ impl Clone for SpecResult {
             full_name: self.full_name.clone(),
             pass,
             error_msg,
-            duration: self.duration.clone(),
+            duration: self.duration,
         }
     }
 }

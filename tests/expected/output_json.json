@@ -1,1 +1,1 @@
-{"name":"add_one","passing":1,"failing":0,"ignored":0,"child_suites":[],"child_tests":[{"name":"should return 1","full_name":"add_one should return 1","pass":true,"error_msg":null,"duration":0}],"duration":0}
+{"name":"add_one","passing":1,"failing":0,"ignored":0,"child_suites":[],"child_tests":[{"name":"should return 1","full_name":"add_one should return 1","pass":true,"error_msg":null,"duration":{"secs":0,"nanos":623}}],"duration":{"secs":0,"nanos":12662}}

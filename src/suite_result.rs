@@ -1,7 +1,9 @@
-use serde::Serialize;
+use std::time::Duration;
+use serde::{Deserialize, Serialize};
 use super::spec_result::SpecResult;
+use super::suite::DurationPrecision;
 
-#[derive(Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct SuiteResult {
     name: String,
     passing: u64,
@@ -9,7 +11,7 @@ pub struct SuiteResult {
     ignored: u64,
     child_suites: Vec<SuiteResult>,
     child_tests: Vec<SpecResult>,
-    duration: u128
+    duration: Duration
 }
 impl SuiteResult {
     pub fn new(name: &str) -> SuiteResult {
@@ -20,21 +22,19 @@ impl SuiteResult {
             ignored: 0,
             child_suites: vec![],
             child_tests: vec![],
-            duration: 0
+            duration: Duration::new(0,0)
         }
     }
     // pub fn add_spec_result (&mut self, spec: SpecResult) {
     //     self.child_tests.push(spec);
     // }
     pub fn updated_from_suite(&mut self, child_result_option: Option<SuiteResult>) {
-        match child_result_option {
-            Some(child_result) => {
-                self.passing += child_result.get_passing();
-                self.failing += child_result.get_failing();
-                self.ignored += child_result.get_ignored();
-                self.child_suites.push(child_result);
-            },
-            _ => {}
+        if let Some(child_result) = child_result_option {
+            self.passing += child_result.get_passing();
+            self.failing += child_result.get_failing();
+            self.ignored += child_result.get_ignored();
+            self.duration += child_result.get_duration();
+            self.child_suites.push(child_result);
         }
 
     }
@@ -42,6 +42,7 @@ impl SuiteResult {
         self.passing += spec.update_passing();
         self.failing += spec.update_failing();
         self.ignored += spec.update_ignored();
+        self.duration += *spec.get_duration();
         self.child_tests.push(spec);
     }
     pub fn get_passing(&self) -> u64 { self.passing }
@@ -54,19 +55,19 @@ impl SuiteResult {
         self.child_suites.clone()
     }
     pub fn get_name(&self) -> &str { &self.name }
-    pub fn get_duration(&self) -> &u128 { &self.duration }
-    pub fn set_duration(&mut self, duration: u128) { self.duration = duration }
+    pub fn get_duration(&self) -> Duration { self.duration }
+    pub fn set_duration(&mut self, duration: Duration) { self.duration = duration }
 }
 impl Clone for SuiteResult {
     fn clone(&self) -> SuiteResult {
         SuiteResult {
             name: self.name.clone(),
-            passing: self.passing.clone(),
-            failing: self.failing.clone(),
-            ignored: self.ignored.clone(),
+            passing: self.passing,
+            failing: self.failing,
+            ignored: self.ignored,
             child_suites: self.child_suites.clone(),
             child_tests: self.child_tests.clone(),
-            duration: self.duration.clone()
+            duration: self.duration
         }
     }
 }

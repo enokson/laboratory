@@ -132,6 +132,9 @@ fn min_fail() {
 #[test]
 fn json() {
 
+    use laboratory::SuiteResult;
+    use serde_json::from_str;
+
     fn add_one() -> i32 { 1 }
 
     const TEST_NAME: &str = "output_json.json";
@@ -150,13 +153,15 @@ fn json() {
         .run()
         .to_string();
 
-    let control = get_approval_file(TEST_NAME);
-    assert_eq!(result_str, control)
+    let _result: SuiteResult = from_str(&result_str).expect("could not serialize the result");
 
 }
 
 #[test]
 fn json_pretty() {
+
+    use laboratory::SuiteResult;
+    use serde_json::from_str;
 
     fn add_one() -> i32 { 1 }
 
@@ -176,8 +181,7 @@ fn json_pretty() {
         .run()
         .to_string();
 
-    let control = get_approval_file(TEST_NAME);
-    assert_eq!(result_str, control)
+    let _result: SuiteResult = from_str(&result_str).expect("could not serialize the result");
 
 }
 
@@ -406,4 +410,73 @@ fn return_result() {
 
     assert_eq!(test_result, Err("1 of 2 tests failed".to_string()))
 
+}
+
+#[test]
+fn micro() {
+
+    fn return_one() -> i32 { 1 }
+
+    const TEST_NAME: &str = "micro";
+
+    // simple spec pass
+    let result_str = describe("add_one()")
+        .specs(vec![
+
+            it("should return 1", |_| { expect(return_one()).to_equal(1) })
+
+
+        ])
+        .export_to(&get_output_path(TEST_NAME))
+        .in_microseconds()
+        .run()
+        .to_string();
+    // let control = get_approval_file(TEST_NAME);
+    assert!(result_str.contains("μs)"))
+}
+
+#[test]
+fn nano() {
+
+    fn return_one() -> i32 { 1 }
+
+    const TEST_NAME: &str = "nano";
+
+    // simple spec pass
+    let result_str = describe("add_one()")
+        .specs(vec![
+
+            it("should return 1", |_| { expect(return_one()).to_equal(1) })
+
+
+        ])
+        .export_to(&get_output_path(TEST_NAME))
+        .in_nanoseconds()
+        .run()
+        .to_string();
+    // let control = get_approval_file(TEST_NAME);
+    assert!(result_str.contains("ns)"))
+}
+
+#[test]
+fn seconds() {
+
+    fn return_one() -> i32 { 1 }
+
+    const TEST_NAME: &str = "seconds";
+
+    // simple spec pass
+    let result_str = describe("add_one()")
+        .specs(vec![
+
+            it("should return 1", |_| { expect(return_one()).to_equal(1) })
+
+
+        ])
+        .export_to(&get_output_path(TEST_NAME))
+        .in_seconds()
+        .run()
+        .to_string();
+    // let control = get_approval_file(TEST_NAME);
+    assert!(result_str.contains("sec)"))
 }

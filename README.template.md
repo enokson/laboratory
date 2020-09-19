@@ -9,9 +9,9 @@ A simple, expressive unit test framework for Rust
 
 ## Features
 * before, before_each, after, after_each hooks  
-* Different reporter options  
+* Different reporter options: spec, minimal, json, json-pretty  
 * Different outputs such as to_string and to_result (for continuous integration tests)
-* Reports test durations  
+* Reports test durations in: nanoseconds, microseconds, milliseconds and seconds  
 * The use of custom assertion libraries  
 * Exclude tests  
 * Nested test suites  

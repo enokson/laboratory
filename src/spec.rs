@@ -13,7 +13,7 @@ pub struct Spec {
     pub only_: bool,
     pub time_started: Option<Instant>,
     // pub time_ended: Option<Instant>,
-    pub duration: Option<u128>
+    pub duration: Option<Duration>
 }
 impl Spec {
     pub fn new <T>(name: String, handle: T) -> Spec
@@ -44,7 +44,7 @@ impl Spec {
     //noinspection RsMatchCheck
     pub fn run(&mut self, state: &mut State) {
         let test: &mut dyn FnMut(&mut State) -> Result<(), String> = self.test.borrow_mut();
-        if self.ignore == false {
+        if !self.ignore {
             let start_time = Instant::now();
             match (test)(state) {
                 Ok(_) => {
@@ -61,7 +61,7 @@ impl Spec {
             }
             self.time_started = Some(start_time);
             // self.time_ended = Some(Instant::now());
-            self.duration = Some(start_time.elapsed().as_millis())
+            self.duration = Some(start_time.elapsed())
         }
     }
     pub fn export_results(&self, suite_name: &str) -> SpecResult {
