@@ -165,32 +165,29 @@ impl Suite {
         // check for specs marked as only
         for i in 0..len {
             let test = &self.specs_[i];
-            if test.only_ == true {
+            if test.only_ {
                 only_id = Some(i);
                 break;
             }
         }
 
-        match only_id {
-            Some(id) => {
+        if let Some(id) = only_id {
 
-                // set all other specs to be ignored
-                for i in 0..len {
-                    if i != id {
-                        let spec = &mut self.specs_[i];
-                        spec.ignore = true;
-                    }
+            // set all other specs to be ignored
+            for i in 0..len {
+                if i != id {
+                    let spec = &mut self.specs_[i];
+                    spec.ignore = true;
                 }
+            }
 
-            },
-            None => { }
         }
 
         // run specs not marked with ignore
         for i in 0..len {
             self.execute_hook("before each");
             let spec = &mut self.specs_[i];
-            if self.ignore == true {
+            if self.ignore {
                 spec.ignore = true;
             }
             spec.run(&mut self.state_);
@@ -203,7 +200,7 @@ impl Suite {
         let mut raw_state = self.get_state_raw();
         for i in 0..len {
             let suite = self.suites_[i].borrow_mut();
-            if self.ignore == true {
+            if self.ignore {
                 suite.ignore = true;
             }
             if suite.should_inherit() {
@@ -278,7 +275,7 @@ impl Suite {
     pub fn get_precision(&self) -> &DurationPrecision { &self.duration_precision }
 
     // SETTERS
-    pub fn set_state_raw(&mut self, state: &Vec<u8>) {
+    pub fn set_state_raw(&mut self, state: &[u8]) {
         self.state_.set_raw_state(state.to_vec());
     }
 
