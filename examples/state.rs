@@ -13,7 +13,7 @@ fn main() {
 mod tests {
 
     use super::*;
-    use laboratory::{describe, it, expect, Deserialize, Serialize, State};
+    use laboratory::{describe, it, expect, Deserialize, Serialize, State, Error};
     use std::fmt::{Debug};
 
     // We want a counter to count each time a hook or test is called
@@ -43,19 +43,20 @@ mod tests {
     fn test() {
 
         // Here we will define a function to handle all the hook calls
-        fn hook_handle(state: &mut State) {
+        fn hook_handle(state: &mut State) -> Result<(), Error> {
 
             // We need to call the get_state method in order to get the counter.
             // We also we to tell the Rust compiler what
             // type the result of get_state will be which
             // in this case is the counter.
-            let mut counter= state.get::<Counter>().unwrap();
+            let mut counter = state.get::<Counter>()?;
 
             // Now we will call the update method on Counter
             counter.update();
 
             // And if we want to update the state we need to call set_state
-            state.set(counter).unwrap();
+            state.set(counter)?;
+            Ok(())
         }
 
         // In this example we want to return the state

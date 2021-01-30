@@ -5,7 +5,8 @@ pub enum Error {
   Deserialize,
   Serialize,
   Assertion(String),
-  ResultsNotFound
+  ResultsNotFound,
+  Custom(String)
 }
 
 impl Error {
@@ -14,7 +15,8 @@ impl Error {
       Error::Deserialize => "Could not deserialize state.".to_string(),
       Error::Serialize => "Could not serialize state".to_string(),
       Error::Assertion(string_ref) => string_ref.to_string(),
-      Error::ResultsNotFound => "Results for the suite was not found".to_string()
+      Error::ResultsNotFound => "Results for the suite was not found".to_string(),
+      Error::Custom(msg) => msg.to_string()
     }
   }
 }

@@ -105,11 +105,11 @@ running 1 test
 
 
   add_one()
-     ✓  should return 1 when passed 0 (607ns)
-     ✓  should return 2 when passed 1 (118ns)
+     ✓  should return 1 when passed 0 (910ns)
+     ✓  should return 2 when passed 1 (262ns)
 
 
-  ✓ 2 tests completed (725ns)
+  ✓ 2 tests completed (1172ns)
 
 
 
@@ -226,14 +226,14 @@ running 1 test
 
   Foo
     #new()
-       ✓  should return an instance of Foo with two members (0μs)
+       ✓  should return an instance of Foo with two members (1μs)
     #append()
-       ✓  should append "fizzbuzz" to Foo#line (1μs)
+       ✓  should append "fizzbuzz" to Foo#line (2μs)
     #increase()
        ✓  should increase Foo#count by 1 (0μs)
 
 
-  ✓ 3 tests completed (2μs)
+  ✓ 3 tests completed (4μs)
 
 
 
@@ -365,7 +365,8 @@ mod tests {
             // will only be ran once.
             .before_all(|_| {
 
-                println!("\n\n  before hook called");
+                println!("\n\n  before_all hook called");
+                Ok(())
 
             })
 
@@ -375,6 +376,7 @@ mod tests {
             .before_each(|_| {
 
                 println!("  before_each hook called");
+                Ok(())
 
             })
 
@@ -383,10 +385,12 @@ mod tests {
             .after_each(|_| {
 
                 println!("  after_each hook called");
+                Ok(())
 
             }).after_all(|_| {
 
                 println!("  after_all hook called");
+                Ok(())
 
             }).specs(vec![
 
@@ -411,7 +415,7 @@ Result:
 running 1 test
 
 
-  before hook called
+  before_all hook called
   before_each hook called
   after_each hook called
   before_each hook called
@@ -455,7 +459,7 @@ fn main() {
 mod tests {
 
     use super::*;
-    use laboratory::{describe, it, expect, Deserialize, Serialize, State};
+    use laboratory::{describe, it, expect, Deserialize, Serialize, State, Error};
     use std::fmt::{Debug};
 
     // We want a counter to count each time a hook or test is called
@@ -485,19 +489,20 @@ mod tests {
     fn test() {
 
         // Here we will define a function to handle all the hook calls
-        fn hook_handle(state: &mut State) {
+        fn hook_handle(state: &mut State) -> Result<(), Error> {
 
             // We need to call the get_state method in order to get the counter.
             // We also we to tell the Rust compiler what
             // type the result of get_state will be which
             // in this case is the counter.
-            let mut counter: Counter = state.get_state();
+            let mut counter = state.get::<Counter>()?;
 
             // Now we will call the update method on Counter
             counter.update();
 
             // And if we want to update the state we need to call set_state
-            state.set_state(counter);
+            state.set(counter)?;
+            Ok(())
         }
 
         // In this example we want to return the state
@@ -509,7 +514,7 @@ mod tests {
             // using the state method, but we could very well
             // skip using the state method and define the state
             // in the before_all or even in the before_each hook.
-            .state(Counter::new("Parent Level"))
+            .state(Counter::new("Parent Level")).unwrap()
 
             // Now we will define our hooks
             .before_all(hook_handle)
@@ -549,7 +554,7 @@ mod tests {
 
                     // since this suite will not inherit state
                     // from the parent we will give it a new one.
-                    .state(Counter::new("Child Level"))
+                    .state(Counter::new("Child Level")).unwrap()
 
                     // Here is the set of hooks for the second child suite
                     .before_all(hook_handle)
@@ -591,7 +596,7 @@ mod tests {
                     .inherit_state()
 
 
-            ]).run().to_state();
+            ]).run().to_state().unwrap();
 
         println!("{:#?}\n\n", state);
 
@@ -874,7 +879,7 @@ running 1 test
           "error_msg": null,
           "duration": {
             "secs": 0,
-            "nanos": 447
+            "nanos": 559
           }
         },
         {
@@ -884,13 +889,13 @@ running 1 test
           "error_msg": null,
           "duration": {
             "secs": 0,
-            "nanos": 139
+            "nanos": 246
           }
         }
       ],
       "duration": {
         "secs": 0,
-        "nanos": 586
+        "nanos": 805
       }
     },
     {
@@ -904,23 +909,25 @@ running 1 test
           "name": "should return 2",
           "full_name": "add_two() should return 2",
           "pass": false,
-          "error_msg": "Expected 5 to equal 2",
+          "error_msg": {
+            "Assertion": "Expected 5 to equal 2"
+          },
           "duration": {
             "secs": 0,
-            "nanos": 726
+            "nanos": 1428
           }
         }
       ],
       "duration": {
         "secs": 0,
-        "nanos": 726
+        "nanos": 1428
       }
     }
   ],
   "child_tests": [],
   "duration": {
     "secs": 0,
-    "nanos": 1312
+    "nanos": 2233
   }
 }
 

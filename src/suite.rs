@@ -24,7 +24,7 @@ pub enum DurationPrecision {
 pub struct Suite {
     duration: Duration,
     duration_precision: DurationPrecision,
-    hooks: HashMap<String, Box<dyn Fn(&mut State)>>,
+    hooks: HashMap<String, Box<dyn Fn(&mut State) -> Result<(), Error>>>,
     pub ignore: bool,
     name: String,
     reporter_: ReporterType,
@@ -279,28 +279,28 @@ impl Suite {
 
     pub fn before_all<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&mut State) + 'static
+            H: Fn(&mut State) -> Result<(), Error> + 'static
     {
         self.hooks.insert("before all".to_string(), Box::new(handle));
         self
     }
     pub fn before_each<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&mut State) + 'static
+            H: Fn(&mut State) -> Result<(), Error> + 'static
     {
         self.hooks.insert("before each".to_string(), Box::new(handle));
         self
     }
     pub fn after_all<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&mut State) + 'static
+            H: Fn(&mut State) -> Result<(), Error> + 'static
     {
         self.hooks.insert("after all".to_string(), Box::new(handle));
         self
     }
     pub fn after_each<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&mut State) + 'static
+            H: Fn(&mut State) -> Result<(), Error> + 'static
     {
         self.hooks.insert("after each".to_string(), Box::new(handle));
         self

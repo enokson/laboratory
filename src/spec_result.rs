@@ -40,7 +40,8 @@ impl SpecResult {
                     Error::Assertion(msg) => Some(Error::Assertion(msg.to_string())),
                     Error::Deserialize => Some(Error::Deserialize),
                     Error::Serialize => Some(Error::Serialize),
-                    Error::ResultsNotFound => Some(Error::ResultsNotFound)
+                    Error::ResultsNotFound => Some(Error::ResultsNotFound),
+                    Error::Custom(msg) => Some(Error::Custom(msg.to_string()))
                 }
                 None => None
             },

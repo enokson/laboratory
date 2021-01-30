@@ -25,7 +25,8 @@ mod tests {
             // will only be ran once.
             .before_all(|_| {
 
-                println!("\n\n  before hook called");
+                println!("\n\n  before_all hook called");
+                Ok(())
 
             })
 
@@ -35,6 +36,7 @@ mod tests {
             .before_each(|_| {
 
                 println!("  before_each hook called");
+                Ok(())
 
             })
 
@@ -43,10 +45,12 @@ mod tests {
             .after_each(|_| {
 
                 println!("  after_each hook called");
+                Ok(())
 
             }).after_all(|_| {
 
                 println!("  after_all hook called");
+                Ok(())
 
             }).specs(vec![
 
