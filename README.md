@@ -54,7 +54,7 @@ mod tests {
 
     // now let's pull in our lab tools into scope
     // to test our function
-    use laboratory::{describe, it, expect};
+    use laboratory::{describe, expect, it};
 
     // From Rust's perspective we will only define
     // one test, but inside this test we can define
@@ -86,7 +86,7 @@ mod tests {
 
             })
 
-        ]).in_nanoseconds().run();
+        ]).in_nanoseconds().run().unwrap();
 
     }
 }
@@ -105,11 +105,11 @@ running 1 test
 
 
   add_one()
-     ✓  should return 1 when passed 0 (910ns)
-     ✓  should return 2 when passed 1 (262ns)
+     ✓  should return 1 when passed 0 (576ns)
+     ✓  should return 2 when passed 1 (217ns)
 
 
-  ✓ 2 tests completed (1172ns)
+  ✓ 2 tests completed (793ns)
 
 
 
@@ -157,7 +157,7 @@ mod tests {
     use super::*;
 
     // Now pull in the lab tools
-    use laboratory::{describe, it, expect};
+    use laboratory::{describe, expect, it};
 
     // define single test
     #[test]
@@ -208,7 +208,7 @@ mod tests {
 
             ])
 
-        ]).in_microseconds().run();
+        ]).in_microseconds().run().unwrap();
 
     }
 
@@ -299,7 +299,7 @@ mod tests {
 
             ])
 
-        ]).run();
+        ]).run().unwrap();
 
     }
 
@@ -349,7 +349,7 @@ fn main() {
 mod tests {
 
     use super::always_return_true;
-    use laboratory::{describe, it, expect};
+    use laboratory::{describe, expect, it};
 
     #[test]
     fn test() {
@@ -402,7 +402,7 @@ mod tests {
                     expect(always_return_true()).to_be(true)
                 })
 
-            ]).run();
+            ]).run().unwrap();
 
     }
 
@@ -459,7 +459,7 @@ fn main() {
 mod tests {
 
     use super::*;
-    use laboratory::{describe, it, expect, Deserialize, Serialize, State, Error};
+    use laboratory::{Deserialize, LabResult, Serialize, State, describe, expect, it};
     use std::fmt::{Debug};
 
     // We want a counter to count each time a hook or test is called
@@ -489,7 +489,7 @@ mod tests {
     fn test() {
 
         // Here we will define a function to handle all the hook calls
-        fn hook_handle(state: &mut State) -> Result<(), Error> {
+        fn hook_handle(state: &mut State) -> LabResult {
 
             // We need to call the get_state method in order to get the counter.
             // We also we to tell the Rust compiler what
@@ -537,12 +537,12 @@ mod tests {
                     .specs(vec![
 
                         it("should return 1", |state| {
-                            hook_handle(state);
+                            hook_handle(state)?;
                             expect(add_one(0)).to_be(1)
                         }),
 
                         it("should return 2", |state| {
-                            hook_handle(state);
+                            hook_handle(state)?;
                             expect(add_one(1)).to_be(2)
                         })
 
@@ -564,12 +564,12 @@ mod tests {
                     .specs(vec![
 
                         it("should return 2", |state| {
-                            hook_handle(state);
+                            hook_handle(state)?;
                             expect(add_two(0)).to_be(2)
                         }),
 
                         it("should return 4", |state| {
-                            hook_handle(state);
+                            hook_handle(state)?;
                             expect(add_two(2)).to_be(4)
                         })
 
@@ -588,7 +588,7 @@ mod tests {
                     .specs(vec![
 
                         it("should always return true", |state| {
-                            hook_handle(state);
+                            hook_handle(state)?;
                             expect(add_one(0)).to_be(1)
                         })
 
@@ -596,7 +596,8 @@ mod tests {
                     .inherit_state()
 
 
-            ]).run().to_state().unwrap();
+            ]).run().unwrap()
+            .to_state().unwrap();
 
         println!("{:#?}\n\n", state);
 
@@ -769,7 +770,7 @@ mod tests {
             ])
 
             // Now we can run our tests with any other options
-            .run();
+            .run().unwrap();
 
     }
 
@@ -820,7 +821,7 @@ fn add_two (x: u64) -> u64 { x + 5 }
 mod tests {
 
     use super::*;
-    use laboratory::{describe, it, expect};
+    use laboratory::{describe, expect, it};
 
     #[test]
     fn suite() {
@@ -849,7 +850,7 @@ mod tests {
 
             ])
 
-        ]).json_pretty().run();
+        ]).json_pretty().run().unwrap();
 
     }
 }
@@ -879,7 +880,7 @@ running 1 test
           "error_msg": null,
           "duration": {
             "secs": 0,
-            "nanos": 559
+            "nanos": 555
           }
         },
         {
@@ -889,13 +890,13 @@ running 1 test
           "error_msg": null,
           "duration": {
             "secs": 0,
-            "nanos": 246
+            "nanos": 219
           }
         }
       ],
       "duration": {
         "secs": 0,
-        "nanos": 805
+        "nanos": 774
       }
     },
     {
@@ -909,25 +910,23 @@ running 1 test
           "name": "should return 2",
           "full_name": "add_two() should return 2",
           "pass": false,
-          "error_msg": {
-            "Assertion": "Expected 5 to equal 2"
-          },
+          "error_msg": "Expected 5 to equal 2",
           "duration": {
             "secs": 0,
-            "nanos": 1428
+            "nanos": 1385
           }
         }
       ],
       "duration": {
         "secs": 0,
-        "nanos": 1428
+        "nanos": 1385
       }
     }
   ],
   "child_tests": [],
   "duration": {
     "secs": 0,
-    "nanos": 2233
+    "nanos": 2159
   }
 }
 
