@@ -49,7 +49,7 @@ mod tests {
             // We also we to tell the Rust compiler what
             // type the result of get_state will be which
             // in this case is the counter.
-            let mut counter: Counter = state.get().unwrap();
+            let mut counter= state.get::<Counter>().unwrap();
 
             // Now we will call the update method on Counter
             counter.update();

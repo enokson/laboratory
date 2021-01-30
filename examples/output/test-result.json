@@ -18,7 +18,7 @@
           "error_msg": null,
           "duration": {
             "secs": 0,
-            "nanos": 546
+            "nanos": 354
           }
         },
         {
@@ -28,13 +28,13 @@
           "error_msg": null,
           "duration": {
             "secs": 0,
-            "nanos": 216
+            "nanos": 138
           }
         }
       ],
       "duration": {
         "secs": 0,
-        "nanos": 762
+        "nanos": 492
       }
     },
     {
@@ -53,19 +53,19 @@
           },
           "duration": {
             "secs": 0,
-            "nanos": 1433
+            "nanos": 918
           }
         }
       ],
       "duration": {
         "secs": 0,
-        "nanos": 1433
+        "nanos": 918
       }
     }
   ],
   "child_tests": [],
   "duration": {
     "secs": 0,
-    "nanos": 2195
+    "nanos": 1410
   }
 }
