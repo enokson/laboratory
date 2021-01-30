@@ -49,13 +49,13 @@ mod tests {
             // We also we to tell the Rust compiler what
             // type the result of get_state will be which
             // in this case is the counter.
-            let mut counter: Counter = state.get_state();
+            let mut counter: Counter = state.get().unwrap();
 
             // Now we will call the update method on Counter
             counter.update();
 
             // And if we want to update the state we need to call set_state
-            state.set_state(counter);
+            state.set(counter).unwrap();
         }
 
         // In this example we want to return the state
@@ -67,7 +67,7 @@ mod tests {
             // using the state method, but we could very well
             // skip using the state method and define the state
             // in the before_all or even in the before_each hook.
-            .state(Counter::new("Parent Level"))
+            .state(Counter::new("Parent Level")).unwrap()
 
             // Now we will define our hooks
             .before_all(hook_handle)
@@ -107,7 +107,7 @@ mod tests {
 
                     // since this suite will not inherit state
                     // from the parent we will give it a new one.
-                    .state(Counter::new("Child Level"))
+                    .state(Counter::new("Child Level")).unwrap()
 
                     // Here is the set of hooks for the second child suite
                     .before_all(hook_handle)
@@ -149,7 +149,7 @@ mod tests {
                     .inherit_state()
 
 
-            ]).run().to_state();
+            ]).run().to_state().unwrap();
 
         println!("{:#?}\n\n", state);
 

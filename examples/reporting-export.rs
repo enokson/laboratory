@@ -1,4 +1,3 @@
-use std::path::Path;
 
 fn main() {
     add_one(0);
@@ -13,6 +12,7 @@ mod tests {
 
     use super::*;
     use laboratory::{describe, it, expect};
+    use std::path::Path;
 
     #[test]
     fn suite() {

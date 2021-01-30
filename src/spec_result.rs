@@ -1,14 +1,15 @@
 use std::time::{Instant, Duration};
 use serde::{Deserialize, Serialize};
+use crate::error;
+
+use super::error::Error;
 
 #[derive(Deserialize, Serialize)]
 pub struct SpecResult {
     name: String,
     full_name: String,
     pass: Option<bool>,
-    error_msg: Option<String>,
-    // pub time_started: String,
-    // pub time_ended: String,
+    error_msg: Option<Error>,
     duration: Duration
 }
 impl SpecResult {
@@ -16,7 +17,7 @@ impl SpecResult {
         suite_name: &str,
         name: &str,
         pass: Option<bool>,
-        err_msg: &Option<String>,
+        err_msg: &Option<Error>,
         time_started: Option<Instant>) -> SpecResult {
         let pass = match pass {
             Some(result) => Some(result),
@@ -34,7 +35,15 @@ impl SpecResult {
             name: name.to_string(),
             full_name: format!("{} {}", suite_name, name),
             pass,
-            error_msg,
+            error_msg: match error_msg {
+                Some(error) => match error {
+                    Error::Assertion(msg) => Some(Error::Assertion(msg.to_string())),
+                    Error::Deserialize => Some(Error::Deserialize),
+                    Error::Serialize => Some(Error::Serialize),
+                    Error::ResultsNotFound => Some(Error::ResultsNotFound)
+                }
+                None => None
+            },
             duration,
         }
     }
@@ -78,10 +87,10 @@ impl SpecResult {
         &self.duration
     }
     pub fn get_full_name(&self) -> &str { &self.full_name }
-    pub fn get_err_msg(&self) -> &str {
+    pub fn get_err_msg(&self) -> String {
         match &self.error_msg {
-            Some(err_msg) => err_msg,
-            None => ""
+            Some(err_msg) => err_msg.to_string(),
+            None => "".to_string()
         }
     }
 }

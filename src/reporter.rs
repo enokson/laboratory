@@ -32,7 +32,7 @@ fn display_spec_err_msg(spec: &SpecResult, fail_id: &u64, stdout: bool, mut ln: 
 
     } else {
         ln += &format!("{}) {}: ", fail_id, spec.get_full_name());
-        ln += spec.get_err_msg();
+        ln += &spec.get_err_msg();
     }
     ln += "\n";
     ln

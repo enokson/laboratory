@@ -8,7 +8,7 @@ use console::style;
 // use serde::de::Deserialize;
 use serde::{Deserialize, Serialize};
 
-
+use super::error::Error;
 use super::spec::Spec;
 use super::reporter::{ReporterType, Reporter};
 use super::state::State;
@@ -70,11 +70,9 @@ impl Suite {
         self.suites_ = suites;
         self
     }
-    pub fn state<'a, S: Deserialize<'a> + Serialize>(mut self, state: S) -> Self {
-        // self.state_hash.insert(1, Box::new(state));
-        self.state_.set_state(state);
-        // self.bit_state = to_vec(&state).expect("Could not Deserialize state");
-        self
+    pub fn state<'a, S: Deserialize<'a> + Serialize>(mut self, state: S) -> Result<Self, Error> {
+        self.state_.set(state)?;
+        Ok(self)
     }
     pub fn skip (mut self) -> Self {
         self.ignore = true;
@@ -110,13 +108,13 @@ impl Suite {
         self.stdout = false;
         self
     }
-    pub fn to_state<'a, S: Deserialize<'a>>(&'a self) -> S {
-        self.state_.get_state()
+    pub fn to_state<'a, S: Deserialize<'a>>(&'a self) -> Result<S, Error> {
+        self.state_.get()
     }
     pub fn to_string(&self) -> String {
         self.report.clone()
     }
-    pub fn to_result(&self) -> Result<(), String> {
+    pub fn to_result(&self) -> Result<(), Error> {
         match &self.result {
             Some(result) => {
                 let failing_tests = result.get_failing();
@@ -124,10 +122,10 @@ impl Suite {
                     Ok(())
                 } else {
                     let total_tests = result.get_passing() + failing_tests;
-                    Err(format!("{} of {} tests failed", failing_tests, total_tests))
+                    Err(Error::Assertion(format!("{} of {} tests failed", failing_tests, total_tests)))
                 }
             },
-            None => Err("Results for the suite was not found".to_string())
+            None => Err(Error::ResultsNotFound)
         }
     }
 

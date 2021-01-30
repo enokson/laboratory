@@ -1,3 +1,4 @@
+use crate::{error::Error, reporter::Reporter};
 use bincode::{serialize, deserialize};
 use serde::{Deserialize, Serialize};
 
@@ -8,16 +9,23 @@ impl State {
     pub fn new() -> State {
         State { state: vec![] }
     }
-    pub fn get_state<'a, T>(&'a self) -> T
+    pub fn get<'a, T>(&'a self) -> Result<T, Error>
         where
             T: Deserialize<'a>
     {
-        deserialize(&self.state).expect("Could not deserialize state.")
-        // from_str(&self.state).expect("Could not convert from string")
+        let value: Result<T, Error> = match deserialize(&self.state) {
+            Ok(value) => Ok(value),
+            Err(_error) => Err(Error::Deserialize)
+        };
+        value
     }
-    pub fn set_state<T: Serialize>(& mut self, state: T) {
-        // self.state = to_string(&state).expect("Could not convert to String.");
-        self.state = serialize(&state).expect("Could not serialize state.");
+    pub fn set<T: Serialize>(& mut self, state: T) -> Result<(), Error> {
+        let state = match serialize(&state) {
+            Ok(vec) => Ok(vec),
+            Err(_error) => Err(Error::Deserialize)
+        }?;
+        self.state = state;
+        Ok(())
     }
     pub fn get_raw_state(&self) -> Vec<u8> {
         self.state.to_vec()

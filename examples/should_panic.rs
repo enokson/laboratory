@@ -1,6 +1,8 @@
 #[macro_use] extern crate laboratory;
 
-fn main() {}
+fn main() {
+    panic_at_the_disco(false);
+}
 
 fn panic_at_the_disco(should_panic: bool) {
     if should_panic {
@@ -11,7 +13,7 @@ fn panic_at_the_disco(should_panic: bool) {
 #[cfg(test)]
 mod tests {
 
-    use laboratory::{describe, it};
+    use laboratory::{describe, it, Error};
     use super::*;
 
     #[test]

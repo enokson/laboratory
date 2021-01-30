@@ -1,24 +1,25 @@
 use std::time::{Instant, Duration};
 use std::borrow::BorrowMut;
 use serde::Serialize;
+use super::error::Error;
 use super::spec_result::SpecResult;
 use super::state::State;
 
+
 pub struct Spec {
     pub name: String,
-    pub test: Box<dyn FnMut(&mut State) -> Result<(), String>>,
+    pub test: Box<dyn FnMut(&mut State) -> Result<(), Error>>,
     pub pass: Option<bool>,
-    pub error_msg: Option<String>,
+    pub error_msg: Option<Error>,
     pub ignore: bool,
     pub only_: bool,
     pub time_started: Option<Instant>,
-    // pub time_ended: Option<Instant>,
     pub duration: Option<Duration>
 }
 impl Spec {
     pub fn new <T>(name: String, handle: T) -> Spec
         where
-            T: FnMut(&mut State) -> Result<(), String> + 'static
+            T: FnMut(&mut State) -> Result<(), Error> + 'static
     {
         Spec {
             name,
@@ -28,7 +29,6 @@ impl Spec {
             ignore: false,
             only_: false,
             time_started: None,
-            // time_ended: None,
             duration: None
         }
     }
@@ -41,9 +41,8 @@ impl Spec {
         self
     }
 
-    //noinspection RsMatchCheck
     pub fn run(&mut self, state: &mut State) {
-        let test: &mut dyn FnMut(&mut State) -> Result<(), String> = self.test.borrow_mut();
+        let test: &mut dyn FnMut(&mut State) -> Result<(), Error> = self.test.borrow_mut();
         if !self.ignore {
             let start_time = Instant::now();
             match (test)(state) {
@@ -53,14 +52,9 @@ impl Spec {
                 Err(message) => {
                     self.pass = Some(false);
                     self.error_msg = Some(message);
-                }/*,
-                _ => {
-                    self.pass = Some(false);
-                    self.error_msg = Some("something happened".to_string());
-                }*/
+                }
             }
             self.time_started = Some(start_time);
-            // self.time_ended = Some(Instant::now());
             self.duration = Some(start_time.elapsed())
         }
     }

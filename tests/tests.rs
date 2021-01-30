@@ -1,6 +1,6 @@
 use std::fs::{remove_file, read_to_string};
-use std::path::Path;
 use laboratory::*;
+use laboratory::Error;
 
 const EXPECTED_FOLDER: &str = "./tests/expected";
 const OUTPUT_FOLDER: &str = "./tests/output";
@@ -343,46 +343,40 @@ fn state_passing() {
     fn return_two() -> i32 { 2 }
 
     let counter: Counter = describe("Library")
-        .state(Counter::new())
+        .state(Counter::new()).unwrap()
         .suites(vec![
 
             describe("return_one()")
                 .inherit_state()
                 .specs(vec![
 
-                    it("should return 1", |suite| {
-                        let mut counter: Counter = suite.get_state();
+                    it("should return 1", |state| {
+                        let mut counter: Counter = state.get()?;
                         counter.count += 1;
-                        suite.set_state(counter);
+                        state.set(counter)?;
                         expect(return_one()).to_equal(1)
 
                     }),
-                    it("should return 1 again", |suite| {
-
-                        let mut counter: Counter = suite.get_state();
+                    it("should return 1 again", |state| {
+                        let mut counter: Counter = state.get()?;
                         counter.count += 1;
-                        suite.set_state(counter);
+                        state.set(counter)?;
                         expect(return_one()).to_equal(1)
-
                     })
 
                 ]),
 
             describe("return_two()")
                 .specs(vec![
-
                     it("should return 2", |_| {
-
                         expect(return_two()).to_equal(2)
-
                     })
-
                 ])
 
 
         ])
         .run()
-        .to_state();
+        .to_state().unwrap();
 
     assert_eq!(counter.count, 2)
 
@@ -408,7 +402,15 @@ fn return_result() {
 
     ]).run().to_result();
 
-    assert_eq!(test_result, Err("1 of 2 tests failed".to_string()))
+    let mut does_match = false;
+    if let Err(error) = test_result {
+        if let Error::Assertion(msg) = error {
+            if "1 of 2 tests failed".to_string() == msg {
+                does_match = true
+            }
+        }
+    }
+    assert_eq!(does_match, true)
 
 }
 
@@ -479,4 +481,29 @@ fn seconds() {
         .to_string();
     // let control = get_approval_file(TEST_NAME);
     assert!(result_str.contains("sec)"))
+}
+
+#[test]
+fn should_catch_state_deserialize_error() {
+
+    #[derive(Serialize, Deserialize)]
+    struct MyStruct {
+        pub foo: String
+    }
+
+    #[derive(Serialize, Deserialize)]
+    struct MyOtherStruct {
+        pub foo: String,
+        pub bar: String
+    }
+
+    describe("add_one()")
+        .state(MyStruct { foo: "fizzbuzz".to_string() }).unwrap()
+        .specs(vec![
+            it("should return 1", |state| {
+                let my_other_struct: MyOtherStruct = state.get::<MyOtherStruct>()?;
+                expect(my_other_struct.bar).to_equal("hello, worlds".to_string())
+            })
+        ])
+        .run();
 }
