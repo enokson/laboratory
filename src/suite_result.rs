@@ -25,9 +25,6 @@ impl SuiteResult {
             duration: Duration::new(0,0)
         }
     }
-    // pub fn add_spec_result (&mut self, spec: SpecResult) {
-    //     self.child_tests.push(spec);
-    // }
     pub fn updated_from_suite(&mut self, child_result_option: Option<SuiteResult>) {
         if let Some(child_result) = child_result_option {
             self.passing += child_result.get_passing();
@@ -36,7 +33,6 @@ impl SuiteResult {
             self.duration += child_result.get_duration();
             self.child_suites.push(child_result);
         }
-
     }
     pub fn update_from_spec(&mut self, spec: SpecResult) {
         self.passing += spec.update_passing();

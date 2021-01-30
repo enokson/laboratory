@@ -31,7 +31,7 @@ mod tests {
     use super::*;
 
     // Now pull in the lab tools
-    use laboratory::{describe, it, expect};
+    use laboratory::{describe, expect, it};
 
     // define single test
     #[test]
@@ -82,7 +82,7 @@ mod tests {
 
             ])
 
-        ]).in_microseconds().run();
+        ]).in_microseconds().run().unwrap();
 
     }
 

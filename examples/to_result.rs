@@ -10,11 +10,11 @@ fn main() {
 #[cfg(test)]
 mod tests {
 
-    use laboratory::{describe, it, expect, Error};
+    use laboratory::{LabResult, describe, expect, it};
     use crate::{always_return_true, always_return_false};
 
     #[test]
-    fn test() -> Result<(), Error> {
+    fn test() -> LabResult {
 
         let result =  describe("Crate").suites(vec![
 
@@ -38,16 +38,14 @@ mod tests {
 
             ])
 
-        ]).run().to_result();
+        ]).run().unwrap().to_result();
 
-        if let Err(error) = result {
+        if let Err(msg) = result {
             // the resulting error is being caught for the puposes of this example,
             // but we can still print it out (also for the purposes of this example.)
             // In the real world we would just let it fail
             // If you want to see what would happen, simply comment out this block of code
-            if let Error::Assertion(msg) = error {
-                println!("{}", msg);
-            }
+            println!("{}", msg);
             return Ok(())
         }
 

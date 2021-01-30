@@ -9,9 +9,7 @@ mod reporter;
 mod state;
 mod suite_result;
 mod spec_result;
-mod error;
 
-pub use error::Error;
 pub use suite::{Suite, DurationPrecision};
 pub use suite_result::SuiteResult;
 pub use state::State;
@@ -19,6 +17,9 @@ pub use assertion::Expect;
 pub use spec::Spec;
 use std::fmt::{Debug};
 pub use serde::{Deserialize, Serialize};
+
+pub type LabResult = Result<(), String>;
+
 
 #[macro_export]
 macro_rules! should_panic {
@@ -36,7 +37,7 @@ macro_rules! should_panic {
             if tmp_result == false {
                 Ok(())
             } else {
-                Err(Error::Assertion(format!("Expected {} to panic but it didn't", stringify!($name))))
+                Err(format!("Expected {} to panic but it didn't", stringify!($name)))
             }
 
         }
@@ -61,7 +62,7 @@ macro_rules! should_not_panic {
             if tmp_result == true {
                 Ok(())
             } else {
-                Err(Error::Assertion(format!("Expected {} to panic but it didn't", stringify!($name))))
+                Err(format!("Expected {} to panic but it didn't", stringify!($name)))
             }
 
         }
@@ -85,21 +86,21 @@ pub fn describe_skip(name: &'static str) -> Suite {
 
 pub fn it <H>(name: &'static str, handle: H) -> Spec
 where
-    H: FnMut(&mut State) -> Result<(), Error> + 'static
+    H: FnMut(&mut State) -> Result<(), String> + 'static
 {
     Spec::new(name.to_string(), handle)
 }
 
 pub fn it_skip<H>(name: &'static str, handle: H) -> Spec
     where
-        H: FnMut(&mut State) -> Result<(), Error> + 'static
+        H: FnMut(&mut State) -> Result<(), String> + 'static
 {
     Spec::new(name.to_string(), handle).skip()
 }
 
 pub fn it_only<H>(name: &'static str, handle: H) -> Spec
     where
-        H: FnMut(&mut State) -> Result<(), Error> + 'static
+        H: FnMut(&mut State) -> Result<(), String> + 'static
 {
     Spec::new(name.to_string(), handle).only()
 }

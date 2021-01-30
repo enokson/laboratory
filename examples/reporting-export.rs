@@ -39,7 +39,8 @@ mod tests {
 
             ])
 
-        ]).json_pretty().export_to(Path::new("./examples/output/test-result.json").to_str().expect("Could make new path")).run();
+        ]).json_pretty().export_to(Path::new("./examples/output/test-result.json").to_str().expect("Could make new path"))
+        .run().unwrap();
 
     }
 

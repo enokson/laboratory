@@ -23,7 +23,7 @@ mod tests {
                 expect(add_one(1)).to_equal(2)
             })
 
-        ]).run();
+        ]).run().unwrap();
 
     }
 }

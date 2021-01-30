@@ -18,7 +18,7 @@
           "error_msg": null,
           "duration": {
             "secs": 0,
-            "nanos": 830
+            "nanos": 401
           }
         },
         {
@@ -28,13 +28,13 @@
           "error_msg": null,
           "duration": {
             "secs": 0,
-            "nanos": 287
+            "nanos": 143
           }
         }
       ],
       "duration": {
         "secs": 0,
-        "nanos": 1117
+        "nanos": 544
       }
     },
     {
@@ -48,24 +48,22 @@
           "name": "should return 2",
           "full_name": "add_two() should return 2",
           "pass": false,
-          "error_msg": {
-            "Assertion": "Expected 5 to equal 2"
-          },
+          "error_msg": "Expected 5 to equal 2",
           "duration": {
             "secs": 0,
-            "nanos": 1866
+            "nanos": 958
           }
         }
       ],
       "duration": {
         "secs": 0,
-        "nanos": 1866
+        "nanos": 958
       }
     }
   ],
   "child_tests": [],
   "duration": {
     "secs": 0,
-    "nanos": 2983
+    "nanos": 1502
   }
 }

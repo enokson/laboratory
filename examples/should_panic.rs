@@ -13,7 +13,7 @@ fn panic_at_the_disco(should_panic: bool) {
 #[cfg(test)]
 mod tests {
 
-    use laboratory::{describe, it, Error};
+    use laboratory::{describe, it};
     use super::*;
 
     #[test]
@@ -28,7 +28,7 @@ mod tests {
                 should_not_panic!(panic_at_the_disco, || { panic_at_the_disco(false); })
             })
 
-        ]).run();
+        ]).run().unwrap();
 
     }
 

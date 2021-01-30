@@ -8,7 +8,8 @@ use console::style;
 // use serde::de::Deserialize;
 use serde::{Deserialize, Serialize};
 
-use super::error::Error;
+use crate::LabResult;
+
 use super::spec::Spec;
 use super::reporter::{ReporterType, Reporter};
 use super::state::State;
@@ -24,7 +25,7 @@ pub enum DurationPrecision {
 pub struct Suite {
     duration: Duration,
     duration_precision: DurationPrecision,
-    hooks: HashMap<String, Box<dyn Fn(&mut State) -> Result<(), Error>>>,
+    hooks: HashMap<String, Box<dyn Fn(&mut State) -> Result<(), String>>>,
     pub ignore: bool,
     name: String,
     reporter_: ReporterType,
@@ -58,9 +59,9 @@ impl Suite {
             inherit_state_: false
         }
     }
-    pub fn run(mut self) -> Self {
-        self.run_(0);
-        self
+    pub fn run(mut self) -> Result<Self, String> {
+        self.run_(0)?;
+        Ok(self)
     }
     pub fn specs(mut self, tests: Vec<Spec>) -> Self {
         self.specs_ = tests;
@@ -70,7 +71,7 @@ impl Suite {
         self.suites_ = suites;
         self
     }
-    pub fn state<'a, S: Deserialize<'a> + Serialize>(mut self, state: S) -> Result<Self, Error> {
+    pub fn state<'a, S: Deserialize<'a> + Serialize>(mut self, state: S) -> Result<Self, String> {
         self.state_.set(state)?;
         Ok(self)
     }
@@ -108,13 +109,13 @@ impl Suite {
         self.stdout = false;
         self
     }
-    pub fn to_state<'a, S: Deserialize<'a>>(&'a self) -> Result<S, Error> {
+    pub fn to_state<'a, S: Deserialize<'a>>(&'a self) -> Result<S, String> {
         self.state_.get()
     }
     pub fn to_string(&self) -> String {
         self.report.clone()
     }
-    pub fn to_result(&self) -> Result<(), Error> {
+    pub fn to_result(&self) -> Result<(), String> {
         match &self.result {
             Some(result) => {
                 let failing_tests = result.get_failing();
@@ -122,10 +123,10 @@ impl Suite {
                     Ok(())
                 } else {
                     let total_tests = result.get_passing() + failing_tests;
-                    Err(Error::Assertion(format!("{} of {} tests failed", failing_tests, total_tests)))
+                    Err(format!("{} of {} tests failed", failing_tests, total_tests))
                 }
             },
-            None => Err(Error::ResultsNotFound)
+            None => Err(format!("Results for the suite was not found"))
         }
     }
 
@@ -153,10 +154,12 @@ impl Suite {
             None => None
         }
     }
-    fn run_(&mut self, nest_count: u32) {
+    fn run_(&mut self, nest_count: u32) -> Result<(), String> {
 
         let mut result = SuiteResult::new(&self.name);
-        self.execute_hook("before all");
+        if let Err(msg) = self.execute_hook("before all") {
+            return Err(format!("There was an error in the before all hook in the {} suite: {}", self.name, msg));
+        };
         let len = self.specs_.len();
         let mut only_id = None;
 
@@ -183,15 +186,18 @@ impl Suite {
 
         // run specs not marked with ignore
         for i in 0..len {
-            self.execute_hook("before each");
+            if let Err(msg) = self.execute_hook("before each") {
+                return Err(format!("There was an error in the before each hook in the {} suite: {}", self.name, msg));
+            };
             let spec = &mut self.specs_[i];
             if self.ignore {
                 spec.ignore = true;
             }
             spec.run(&mut self.state_);
             result.update_from_spec(spec.export_results(&self.name));
-            // (self.after_each_handle)();
-            self.execute_hook("after each");
+            if let Err(msg) = self.execute_hook("after each") {
+                return Err(format!("There was an error in the after each hook in the {} suite: {}", self.name, msg));
+            }            
         }
 
         let len = self.suites_.len();
@@ -205,7 +211,7 @@ impl Suite {
                 // let raw_state = self.get_state_raw();
                 suite.set_state_raw(&raw_state);
             }
-            suite.run_(nest_count + 1);
+            suite.run_(nest_count + 1)?;
             result.updated_from_suite(suite.clone_result());
             if suite.should_inherit() {
                 raw_state = suite.get_state_raw();
@@ -213,19 +219,22 @@ impl Suite {
             }
         }
         self.set_state_raw(&raw_state);
-        self.execute_hook("after all");
-        // result.set_duration(start_time.elapsed());
+        if let Err(msg) = self.execute_hook("after all") {
+            return Err(format!("There was an error in the after all hook in the {} suite: {}", self.name, msg));
+        };
+        
 
         self.result = Some(result);
         if nest_count == 0 {
             self.report();
         }
-
+        Ok(())
     }
-    fn execute_hook(&mut self, hook_name: &str) {
+    fn execute_hook(&mut self, hook_name: &str) -> Result<(), String> {
         if let Some(hook) = self.hooks.get(hook_name) {
-            (hook)(&mut self.state_);
+            (hook)(&mut self.state_)?;
         }
+        Ok(())
     }
     fn report(&mut self) {
 
@@ -279,28 +288,28 @@ impl Suite {
 
     pub fn before_all<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&mut State) -> Result<(), Error> + 'static
+            H: Fn(&mut State) -> Result<(), String> + 'static
     {
         self.hooks.insert("before all".to_string(), Box::new(handle));
         self
     }
     pub fn before_each<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&mut State) -> Result<(), Error> + 'static
+            H: Fn(&mut State) -> Result<(), String> + 'static
     {
         self.hooks.insert("before each".to_string(), Box::new(handle));
         self
     }
     pub fn after_all<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&mut State) -> Result<(), Error> + 'static
+            H: Fn(&mut State) -> Result<(), String> + 'static
     {
         self.hooks.insert("after all".to_string(), Box::new(handle));
         self
     }
     pub fn after_each<H>(mut self, handle: H) -> Self
         where
-            H: Fn(&mut State) -> Result<(), Error> + 'static
+            H: Fn(&mut State) -> Result<(), String> + 'static
     {
         self.hooks.insert("after each".to_string(), Box::new(handle));
         self

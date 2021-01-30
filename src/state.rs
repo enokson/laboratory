@@ -1,4 +1,4 @@
-use crate::{error::Error, reporter::Reporter};
+use crate::reporter::Reporter;
 use bincode::{serialize, deserialize};
 use serde::{Deserialize, Serialize};
 
@@ -9,20 +9,20 @@ impl State {
     pub fn new() -> State {
         State { state: vec![] }
     }
-    pub fn get<'a, T>(&'a self) -> Result<T, Error>
+    pub fn get<'a, T>(&'a self) -> Result<T, String>
         where
             T: Deserialize<'a>
     {
-        let value: Result<T, Error> = match deserialize(&self.state) {
+        let value: Result<T, String> = match deserialize(&self.state) {
             Ok(value) => Ok(value),
-            Err(_error) => Err(Error::Deserialize)
+            Err(_error) => Err(format!("Could not seserialize state."))
         };
         value
     }
-    pub fn set<T: Serialize>(& mut self, state: T) -> Result<(), Error> {
+    pub fn set<T: Serialize>(& mut self, state: T) -> Result<(), String> {
         let state = match serialize(&state) {
             Ok(vec) => Ok(vec),
-            Err(_error) => Err(Error::Deserialize)
+            Err(_error) => Err(format!("Could not serialize state."))
         }?;
         self.state = state;
         Ok(())

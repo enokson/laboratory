@@ -1,15 +1,12 @@
 use std::time::{Instant, Duration};
 use serde::{Deserialize, Serialize};
-use crate::error;
-
-use super::error::Error;
 
 #[derive(Deserialize, Serialize)]
 pub struct SpecResult {
     name: String,
     full_name: String,
     pass: Option<bool>,
-    error_msg: Option<Error>,
+    error_msg: Option<String>,
     duration: Duration
 }
 impl SpecResult {
@@ -17,7 +14,7 @@ impl SpecResult {
         suite_name: &str,
         name: &str,
         pass: Option<bool>,
-        err_msg: &Option<Error>,
+        err_msg: &Option<String>,
         time_started: Option<Instant>) -> SpecResult {
         let pass = match pass {
             Some(result) => Some(result),
@@ -35,16 +32,7 @@ impl SpecResult {
             name: name.to_string(),
             full_name: format!("{} {}", suite_name, name),
             pass,
-            error_msg: match error_msg {
-                Some(error) => match error {
-                    Error::Assertion(msg) => Some(Error::Assertion(msg.to_string())),
-                    Error::Deserialize => Some(Error::Deserialize),
-                    Error::Serialize => Some(Error::Serialize),
-                    Error::ResultsNotFound => Some(Error::ResultsNotFound),
-                    Error::Custom(msg) => Some(Error::Custom(msg.to_string()))
-                }
-                None => None
-            },
+            error_msg,
             duration,
         }
     }

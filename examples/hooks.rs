@@ -9,7 +9,7 @@ fn main() {
 mod tests {
 
     use super::always_return_true;
-    use laboratory::{describe, it, expect};
+    use laboratory::{describe, expect, it};
 
     #[test]
     fn test() {
@@ -62,7 +62,7 @@ mod tests {
                     expect(always_return_true()).to_be(true)
                 })
 
-            ]).run();
+            ]).run().unwrap();
 
     }
 

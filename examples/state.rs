@@ -13,7 +13,7 @@ fn main() {
 mod tests {
 
     use super::*;
-    use laboratory::{describe, it, expect, Deserialize, Serialize, State, Error};
+    use laboratory::{Deserialize, LabResult, Serialize, State, describe, expect, it};
     use std::fmt::{Debug};
 
     // We want a counter to count each time a hook or test is called
@@ -43,7 +43,7 @@ mod tests {
     fn test() {
 
         // Here we will define a function to handle all the hook calls
-        fn hook_handle(state: &mut State) -> Result<(), Error> {
+        fn hook_handle(state: &mut State) -> LabResult {
 
             // We need to call the get_state method in order to get the counter.
             // We also we to tell the Rust compiler what
@@ -91,12 +91,12 @@ mod tests {
                     .specs(vec![
 
                         it("should return 1", |state| {
-                            hook_handle(state);
+                            hook_handle(state)?;
                             expect(add_one(0)).to_be(1)
                         }),
 
                         it("should return 2", |state| {
-                            hook_handle(state);
+                            hook_handle(state)?;
                             expect(add_one(1)).to_be(2)
                         })
 
@@ -118,12 +118,12 @@ mod tests {
                     .specs(vec![
 
                         it("should return 2", |state| {
-                            hook_handle(state);
+                            hook_handle(state)?;
                             expect(add_two(0)).to_be(2)
                         }),
 
                         it("should return 4", |state| {
-                            hook_handle(state);
+                            hook_handle(state)?;
                             expect(add_two(2)).to_be(4)
                         })
 
@@ -142,7 +142,7 @@ mod tests {
                     .specs(vec![
 
                         it("should always return true", |state| {
-                            hook_handle(state);
+                            hook_handle(state)?;
                             expect(add_one(0)).to_be(1)
                         })
 
@@ -150,7 +150,8 @@ mod tests {
                     .inherit_state()
 
 
-            ]).run().to_state().unwrap();
+            ]).run().unwrap()
+            .to_state().unwrap();
 
         println!("{:#?}\n\n", state);
 

@@ -11,7 +11,7 @@ fn add_two (x: u64) -> u64 { x + 5 }
 mod tests {
 
     use super::*;
-    use laboratory::{describe, it, expect};
+    use laboratory::{describe, expect, it};
 
     #[test]
     fn suite() {
@@ -40,7 +40,7 @@ mod tests {
 
             ])
 
-        ]).json_pretty().run();
+        ]).json_pretty().run().unwrap();
 
     }
 }

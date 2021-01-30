@@ -15,7 +15,7 @@ mod tests {
 
     // now let's pull in our lab tools into scope
     // to test our function
-    use laboratory::{describe, it, expect};
+    use laboratory::{describe, expect, it};
 
     // From Rust's perspective we will only define
     // one test, but inside this test we can define
@@ -47,7 +47,7 @@ mod tests {
 
             })
 
-        ]).in_nanoseconds().run();
+        ]).in_nanoseconds().run().unwrap();
 
     }
 }

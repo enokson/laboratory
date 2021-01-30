@@ -13,9 +13,6 @@ use super::spec_result::SpecResult;
 
 fn get_count(suite: &SuiteResult, count: &mut u64) -> u64 {
     *count += suite.get_passing() + suite.get_failing() as u64;
-    // for child in suite.get_child_suites() {
-    //     get_count(&child, count);
-    // }
     *count
 }
 fn indent(indention: u32, mut ln: String) -> String {

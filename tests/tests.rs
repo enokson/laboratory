@@ -1,6 +1,5 @@
 use std::fs::{remove_file, read_to_string};
 use laboratory::*;
-use laboratory::Error;
 
 const EXPECTED_FOLDER: &str = "./tests/expected";
 const OUTPUT_FOLDER: &str = "./tests/output";
@@ -44,7 +43,7 @@ fn simple_pass() {
 
         ])
         .export_to(&get_output_path(TEST_NAME))
-        .run()
+        .run().unwrap()
         .to_string();
     let control = get_approval_file(TEST_NAME);
     assert_eq!(result_str, control)
@@ -69,7 +68,7 @@ fn simple_fail() {
         ])
         .spec()
         .export_to(&get_output_path(TEST_NAME))
-        .run()
+        .run().unwrap()
         .to_string();
 
     let control = get_approval_file(TEST_NAME);
@@ -95,7 +94,7 @@ fn min() {
         ])
         .min()
         .export_to(&get_output_path(TEST_NAME))
-        .run()
+        .run().unwrap()
         .to_string();
 
     let control = get_approval_file(TEST_NAME);
@@ -121,7 +120,7 @@ fn min_fail() {
         ])
         .min()
         .export_to(&get_output_path(TEST_NAME))
-        .run()
+        .run().unwrap()
         .to_string();
 
     let control = get_approval_file(TEST_NAME);
@@ -150,7 +149,7 @@ fn json() {
         ])
         .json()
         .export_to(&get_output_path(TEST_NAME))
-        .run()
+        .run().unwrap()
         .to_string();
 
     let _result: SuiteResult = from_str(&result_str).expect("could not serialize the result");
@@ -178,7 +177,7 @@ fn json_pretty() {
         ])
         .json_pretty()
         .export_to(&get_output_path(TEST_NAME))
-        .run()
+        .run().unwrap()
         .to_string();
 
     let _result: SuiteResult = from_str(&result_str).expect("could not serialize the result");
@@ -221,7 +220,7 @@ fn suite_skip() {
 
         ])
         .export_to(&get_output_path(TEST_NAME))
-        .run()
+        .run().unwrap()
         .to_string();
 
     let control = get_approval_file(TEST_NAME);
@@ -270,7 +269,7 @@ fn spec_skip() {
 
         ])
         .export_to(&get_output_path(TEST_NAME))
-        .run()
+        .run().unwrap()
         .to_string();
 
     let control = get_approval_file(TEST_NAME);
@@ -319,7 +318,7 @@ fn spec_only() {
 
         ])
         .export_to(&get_output_path(TEST_NAME))
-        .run()
+        .run().unwrap()
         .to_string();
 
     let control = get_approval_file(TEST_NAME);
@@ -375,7 +374,7 @@ fn state_passing() {
 
 
         ])
-        .run()
+        .run().unwrap()
         .to_state().unwrap();
 
     assert_eq!(counter.count, 2)
@@ -400,18 +399,8 @@ fn return_result() {
 
         })
 
-    ]).run().to_result();
-
-    let mut does_match = false;
-    if let Err(error) = test_result {
-        if let Error::Assertion(msg) = error {
-            if "1 of 2 tests failed".to_string() == msg {
-                does_match = true
-            }
-        }
-    }
-    assert_eq!(does_match, true)
-
+    ]).run().unwrap().to_result();
+    assert_eq!(test_result, Err(format!("1 of 2 tests failed")))
 }
 
 #[test]
@@ -431,7 +420,7 @@ fn micro() {
         ])
         .export_to(&get_output_path(TEST_NAME))
         .in_microseconds()
-        .run()
+        .run().unwrap()
         .to_string();
     // let control = get_approval_file(TEST_NAME);
     assert!(result_str.contains("μs)"))
@@ -454,7 +443,7 @@ fn nano() {
         ])
         .export_to(&get_output_path(TEST_NAME))
         .in_nanoseconds()
-        .run()
+        .run().unwrap()
         .to_string();
     // let control = get_approval_file(TEST_NAME);
     assert!(result_str.contains("ns)"))
@@ -477,7 +466,7 @@ fn seconds() {
         ])
         .export_to(&get_output_path(TEST_NAME))
         .in_seconds()
-        .run()
+        .run().unwrap()
         .to_string();
     // let control = get_approval_file(TEST_NAME);
     assert!(result_str.contains("sec)"))
@@ -505,5 +494,5 @@ fn should_catch_state_deserialize_error() {
                 expect(my_other_struct.bar).to_equal("hello, worlds".to_string())
             })
         ])
-        .run();
+        .run().unwrap();
 }

@@ -49,7 +49,7 @@ mod tests {
 
             ])
 
-        ]).run();
+        ]).run().unwrap();
 
     }
 

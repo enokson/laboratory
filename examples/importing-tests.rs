@@ -100,7 +100,7 @@ mod tests {
             ])
 
             // Now we can run our tests with any other options
-            .run();
+            .run().unwrap();
 
     }
 
