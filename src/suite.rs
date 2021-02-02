@@ -1,22 +1,61 @@
+use chrono::offset::Utc;
+use chrono::DateTime;
 use console::{style, Style};
+use serde::{Serialize};
+use serde_json::{to_string, to_string_pretty};
 use std::rc::Rc;
-use std::time::Instant;
+use std::time::{Instant, SystemTime};
 use convert_case::{Case, Casing};
 
 /* 
-TODO: implement json, json_pretty reporter
+
 TODO: implement random spec iteration order
 TODO: implement async support
 
-
-pub fn json(suite_results: SuiteResult) -> String {
-    to_string(&suite_results).expect("Could not send to JSON")
-}
-pub fn json_pretty(suite_results: SuiteResult) -> String {
-    to_string_pretty(&suite_results).expect("Could not send to JSON")
-}
-
 */
+
+#[derive(Debug, Serialize, Clone)]
+struct JsonSpecReport {
+  pub title: String,
+  pub full_title: String,
+  pub duration: u128,
+  pub error: Option<String>
+}
+
+impl JsonSpecReport {
+  fn copy(&self) -> JsonSpecReport {
+    JsonSpecReport {
+      title: self.title.to_string(),
+      full_title: self.full_title.to_string(),
+      duration: self.duration,
+      error: match &self.error {
+        Some(msg) => Some(msg.to_string()),
+        None => None
+      }
+    }
+  }
+}
+
+#[derive(Debug, Serialize)]
+struct JsonStats {
+  pub suites: u32,
+  pub tests: u32,
+  pub passing: u32,
+  pub pending: u32,
+  pub failing: u32,
+  pub start: String,
+  pub end: String,
+  pub duration: u128
+}
+
+#[derive(Debug, Serialize)]
+struct JsonReport {
+  pub stats: JsonStats,
+  pub tests: Vec<JsonSpecReport>,
+  pub passing: Vec<JsonSpecReport>,
+  pub pending: Vec<JsonSpecReport>,
+  pub failing: Vec<JsonSpecReport>
+}
 
 struct MinReporterStats {
   pub passed: u32,
@@ -38,9 +77,8 @@ pub enum Reporter{
   Dot,
   List,
   Rust,
-  Tap
-  // Json,
-  // JsonPretty
+  Tap,
+  Json(bool) // true = pretty
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -267,7 +305,9 @@ pub struct Suite {
   pub suite_duration: u128,
   pub total_duration: u128,
   pub depth: u32,
-  pub reporter: Reporter
+  pub reporter: Reporter,
+  pub start_time: String,
+  pub end_time: String
 }
 impl Suite {
   pub fn run(&mut self) {
@@ -307,7 +347,34 @@ impl Suite {
     self.reporter = Reporter::Rust;
     self    
   }
+  pub fn json(mut self) -> Self {
+    self.reporter = Reporter::Json(false);
+    self
+  }
+  pub fn json_pretty(mut self) -> Self {
+    self.reporter = Reporter::Json(true);
+    self
+  }
+  pub fn nano(mut self) -> Self {
+    self.duration_type = DurationType::Nano;
+    self
+  }
+  pub fn micro(mut self) -> Self {
+    self.duration_type = DurationType::Micro;
+    self
+  }
+  pub fn milis(mut self) -> Self {
+    self.duration_type = DurationType::Mil;
+    self
+  }
+  pub fn sec(mut self) -> Self {
+    self.duration_type = DurationType::Sec;
+    self
+  }
   fn run_specs_and_suites(suite: &mut Suite) {
+    let system_time = SystemTime::now();
+    let datetime: DateTime<Utc> = system_time.into();
+    suite.start_time = datetime.to_string();
     if let Some(boxed_hook) = &suite.context.before_all_hook {
       let hook = boxed_hook.as_ref();
       (hook)()
@@ -354,7 +421,10 @@ impl Suite {
           }
         }
       }
-
+      let system_time = SystemTime::now();
+      let datetime: DateTime<Utc> = system_time.into();
+      suite.end_time = datetime.to_string();
+    
     }
     for child_suite in suite.context.suites.iter_mut() {
       if !child_suite.context.skip_ {
@@ -795,7 +865,70 @@ impl Suite {
         print!("\n");
         println!("### Lab Results end ###");
         print!("\n\n");
-      }      
+      },
+      Reporter::Json(pretty) => {
+        fn get_stats_for_json(suite: &Suite, stats: &mut JsonReport, prefix: String) {
+          for spec in &suite.context.specs {
+            let mut spec_stat = JsonSpecReport {
+              title: spec.name.to_string(),
+              full_title: format!("{} {}", prefix, spec.name),
+              duration: spec.duration,
+              error: None
+            };
+            if let Some(result) = &spec.result {
+              if let Err(msg) = result {
+                spec_stat.error = Some(msg.to_string());
+                stats.stats.failing += 1;
+                stats.failing.push(spec_stat.copy());
+              } else {
+                stats.passing.push(spec_stat.copy());
+                stats.stats.passing += 1;
+              }
+            } else {
+              stats.pending.push(spec_stat.copy());
+              stats.stats.pending += 1;
+            }
+            stats.stats.duration += spec.duration;
+            stats.tests.push(spec_stat);
+          }
+          for child_suite in &suite.context.suites {
+            stats.stats.suites += 1;
+            get_stats_for_json(child_suite, stats, format!("{} {}", prefix, child_suite.name));
+          }
+        }
+        let mut json_report = JsonReport {
+          stats: JsonStats {
+            suites: 0,
+            tests: 0,
+            passing: 0,
+            pending: 0,
+            failing: 0,
+            start: suite.start_time.to_string(),
+            end: suite.end_time.to_string(),
+            duration: 0
+          },
+          tests: vec![],
+          passing: vec![],
+          pending: vec![],
+          failing: vec![]
+        };
+        get_stats_for_json(suite, &mut json_report, suite.name.to_string());
+        print!("\n\n");
+        if pretty {
+          if let Ok(json) = to_string_pretty(&json_report) {
+            println!("{}", json);
+          } else {
+            println!("Could not print out json result");
+          }          
+        } else {
+          if let Ok(json) = to_string(&json_report) {
+            println!("{}", json);
+          } else {
+            println!("Could not print out json result");
+          }
+        }
+        print!("\n\n");
+      }
     }    
   }
   fn apply_hooks(suite: &mut Suite) {
@@ -954,7 +1087,9 @@ pub fn describe<T: Fn(&mut SuiteContext) + 'static>(name: String, cb: T) -> Suit
     depth: 0,
     suite_duration: 0,
     total_duration: 0,
-    reporter: Reporter::Spec
+    reporter: Reporter::Spec,
+    start_time: String::new(),
+    end_time: String::new()
   }
 }
 
@@ -1052,7 +1187,7 @@ mod tests {
         
       });
 
-    }).spec().run();
+    }).json_pretty().nano().run();
 
   }
 
