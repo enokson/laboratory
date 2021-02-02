@@ -3,7 +3,7 @@ use chrono::DateTime;
 use console::{style, Style};
 use serde::{Serialize};
 use serde_json::{to_string, to_string_pretty};
-use std::rc::Rc;
+use std::{fmt::Display, rc::Rc};
 use std::time::{Instant, SystemTime};
 use convert_case::{Case, Casing};
 
@@ -252,35 +252,73 @@ impl SuiteContext {
     self.after_each_hook = Some(Rc::new(hook));
     self
   }
-  pub fn it<H: Fn(&mut SpecContext) -> Result<(), String> + 'static>(&mut self, name: String, hook: H) -> &mut Self {
-    self.specs.push(Spec::new(name, Box::new(hook)));
+  pub fn it<S, H>(&mut self, name: S, hook: H) -> &mut Self
+    where 
+      S: Into<String> + Display,
+      H: Fn(&mut SpecContext) -> Result<(), String> + 'static
+  {
+    self.specs.push(Spec::new(name.to_string(), Box::new(hook)));
     self
   }
-  pub fn it_x<H: Fn(&mut SpecContext) -> Result<(), String> + 'static>(&mut self, name: String, hook: H) -> &mut Self {
-    let mut spec = Spec::new(name, Box::new(hook));
+  pub fn it_skip<S, H>(&mut self, name: S, hook: H) -> &mut Self
+  where 
+    S: Into<String> + Display,
+    H: Fn(&mut SpecContext) -> Result<(), String> + 'static
+ {
+    let mut spec = Spec::new(name.to_string(), Box::new(hook));
     spec.skip = true;
     self.specs.push(spec);
     self
   }
-  pub fn it_only<H: Fn(&mut SpecContext) -> Result<(), String> + 'static>(&mut self, name: String, hook: H) -> &mut Self {
-    let mut spec = Spec::new(name, Box::new(hook));
+  pub fn it_only<S, H>(&mut self, name: S, hook: H) -> &mut Self
+  where 
+    S: Into<String> + Display,
+    H: Fn(&mut SpecContext) -> Result<(), String> + 'static
+ {
+    let mut spec = Spec::new(name.to_string(), Box::new(hook));
     spec.only = true;
     self.specs.push(spec);
     self
   }
-  pub fn describe<H: Fn(&mut SuiteContext) + 'static>(&mut self, name: String, cb: H) -> &mut Self {
+  pub fn describe<S, H>(&mut self, name: S, cb: H) -> &mut Self
+  where 
+    S: Into<String> + Display,
+    H: Fn(&mut SuiteContext) + 'static
+ {
     let suite = describe(name, cb);
     self.suites.push(suite);
     self
   }
-  pub fn describe_x<H: Fn(&mut SuiteContext) + 'static>(&mut self, name: String, cb: H) -> &mut Self {
-    let mut suite = describe(name, cb);
+  pub fn describe_skip<S, H>(&mut self, name: S, cb: H) -> &mut Self
+  where 
+    S: Into<String> + Display,
+    H: Fn(&mut SuiteContext) + 'static
+ {
+    let mut suite = describe(name.to_string(), cb);
     suite.context.skip_ = true;
     self.suites.push(suite);
     self
   }
-  pub fn describe_only<H: Fn(&mut SuiteContext) + 'static>(&mut self, name: String, cb: H) -> &mut Self {
-    let mut suite = describe(name, cb);
+  pub fn describe_only<S, H>(&mut self, name: S, cb: H) -> &mut Self
+  where 
+    S: Into<String> + Display,
+    H: Fn(&mut SuiteContext) + 'static
+ {
+    let mut suite = describe(name.to_string(), cb);
+    suite.only = true;
+    self.suites.push(suite);
+    self
+  }
+  pub fn describe_import(&mut self, suite: Suite) -> &mut Self {
+    self.suites.push(suite);
+    self
+  }
+  pub fn describe_import_skip(&mut self, mut suite: Suite) -> &mut Self {
+    suite.context.skip_ = true;
+    self.suites.push(suite);
+    self
+  }
+  pub fn describe_import_only(&mut self, mut suite: Suite) -> &mut Self {
     suite.only = true;
     self.suites.push(suite);
     self
@@ -1083,11 +1121,15 @@ impl Suite {
   }
 }
 
-pub fn describe<T: Fn(&mut SuiteContext) + 'static>(name: String, cb: T) -> Suite {
+pub fn describe<S, T>(name: S, cb: T) -> Suite
+  where
+    S: Into<String> + Display,
+    T: Fn(&mut SuiteContext) + 'static
+{
   let mut context = SuiteContext::new();
   (cb)(&mut context);
   Suite {
-    name,
+    name: name.to_string(),
     only: false,
     context,
     duration_type: DurationType::Nano,
@@ -1110,7 +1152,7 @@ mod tests {
   #[test]
   fn describe_a_suite() -> LabResult {
     
-    describe("my suite".to_string(), |ctx| {
+    describe("my suite", |ctx| {
 
       let state = Rc::new(RefCell::new(0));
 
@@ -1132,13 +1174,13 @@ mod tests {
 
       // ctx.retries(5);
 
-      ctx.it("should do timely stuff".to_string(), |_ctx| {
+      ctx.it("should do timely stuff", |_ctx| {
         should_panic(|| {
           panic!("help!");
         })
       });
 
-      ctx.it_x("should do stuff".to_string(), |ctx| {
+      ctx.it_skip("should do stuff", |ctx| {
 
         ctx.retries(0);
         ctx.slow(5000);
@@ -1147,7 +1189,7 @@ mod tests {
         Ok(())
       });
 
-      ctx.it("should do stuff".to_string(), |ctx| {
+      ctx.it("should do stuff", |ctx| {
 
         ctx.retries(10);
 
@@ -1155,45 +1197,45 @@ mod tests {
         Ok(())
       });
 
-      ctx.it("should do stuff".to_string(), |_ctx| {
+      ctx.it_skip("should do stuff", |_ctx| {
 
         println!("test 4");
         Err("failed".to_string())
 
       });
 
-      ctx.describe("sub module 1".to_string(), |ctx| {
+      ctx.describe("sub module 1", |ctx| {
 
         ctx.before_all(|| {
           println!("sub module 1 is running.");
         });
 
-        ctx.it("should do stuff".to_string(), move |_ctx| {
+        ctx.it("should do stuff", move |_ctx| {
           // Err("I am a failure".to_string())
           Ok(())
         });
         
       });
 
-      ctx.describe("sub module 2".to_string(), |ctx| {
+      ctx.describe("sub module 2", |ctx| {
 
         ctx.before_all(|| {
           println!("sub module 2 is running.");
         });
 
-        ctx.it("should do stuff".to_string(), move |_ctx| {
+        ctx.it("should do stuff", move |_ctx| {
           println!("sub module 2 test 1 running.");
           Ok(())
         });
 
-        ctx.it("should do stuff".to_string(), move |_ctx| {
+        ctx.it("should do stuff", move |_ctx| {
           println!("sub module 2 test 2 running.");
           Ok(())
         });
         
       });
 
-    }).json_pretty().nano().run()
+    }).min().nano().run()
 
   }
 
