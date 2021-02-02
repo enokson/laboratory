@@ -7,6 +7,8 @@ use std::rc::Rc;
 use std::time::{Instant, SystemTime};
 use convert_case::{Case, Casing};
 
+use crate::LabResult;
+
 /* 
 
 TODO: implement random spec iteration order
@@ -310,7 +312,7 @@ pub struct Suite {
   pub end_time: String
 }
 impl Suite {
-  pub fn run(&mut self) {
+  pub fn run(&mut self) -> LabResult {
     Suite::apply_depth_to_suites(self);
     Suite::index_specs(self, &mut 0);
     Suite::ignore_non_onlys(self);
@@ -322,6 +324,11 @@ impl Suite {
     Suite::apply_slow_settings(self);
     Suite::calculate_speed(self);
     Suite::report_to_stdout(&self);
+    if self.context.failed == 0 {
+      Ok(())
+    } else {
+      Err(format!("Expected {} to equal 0", self.context.failed))
+    }
   }
   pub fn spec(mut self) -> Self {
     self.reporter = Reporter::Spec;
@@ -1103,8 +1110,9 @@ mod tests {
   use super::super::*;
 
   #[test]
-  fn describe_a_suite() {
-    let _suite = describe("my suite".to_string(), |ctx| {
+  fn describe_a_suite() -> LabResult {
+    
+    describe("my suite".to_string(), |ctx| {
 
       let state = Rc::new(RefCell::new(0));
 
@@ -1187,7 +1195,7 @@ mod tests {
         
       });
 
-    }).json_pretty().nano().run();
+    }).json_pretty().nano().run()
 
   }
 
