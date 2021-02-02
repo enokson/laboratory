@@ -8,6 +8,14 @@ TODO: implement json, json_pretty reporter
 TODO: implement random spec iteration order
 TODO: implement async support
 
+
+pub fn json(suite_results: SuiteResult) -> String {
+    to_string(&suite_results).expect("Could not send to JSON")
+}
+pub fn json_pretty(suite_results: SuiteResult) -> String {
+    to_string_pretty(&suite_results).expect("Could not send to JSON")
+}
+
 */
 
 struct MinReporterStats {
