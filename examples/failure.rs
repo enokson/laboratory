@@ -13,26 +13,26 @@ fn main() {
 #[cfg(test)]
 mod tests {
 
-    // let call in our functions
+    // let bring in our functions
     use super::*;
 
     // and now let's bring in our lab tools
-    use laboratory::{describe,expect};
+    use laboratory::{LabResult, describe, expect};
 
     // define our single rust test
     #[test]
-    fn test() {
+    fn test() -> LabResult {
 
         // We have two different functions that we
         // want to test in our crate. So, let's
         // describe our crate and nest our functions
         // under that umbrella.
-        describe("Crate".to_string(), |ctx| {
+        let test_results = describe("Crate", |ctx| {
             
             ctx
-            .describe("add_one()".to_string(), |ctx| {
+            .describe("add_one()", |ctx| {
                 
-                ctx.it("should return 1 to when passed 0".to_string(), |_| {
+                ctx.it("should return 1 to when passed 0", |_| {
 
                     expect(add_one(0)).to_equal(1)
 
@@ -40,9 +40,9 @@ mod tests {
 
             })
 
-            .describe("add_two()".to_string(), |ctx| {
+            .describe("add_two()", |ctx| {
                 
-                ctx.it("should return 2 to when passed 0".to_string(), |_| {
+                ctx.it("should return 2 to when passed 0", |_| {
 
                     expect(add_two(0)).to_equal(2)
 
@@ -51,6 +51,12 @@ mod tests {
             });
 
         }).run();
+
+        if let Err(_msg) = test_results {
+            // return Err(msg);
+        }
+
+        Ok(())
 
     }
 

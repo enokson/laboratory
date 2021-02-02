@@ -10,34 +10,34 @@ fn add_two (x: u64) -> u64 { x + 5 }
 mod tests {
 
     use super::*;
-    use laboratory::{describe, expect, it};
+    use laboratory::{describe, expect, LabResult};
 
     #[test]
-    fn suite() {
+    fn suite() -> LabResult {
 
-        describe("Package").suites(vec![
+        describe("Package", |ctx| {
 
-            describe("add_one()").specs(vec![
+            ctx.describe("add_one()", |ctx| {
 
-                it("should return 1", |_| {
+                ctx.it("should return 1", |_| {
+
                     expect(add_one(0)).to_equal(1)
-                }),
 
-                it("should return 2", |_| {
+                }).it("should return 2", |_| {
+
                     expect(add_one(1)).to_equal(2)
-                })
+                    
+                });
 
-            ]),
+            }).describe("add_two()", |ctx| {
 
-            describe("add_two()").specs(vec![
-
-                it("should return 2", |_| {
+                ctx.it("should return 2", |_| {
                     expect(add_two(0)).to_equal(2)
-                })
+                });
 
-            ])
+            });
 
-        ]).json().run().unwrap();
+        }).json().run()
 
     }
 }
