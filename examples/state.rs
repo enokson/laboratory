@@ -13,14 +13,14 @@ fn main() {
 mod tests {
 
     use super::*;
-    use laboratory::{Deserialize, LabResult, Serialize, State, describe, expect, it};
+    use laboratory::{describe, expect, LabResult};
+    use std::cell::{RefCell, RefMut};
     use std::fmt::{Debug};
+    use std::rc::Rc;
 
     // We want a counter to count each time a hook or test is called
-    // Note that any state we want to use in the suite
-    // must be able to be serialized and deserialized by serde.
 
-    #[derive(Deserialize, Serialize, Debug)]
+    #[derive(Debug)]
     struct Counter {
         suite: String, // the name of the suite
         call_count: u8 // the number of times a hook or test was called
@@ -40,120 +40,105 @@ mod tests {
     }
 
     #[test]
-    fn test() {
+    fn test() -> LabResult {
 
         // Here we will define a function to handle all the hook calls
-        fn hook_handle(state: &mut State) -> LabResult {
-
-            // We need to call the get_state method in order to get the counter.
-            // We also we to tell the Rust compiler what
-            // type the result of get_state will be which
-            // in this case is the counter.
-            let mut counter = state.get::<Counter>()?;
-
-            // Now we will call the update method on Counter
+        let hook_handle = |counter: RefMut<Counter>| {
             counter.update();
+        };
 
-            // And if we want to update the state we need to call set_state
-            state.set(counter)?;
-            Ok(())
-        }
+        describe("My Crate", |ctx| {
 
-        // In this example we want to return the state
-        // after all the tests are ran so that we can echo the
-        // the final result to stdout.
-        let state: Counter = describe("My Crate")
+            let parent_counter = Rc::new(RefCell::new(Counter::new("Parent Counter")));
 
-            // We can give the suite the initial state by
-            // using the state method, but we could very well
-            // skip using the state method and define the state
-            // in the before_all or even in the before_each hook.
-            .state(Counter::new("Parent Level")).unwrap()
+            ctx.before_all(move || {
 
-            // Now we will define our hooks
-            .before_all(hook_handle)
-            .before_each(hook_handle)
-            .after_each(hook_handle)
-            .after_all(hook_handle)
+                let counter = Rc::clone(&parent_counter);
+                hook_handle(counter.borrow_mut())
 
-            .suites(vec![
+            }).before_each(move || {
 
-                // this suite will inherit the parent's state
-                describe("add_one()")
+                let counter = Rc::clone(&parent_counter);
+                hook_handle(counter.borrow_mut())
 
-                    // Here is the set of hooks for the child suite
-                    .before_all(hook_handle)
-                    .before_each(hook_handle)
-                    .after_each(hook_handle)
-                    .after_all(hook_handle)
+            }).after_each(move || {
 
+                let counter = Rc::clone(&parent_counter);
+                hook_handle(counter.borrow_mut())
 
-                    .specs(vec![
+            }).after_all(move || {
 
-                        it("should return 1", |state| {
-                            hook_handle(state)?;
-                            expect(add_one(0)).to_be(1)
-                        }),
+                let counter = Rc::clone(&parent_counter);
+                hook_handle(counter.borrow_mut());
+                println!("{:#?}\n\n", Rc::clone(&parent_counter).borrow());
 
-                        it("should return 2", |state| {
-                            hook_handle(state)?;
-                            expect(add_one(1)).to_be(2)
-                        })
+            }).describe("add_one()", |ctx| {
 
-                    ])
-                    .inherit_state(),
+                ctx.it("should return 1", |_| {
 
-                // This suite will use its own state
-                describe("add_two()")
+                    let counter = Rc::clone(&parent_counter);
+                    hook_handle(counter.borrow_mut());
+                    expect(add_one(0)).to_be(1)
 
-                    // since this suite will not inherit state
-                    // from the parent we will give it a new one.
-                    .state(Counter::new("Child Level")).unwrap()
+                }).it("should return 2", |_| {
 
-                    // Here is the set of hooks for the second child suite
-                    .before_all(hook_handle)
-                    .before_each(hook_handle)
-                    .after_each(hook_handle)
-                    .after_all(hook_handle)
-                    .specs(vec![
+                    let counter = Rc::clone(&parent_counter);
+                    hook_handle(counter.borrow_mut());
+                    expect(add_one(1)).to_be(2)
 
-                        it("should return 2", |state| {
-                            hook_handle(state)?;
-                            expect(add_two(0)).to_be(2)
-                        }),
+                });
 
-                        it("should return 4", |state| {
-                            hook_handle(state)?;
-                            expect(add_two(2)).to_be(4)
-                        })
+            }).describe("add_two()", |ctx| {
 
-                    ]),
+                let child_rounter = Rc::new(RefCell::new(Counter::new("Child Counter")));
 
-                // this suite will also inherit the parent's state
-                describe("always_return_true()")
+                ctx.before_all(move || {
 
-                    // Here is the set of hooks for the child suite
-                    .before_all(hook_handle)
-                    .before_each(hook_handle)
-                    .after_each(hook_handle)
-                    .after_all(hook_handle)
+                    let counter = Rc::clone(&child_rounter);
+                    hook_handle(counter.borrow_mut())
+    
+                }).before_each(move || {
+    
+                    let counter = Rc::clone(&child_rounter);
+                    hook_handle(counter.borrow_mut())
+    
+                }).after_each(move || {
+    
+                    let counter = Rc::clone(&child_rounter);
+                    hook_handle(counter.borrow_mut())
+    
+                }).after_all(move || {
+    
+                    let counter = Rc::clone(&child_rounter);
+                    hook_handle(counter.borrow_mut())
+    
+                }).it("should return 2", |_| {
 
+                    let counter = Rc::clone(&child_rounter);
+                    hook_handle(counter.borrow_mut());
+                    expect(add_two(0)).to_be(2)
 
-                    .specs(vec![
+                }).it("should return 4", |_| {
 
-                        it("should always return true", |state| {
-                            hook_handle(state)?;
-                            expect(add_one(0)).to_be(1)
-                        })
+                    let counter = Rc::clone(&child_rounter);
+                    hook_handle(counter.borrow_mut());
+                    expect(add_two(2)).to_be(4)
 
-                    ])
-                    .inherit_state()
+                });
 
+            }).describe("always_return_true()", |ctx| {
 
-            ]).run().unwrap()
-            .to_state().unwrap();
+                ctx.it("should always return true", |_| {
 
-        println!("{:#?}\n\n", state);
+                    let counter = Rc::clone(&parent_counter);
+                    hook_handle(counter.borrow_mut());
+                    expect(add_one(0)).to_be(1)
+
+                });
+
+            });
+
+        }).run()
 
     }
 
