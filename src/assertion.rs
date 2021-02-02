@@ -1,5 +1,5 @@
 use std::cmp::PartialEq;
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
 use std::{panic::{catch_unwind, UnwindSafe, set_hook, take_hook}};
 
 pub struct Expect<T>
