@@ -1104,8 +1104,6 @@ pub fn describe<T: Fn(&mut SuiteContext) + 'static>(name: String, cb: T) -> Suit
 mod tests {
   use std::rc::Rc;
   use std::cell::RefCell;
-  // use std::thread;
-  // use std::time::Duration;
   use super::*;
   use super::super::*;
 
