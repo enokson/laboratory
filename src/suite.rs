@@ -179,18 +179,18 @@ impl SpecContext {
 
 }
 
-struct Spec {
+struct Spec<'a> {
   pub name: String,
   pub order: Option<u32>,
   pub only: bool,
-  pub hook: Box<dyn Fn(&mut SpecContext) -> Result<(), String>>,
+  pub hook: Box<dyn Fn(&mut SpecContext) -> Result<(), String> + 'a>,
   pub result: Option<Result<(), String>>,
   pub duration: u128,
   pub context:  SpecContext,
   pub skip: bool
 }
-impl Spec {
-  pub fn new(name: String, hook: Box<dyn Fn(&mut SpecContext) -> Result<(), String>>) -> Spec {
+impl<'a> Spec<'a> {
+  pub fn new(name: String, hook: Box<dyn Fn(&mut SpecContext) -> Result<(), String>>) -> Spec<'a> {
     let context = SpecContext::new();
     Spec {
       name,
@@ -205,13 +205,13 @@ impl Spec {
   }
 }
 
-pub struct SuiteContext {
-  after_all_hook: Option<Rc<dyn Fn()>>,
-  after_each_hook: Option<Rc<dyn Fn()>>,
-  before_all_hook: Option<Rc<dyn Fn()>>,
-  before_each_hook: Option<Rc<dyn Fn()>>,
-  specs: Vec<Spec>,
-  suites: Vec<Suite>,
+pub struct SuiteContext<'a> {
+  after_all_hook: Option<Rc<dyn Fn() + 'a>>,
+  after_each_hook: Option<Rc<dyn Fn() + 'a>>,
+  before_all_hook: Option<Rc<dyn Fn() + 'a>>,
+  before_each_hook: Option<Rc<dyn Fn() + 'a>>,
+  specs: Vec<Spec<'a>>,
+  suites: Vec<Suite<'a>>,
   retries_: Option<u32>,
   skip_: bool,
   slow_: Option<u128>,
@@ -219,8 +219,8 @@ pub struct SuiteContext {
   failed: u32,
   ignored: u32
 }
-impl SuiteContext {
-  pub fn new() -> SuiteContext {
+impl<'a> SuiteContext<'a> {
+  pub fn new() -> SuiteContext<'a> {
     SuiteContext {
       after_all_hook: None,
       after_each_hook: None,
@@ -309,16 +309,16 @@ impl SuiteContext {
     self.suites.push(suite);
     self
   }
-  pub fn describe_import(&mut self, suite: Suite) -> &mut Self {
+  pub fn describe_import(&mut self, suite: Suite<'a>) -> &mut Self {
     self.suites.push(suite);
     self
   }
-  pub fn describe_import_skip(&mut self, mut suite: Suite) -> &mut Self {
+  pub fn describe_import_skip(&mut self, mut suite: Suite<'a>) -> &mut Self {
     suite.context.skip_ = true;
     self.suites.push(suite);
     self
   }
-  pub fn describe_import_only(&mut self, mut suite: Suite) -> &mut Self {
+  pub fn describe_import_only(&mut self, mut suite: Suite<'a>) -> &mut Self {
     suite.only = true;
     self.suites.push(suite);
     self
@@ -337,10 +337,10 @@ impl SuiteContext {
   }
 }
 
-pub struct Suite {
+pub struct Suite<'a> {
   pub name: String,
   pub only: bool,
-  pub context: SuiteContext,
+  pub context: SuiteContext<'a>,
   pub duration_type: DurationType,
   pub suite_duration: u128,
   pub total_duration: u128,
@@ -349,7 +349,7 @@ pub struct Suite {
   pub start_time: String,
   pub end_time: String
 }
-impl Suite {
+impl<'a> Suite<'a> {
   pub fn run(&mut self) -> LabResult {
     Suite::apply_depth_to_suites(self);
     Suite::index_specs(self, &mut 0);
@@ -1121,7 +1121,7 @@ impl Suite {
   }
 }
 
-pub fn describe<S, T>(name: S, cb: T) -> Suite
+pub fn describe<'a, S, T>(name: S, cb: T) -> Suite<'a>
   where
     S: Into<String> + Display,
     T: Fn(&mut SuiteContext) + 'static
