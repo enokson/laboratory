@@ -17,7 +17,7 @@ mod tests {
     use super::*;
 
     // and now let's bring in our lab tools
-    use laboratory::{describe,it,expect};
+    use laboratory::{describe,expect};
 
     // define our single rust test
     #[test]
@@ -27,29 +27,30 @@ mod tests {
         // want to test in our crate. So, let's
         // describe our crate and nest our functions
         // under that umbrella.
-        describe("Crate").suites(vec![
-
-            describe("add_one()").specs(vec![
-
-                it("should return 1 to when passed 0", |_| {
+        describe("Crate".to_string(), |ctx| {
+            
+            ctx
+            .describe("add_one()".to_string(), |ctx| {
+                
+                ctx.it("should return 1 to when passed 0".to_string(), |_| {
 
                     expect(add_one(0)).to_equal(1)
 
-                })
+                });
 
-            ]),
+            })
 
-            describe("add_two()").specs(vec![
-
-                it("should return 2 to when passed 0", |_| {
+            .describe("add_two()".to_string(), |ctx| {
+                
+                ctx.it("should return 2 to when passed 0".to_string(), |_| {
 
                     expect(add_two(0)).to_equal(2)
 
-                })
+                });
 
-            ])
+            });
 
-        ]).run().unwrap();
+        }).run();
 
     }
 

@@ -9,7 +9,7 @@ fn main() {
 mod tests {
 
     use super::always_return_true;
-    use laboratory::{describe, expect, it};
+    use laboratory::{describe, expect};
 
     #[test]
     fn test() {
