@@ -1,4 +1,4 @@
-#[macro_use] extern crate laboratory;
+extern crate laboratory;
 
 fn main() {
     panic_at_the_disco(false);
