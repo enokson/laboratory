@@ -1,5 +1,5 @@
 use laboratory::{describe, expect, LabResult};
-use std::{borrow::Borrow, cell::{RefCell, RefMut}};
+use std::cell::RefCell;
 use std::fmt::{Debug};
 use std::rc::Rc;
 
@@ -41,7 +41,7 @@ impl Counter {
 fn test() -> LabResult {
 
     // Here we will define a function to handle all the hook calls
-    let hook_handle = |mut counter: Rc<RefCell<Counter>>| {
+    let hook_handle = |counter: Rc<RefCell<Counter>>| {
       let mut counter = counter.borrow_mut();
       counter.update();
     };
