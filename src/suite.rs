@@ -11,7 +11,6 @@ use crate::LabResult;
 
 /* 
 
-FIX: JSON reporter does not output endtime
 TODO: implement random spec iteration order
 TODO: implement async support
 
@@ -466,11 +465,7 @@ impl Suite {
             break;
           }
         }
-      }
-      let system_time = SystemTime::now();
-      let datetime: DateTime<Utc> = system_time.into();
-      suite.end_time = datetime.to_string();
-    
+      }    
     }
     for child_suite in suite.context.suites.iter_mut() {
       if !child_suite.context.skip_ {
@@ -480,7 +475,10 @@ impl Suite {
     if let Some(boxed_hook) = &suite.context.after_all_hook {
       let hook = boxed_hook.as_ref();
       (hook)()
-    }    
+    }
+    let system_time = SystemTime::now();
+    let datetime: DateTime<Utc> = system_time.into();
+    suite.end_time = datetime.to_string();
   }
   fn index_specs(suite: &mut Suite, count: &mut u32) {
     for spec in suite.context.specs.iter_mut() {
