@@ -11,6 +11,7 @@ use crate::LabResult;
 
 /* 
 
+FIX: JSON reporter does not output endtime
 TODO: implement random spec iteration order
 TODO: implement async support
 
