@@ -13,6 +13,8 @@ TODO: build docs
 
 mod assertion;
 mod suite;
+mod suite_context;
+mod spec;
 
 pub use suite::{describe, Suite};
 pub use assertion::{expect, should_panic, should_not_panic};

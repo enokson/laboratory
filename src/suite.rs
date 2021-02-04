@@ -3,11 +3,12 @@ use chrono::DateTime;
 use console::{style, Style};
 use serde::{Serialize};
 use serde_json::{to_string, to_string_pretty};
-use std::{fmt::Display, rc::Rc};
+use std::{fmt::Display};
 use std::time::{Instant, SystemTime};
 use convert_case::{Case, Casing};
 
 use crate::LabResult;
+use crate::suite_context::SuiteContext;
 
 /* 
 
@@ -84,7 +85,7 @@ pub enum Reporter{
 }
 
 #[derive(Debug, Clone, Copy)]
-enum Speed {
+pub enum Speed {
   Fast,
   OnTime,
   Slow
@@ -149,193 +150,6 @@ enum SpecReportLine {
   Fail(Index, String, String)
 }
 
-pub struct SpecContext {
-  retries_: Option<u32>,
-  slow_: Option<u128>,
-  speed_result: Speed
-}
-impl SpecContext {
-  pub fn new() -> SpecContext {
-    SpecContext {
-      retries_: None,
-      slow_: None,
-      speed_result: Speed::Fast
-    }
-  }
-  pub fn retries(&mut self, count: u32) -> &mut Self {
-    self.retries_ = Some(count);
-    self
-  }
-  pub fn slow(&mut self, count: u128) -> &mut Self {
-    self.slow_ = Some(count);
-    self
-  }
-  pub fn get_retries(&self) -> Option<&u32> {
-    self.retries_.as_ref()
-  }
-  pub fn get_slow(&self) -> Option<&u128> {
-    self.slow_.as_ref()
-  }
-
-}
-
-struct Spec {
-  pub name: String,
-  pub order: Option<u32>,
-  pub only: bool,
-  pub hook: Box<dyn Fn(&mut SpecContext) -> Result<(), String> + 'static>,
-  pub result: Option<Result<(), String>>,
-  pub duration: u128,
-  pub context:  SpecContext,
-  pub skip: bool
-}
-impl Spec {
-  pub fn new(name: String, hook: Box<dyn Fn(&mut SpecContext) -> Result<(), String>>) -> Spec {
-    let context = SpecContext::new();
-    Spec {
-      name,
-      order: None,
-      only: false,
-      hook,
-      result: None,
-      duration: 0,
-      context,
-      skip: false,
-    }
-  }
-}
-
-pub struct SuiteContext {
-  after_all_hook: Option<Rc<dyn Fn() + 'static>>,
-  after_each_hook: Option<Rc<dyn Fn() + 'static>>,
-  before_all_hook: Option<Rc<dyn Fn() + 'static>>,
-  before_each_hook: Option<Rc<dyn Fn() + 'static>>,
-  specs: Vec<Spec>,
-  suites: Vec<Suite>,
-  retries_: Option<u32>,
-  skip_: bool,
-  slow_: Option<u128>,
-  passed: u32,
-  failed: u32,
-  ignored: u32
-}
-impl SuiteContext {
-  pub fn new() -> SuiteContext {
-    SuiteContext {
-      after_all_hook: None,
-      after_each_hook: None,
-      before_all_hook: None,
-      before_each_hook: None,
-      specs: vec![],
-      suites: vec![],
-      retries_: None,
-      skip_: false,
-      slow_: None,
-      passed: 0,
-      failed: 0,
-      ignored: 0
-    }
-  }
-  pub fn before_all<H: Fn() + 'static>(&mut self, hook: H) -> &mut Self {
-    self.before_all_hook = Some(Rc::new(hook));
-    self
-  }
-  pub fn before_each<H: Fn() + 'static>(&mut self, hook: H) -> &mut Self {
-    self.before_each_hook = Some(Rc::new(hook));
-    self
-  }
-  pub fn after_all<H: Fn() + 'static>(&mut self, hook: H) -> &mut Self {
-    self.after_all_hook = Some(Rc::new(hook));
-    self
-  }
-  pub fn after_each<H: Fn() + 'static>(&mut self, hook: H) -> &mut Self {
-    self.after_each_hook = Some(Rc::new(hook));
-    self
-  }
-  pub fn it<S, H>(&mut self, name: S, hook: H) -> &mut Self
-    where 
-      S: Into<String> + Display,
-      H: Fn(&mut SpecContext) -> Result<(), String> + 'static
-  {
-    self.specs.push(Spec::new(name.to_string(), Box::new(hook)));
-    self
-  }
-  pub fn it_skip<S, H>(&mut self, name: S, hook: H) -> &mut Self
-  where 
-    S: Into<String> + Display,
-    H: Fn(&mut SpecContext) -> Result<(), String> + 'static
- {
-    let mut spec = Spec::new(name.to_string(), Box::new(hook));
-    spec.skip = true;
-    self.specs.push(spec);
-    self
-  }
-  pub fn it_only<S, H>(&mut self, name: S, hook: H) -> &mut Self
-  where 
-    S: Into<String> + Display,
-    H: Fn(&mut SpecContext) -> Result<(), String> + 'static
- {
-    let mut spec = Spec::new(name.to_string(), Box::new(hook));
-    spec.only = true;
-    self.specs.push(spec);
-    self
-  }
-  pub fn describe<S, H>(&mut self, name: S, cb: H) -> &mut Self
-  where 
-    S: Into<String> + Display,
-    H: Fn(&mut SuiteContext) + 'static
- {
-    let suite = describe(name, cb);
-    self.suites.push(suite);
-    self
-  }
-  pub fn describe_skip<S, H>(&mut self, name: S, cb: H) -> &mut Self
-  where 
-    S: Into<String> + Display,
-    H: Fn(&mut SuiteContext) + 'static
- {
-    let mut suite = describe(name.to_string(), cb);
-    suite.context.skip_ = true;
-    self.suites.push(suite);
-    self
-  }
-  pub fn describe_only<S, H>(&mut self, name: S, cb: H) -> &mut Self
-  where 
-    S: Into<String> + Display,
-    H: Fn(&mut SuiteContext) + 'static
- {
-    let mut suite = describe(name.to_string(), cb);
-    suite.only = true;
-    self.suites.push(suite);
-    self
-  }
-  pub fn describe_import(&mut self, suite: Suite) -> &mut Self {
-    self.suites.push(suite);
-    self
-  }
-  pub fn describe_import_skip(&mut self, mut suite: Suite) -> &mut Self {
-    suite.context.skip_ = true;
-    self.suites.push(suite);
-    self
-  }
-  pub fn describe_import_only(&mut self, mut suite: Suite) -> &mut Self {
-    suite.only = true;
-    self.suites.push(suite);
-    self
-  }
-  pub fn skip(&mut self) -> &mut Self {
-    self.skip_ = true;
-    self
-  }
-  pub fn retries(&mut self, count: u32) -> &mut Self {
-    self.retries_ = Some(count);
-    self
-  }
-  pub fn slow(&mut self, count: u128) -> &mut Self {
-    self.slow_ = Some(count);
-    self
-  }
-}
 
 pub struct Suite {
   pub name: String,
