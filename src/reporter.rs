@@ -89,83 +89,293 @@ struct DotReporterStats {
   pub dots: Vec<String>
 }
 
+fn red(text: &str) -> String {
+  style(text).red().to_string()
+}
+fn green(text: &str) -> String {
+  style(text).green().to_string()
+}
+fn cyan(text: &str) -> String {
+  style(text).cyan().to_string()
+}
+fn dim(text: &str) -> String {
+  style(text).dim().to_string()
+}
+
+fn get_lines_for_spec(suite: &Suite, depth: u32, stats: &mut MinReporterStats) {
+
+  let red = Style::new().for_stdout().red();
+
+  println!("{}{}", suite_spacing(depth), suite.name.to_string());
+  for spec in &suite.context.specs {
+    if let Some(result) = &spec.result {
+      if let Err(msg) = result {
+        println!("{}{} {}", 
+          line_spacing(depth),
+          red.apply_to(format!("{})", stats.failed)),
+          red.apply_to(spec.name.to_string()));
+        stats.error_lines.push(style(format!("{}) {}: {}", stats.failed, spec.name, msg)).red().to_string());
+        stats.failed += 1;
+      } else {
+        let duration = match suite.duration_type {
+          DurationType::Nano => Duration::Nano(spec.duration),
+          DurationType::Micro => Duration::Micro(spec.duration),
+          DurationType::Mil => Duration::Mil(spec.duration),
+          DurationType::Sec => Duration::Sec(spec.duration)
+        };
+        let speed_display = match spec.context.speed_result {
+          Speed::Fast => SpeedDisplay::Fast(duration),
+          Speed::OnTime => SpeedDisplay::OnTime(duration),
+          Speed::Slow => SpeedDisplay::Slow(duration)
+        };
+        println!("{}{}  {} {}", 
+          line_spacing(depth),
+          style("✓").green().to_string(),
+          style(spec.name.to_string()).dim().to_string(), 
+          speed_display.to_string());
+          stats.passed += 1;
+      }
+    } else {
+      println!("{}   {}", 
+        line_spacing(depth), 
+        style(spec.name.to_string()).dim().to_string());
+        stats.pending += 1;
+    }
+  }
+  for child_suite in &suite.context.suites {
+    get_lines_for_spec(child_suite, depth + 1, stats);
+
+  }
+}
+
+fn suite_spacing(depth: u32) -> String {
+  let mut tab = String::new();
+  let tab_n = depth * 2;
+  for _i in 1..=tab_n {
+    tab.push(' ');
+  }
+  tab
+}
+fn line_spacing(depth: u32) -> String {
+  let mut tab = String::new();
+  let tab_n = (depth * 2) + 2;
+  for _i in 1..=tab_n {
+    tab.push(' ');
+  }
+  tab
+}
+
+fn space_per_byte(n: u32) -> String {
+  let len = n.to_string().len();
+  let mut return_str = String::new();
+  for _i in 0..len {
+    return_str.push(' ');
+  }
+  return_str
+}
+
+fn line_spacing_for_min(depth: u32) -> String {
+  let mut tab = String::new();
+  let tab_n = (depth * 2) + 2;
+  for _i in 1..=tab_n {
+    tab.push(' ');
+  }
+  tab
+}  
+
+fn get_lines_for_min(suite: &Suite, stats: &mut MinReporterStats, prefix: String, depth: u32) {
+  for spec in &suite.context.specs {
+    if let Some(result) = &spec.result {
+      if let Err(msg) = result {
+        stats.failed += 1;
+        stats.error_lines.push(
+          style(format!("{}) {}\n   {}{}\n{}  Error: {}", 
+            stats.failed, prefix, 
+            line_spacing_for_min(depth), 
+            spec.name, 
+            space_per_byte(stats.failed), 
+            msg)).red().to_string()
+        );
+      } else {
+        stats.passed += 1;
+      }
+    } else {
+      stats.pending += 1;
+    }
+  }
+  for child_suite in &suite.context.suites {
+    get_lines_for_min(child_suite, stats, format!("{}\n   {}{}", prefix, line_spacing_for_min(depth), child_suite.name), depth + 1);
+  }
+}
+
+fn get_dots(suite: &Suite, stats: &mut DotReporterStats) {
+  for spec in &suite.context.specs {
+    if let Some(result) = &spec.result {
+      match result {
+        Ok(_) => {
+          stats.passed += 1;
+          match spec.context.speed_result {
+            Speed::Fast => {
+              stats.dots.push(style(".").green().to_string())
+            },
+            Speed::OnTime => {
+              stats.dots.push(style(".").yellow().to_string())
+            },
+            Speed::Slow => {
+              stats.dots.push(style(".").red().to_string())
+            }
+          }
+        },
+        Err(_) => {
+          stats.failed += 1;
+          stats.dots.push(style("!").red().to_string())
+        }
+      }
+    } else {
+      stats.pending += 1;              
+      stats.dots.push(style(",").cyan().to_string())
+    }
+  }
+  for child_suite in &suite.context.suites {
+    get_dots(child_suite, stats);
+  }
+}
+
+fn get_list(suite: &Suite, stats: &mut MinReporterStats, prefix: String) {
+  for spec in &suite.context.specs {
+    if let Some(result) = &spec.result {
+      if let Err(msg) = result {
+        println!("✖ {}",
+          style(format!("{} {}: {}", prefix, spec.name, msg)).red().to_string()
+        );
+        stats.failed += 1;
+      } else {
+        let duration = match suite.duration_type {
+          DurationType::Nano => Duration::Nano(spec.duration),
+          DurationType::Micro => Duration::Micro(spec.duration),
+          DurationType::Mil => Duration::Mil(spec.duration),
+          DurationType::Sec => Duration::Sec(spec.duration)
+        };
+        println!("✓ {}{}",
+          style(format!("{} {}", prefix, spec.name)).green().to_string(),
+          style(format!(": {}", duration.to_string())).dim().to_string()
+        );
+        stats.passed += 1;
+      }
+    } else {
+      println!("  {}",
+        style(format!("{} {}", prefix, spec.name)).dim().to_string()
+      );
+      stats.pending += 1;
+    }
+  }
+  for child_suite in &suite.context.suites {
+    get_list(child_suite, stats, format!("{} {}", prefix, child_suite.name));
+  }
+}
+
+fn get_tap_list(suite: &Suite, lines: &mut Vec<String>, count: &mut u32, prefix: String) {
+  for spec in &suite.context.specs {
+    *count += 1;
+    if let Some(result) = &spec.result {
+      if let Err(_msg) = result {
+        lines.push(format!("{} {} - {}",
+          style("not ok").red().to_string(),
+          count,
+          format!("{} {}", prefix, spec.name)
+        ));
+      } else {
+        lines.push(format!("{} {} - {}",
+          style("ok").green().to_string(),
+          count,
+          format!("{} {}", prefix, spec.name)
+        ));
+      }
+    } else {
+      lines.push(format!("{} {} - {}",
+        style("ok").green().to_string(),
+        count,
+        format!("# skip {} {}", prefix, spec.name)
+      ));
+    }
+  }
+  for child_suite in &suite.context.suites {
+    get_tap_list(child_suite, lines, count, format!("{} {}", prefix, child_suite.name));
+  }
+}
+
+fn get_count(suite: &Suite) -> u32 {
+  let mut count = suite.context.specs.len() as u32;
+  for child_suite in &suite.context.suites {
+    count += get_count(child_suite);
+  }
+  return count;
+}
+
+fn get_list_for_rust(suite: &Suite, stats: &mut MinReporterStats, prefix: String) {
+  for spec in &suite.context.specs {
+    if let Some(result) = &spec.result {
+      if let Err(_msg) = result {
+        println!("test {}::{} ... {}", prefix, spec.name.to_case(Case::Snake), red("FAILED"));
+        stats.error_lines.push(format!("{}::{}", prefix, spec.name.to_case(Case::Snake)));
+        stats.failed += 1;
+      } else {
+        println!("test {}::{} ... {}", prefix, spec.name.to_case(Case::Snake), green("ok"));
+        stats.passed += 1;
+      }
+    } else {
+      println!("test {}::{} ... {}", prefix, spec.name.to_case(Case::Snake), cyan("ignored"));
+      stats.pending += 1;
+    }
+  }
+  for child_suite in &suite.context.suites {
+    get_list_for_rust(child_suite, stats, format!("{}::{}", prefix, child_suite.name.to_case(Case::Snake)));
+  }
+}
+
+fn get_stats_for_json(suite: &Suite, stats: &mut JsonReport, prefix: String) {
+  for spec in &suite.context.specs {
+    let mut spec_stat = JsonSpecReport {
+      title: spec.name.to_string(),
+      full_title: format!("{} {}", prefix, spec.name),
+      duration: spec.duration,
+      error: None
+    };
+    if let Some(result) = &spec.result {
+      if let Err(msg) = result {
+        spec_stat.error = Some(msg.to_string());
+        stats.stats.failing += 1;
+        stats.failing.push(spec_stat.copy());
+      } else {
+        stats.passing.push(spec_stat.copy());
+        stats.stats.passing += 1;
+      }
+    } else {
+      stats.pending.push(spec_stat.copy());
+      stats.stats.pending += 1;
+    }
+    stats.stats.duration += spec.duration;
+    stats.tests.push(spec_stat);
+  }
+  for child_suite in &suite.context.suites {
+    stats.stats.suites += 1;
+    get_stats_for_json(child_suite, stats, format!("{} {}", prefix, child_suite.name));
+  }
+}
+
+fn get_suffix(n: u32) -> String {
+  if n > 1 {
+    "s".to_string()
+  } else {
+    "".to_string()
+  }
+}
 
 pub fn report_to_stdout(suite: &Suite) {
 
-  fn get_suffix(n: u32) -> String {
-    if n > 1 {
-      "s".to_string()
-    } else {
-      "".to_string()
-    }
-  }
-
   match suite.reporter {
     Reporter::Spec => {
-      
-      fn get_lines(suite: &Suite, depth: u32, stats: &mut MinReporterStats) {
-
-        let red = Style::new().for_stdout().red();
-
-        println!("{}{}", suite_spacing(depth), suite.name.to_string());
-        for spec in &suite.context.specs {
-          if let Some(result) = &spec.result {
-            if let Err(msg) = result {
-              println!("{}{} {}", 
-                line_spacing(depth),
-                red.apply_to(format!("{})", stats.failed)),
-                red.apply_to(spec.name.to_string()));
-              stats.error_lines.push(style(format!("{}) {}: {}", stats.failed, spec.name, msg)).red().to_string());
-              stats.failed += 1;
-            } else {
-              let duration = match suite.duration_type {
-                DurationType::Nano => Duration::Nano(spec.duration),
-                DurationType::Micro => Duration::Micro(spec.duration),
-                DurationType::Mil => Duration::Mil(spec.duration),
-                DurationType::Sec => Duration::Sec(spec.duration)
-              };
-              let speed_display = match spec.context.speed_result {
-                Speed::Fast => SpeedDisplay::Fast(duration),
-                Speed::OnTime => SpeedDisplay::OnTime(duration),
-                Speed::Slow => SpeedDisplay::Slow(duration)
-              };
-              println!("{}{}  {} {}", 
-                line_spacing(depth),
-                style("✓").green().to_string(),
-                style(spec.name.to_string()).dim().to_string(), 
-                speed_display.to_string());
-                stats.passed += 1;
-            }
-          } else {
-            println!("{}   {}", 
-              line_spacing(depth), 
-              style(spec.name.to_string()).dim().to_string());
-              stats.pending += 1;
-          }
-        }
-        for child_suite in &suite.context.suites {
-          get_lines(child_suite, depth + 1, stats);
-
-        }
-      }
-
-      fn suite_spacing(depth: u32) -> String {
-        let mut tab = String::new();
-        let tab_n = depth * 2;
-        for _i in 1..=tab_n {
-          tab.push(' ');
-        }
-        tab
-      }
-      fn line_spacing(depth: u32) -> String {
-        let mut tab = String::new();
-        let tab_n = (depth * 2) + 2;
-        for _i in 1..=tab_n {
-          tab.push(' ');
-        }
-        tab
-      }
-      
+            
       let mut stats = MinReporterStats {
         passed: 0,
         pending: 0,
@@ -173,7 +383,7 @@ pub fn report_to_stdout(suite: &Suite) {
         error_lines: vec![]
       };
       print!("\n\n");
-      get_lines(suite, 0, &mut stats);
+      get_lines_for_spec(suite, 0, &mut stats);
       
       println!("");
       if stats.failed == 0 {
@@ -222,48 +432,6 @@ pub fn report_to_stdout(suite: &Suite) {
         error_lines: vec![]
       };
 
-      fn space_per_byte(n: u32) -> String {
-        let len = n.to_string().len();
-        let mut return_str = String::new();
-        for _i in 0..len {
-          return_str.push(' ');
-        }
-        return_str
-      }
-
-      fn line_spacing(depth: u32) -> String {
-        let mut tab = String::new();
-        let tab_n = (depth * 2) + 2;
-        for _i in 1..=tab_n {
-          tab.push(' ');
-        }
-        tab
-      }        
-
-      fn get_lines_for_min(suite: &Suite, stats: &mut MinReporterStats, prefix: String, depth: u32) {
-        for spec in &suite.context.specs {
-          if let Some(result) = &spec.result {
-            if let Err(msg) = result {
-              stats.failed += 1;
-              stats.error_lines.push(
-                style(format!("{}) {}\n   {}{}\n{}  Error: {}", 
-                  stats.failed, prefix, 
-                  line_spacing(depth), 
-                  spec.name, 
-                  space_per_byte(stats.failed), 
-                  msg)).red().to_string()
-              );
-            } else {
-              stats.passed += 1;
-            }
-          } else {
-            stats.pending += 1;
-          }
-        }
-        for child_suite in &suite.context.suites {
-          get_lines_for_min(child_suite, stats, format!("{}\n   {}{}", prefix, line_spacing(depth), child_suite.name), depth + 1);
-        }
-      }
 
       get_lines_for_min(suite, &mut stats, suite.name.to_string(), 0);
       
@@ -297,38 +465,6 @@ pub fn report_to_stdout(suite: &Suite) {
       print!("\n\n");
     },
     Reporter::Dot => {
-      fn get_dots(suite: &Suite, stats: &mut DotReporterStats) {
-        for spec in &suite.context.specs {
-          if let Some(result) = &spec.result {
-            match result {
-              Ok(_) => {
-                stats.passed += 1;
-                match spec.context.speed_result {
-                  Speed::Fast => {
-                    stats.dots.push(style(".").green().to_string())
-                  },
-                  Speed::OnTime => {
-                    stats.dots.push(style(".").yellow().to_string())
-                  },
-                  Speed::Slow => {
-                    stats.dots.push(style(".").red().to_string())
-                  }
-                }
-              },
-              Err(_) => {
-                stats.failed += 1;
-                stats.dots.push(style("!").red().to_string())
-              }
-            }
-          } else {
-            stats.pending += 1;              
-            stats.dots.push(style(",").cyan().to_string())
-          }
-        }
-        for child_suite in &suite.context.suites {
-          get_dots(child_suite, stats);
-        }
-      }
       let mut stats = DotReporterStats {
         passed: 0,
         failed: 0,
@@ -347,39 +483,6 @@ pub fn report_to_stdout(suite: &Suite) {
       print!("\n\n");
     },
     Reporter::List => {
-      
-      fn get_list(suite: &Suite, stats: &mut MinReporterStats, prefix: String) {
-        for spec in &suite.context.specs {
-          if let Some(result) = &spec.result {
-            if let Err(msg) = result {
-              println!("✖ {}",
-                style(format!("{} {}: {}", prefix, spec.name, msg)).red().to_string()
-              );
-              stats.failed += 1;
-            } else {
-              let duration = match suite.duration_type {
-                DurationType::Nano => Duration::Nano(spec.duration),
-                DurationType::Micro => Duration::Micro(spec.duration),
-                DurationType::Mil => Duration::Mil(spec.duration),
-                DurationType::Sec => Duration::Sec(spec.duration)
-              };
-              println!("✓ {}{}",
-                style(format!("{} {}", prefix, spec.name)).green().to_string(),
-                style(format!(": {}", duration.to_string())).dim().to_string()
-              );
-              stats.passed += 1;
-            }
-          } else {
-            println!("  {}",
-              style(format!("{} {}", prefix, spec.name)).dim().to_string()
-            );
-            stats.pending += 1;
-          }
-        }
-        for child_suite in &suite.context.suites {
-          get_list(child_suite, stats, format!("{} {}", prefix, child_suite.name));
-        }
-      }
       let mut stats = MinReporterStats {
         passed: 0,
         failed: 0,
@@ -401,36 +504,6 @@ pub fn report_to_stdout(suite: &Suite) {
       print!("\n\n");
     },
     Reporter::Tap => {
-      
-      fn get_tap_list(suite: &Suite, lines: &mut Vec<String>, count: &mut u32, prefix: String) {
-        for spec in &suite.context.specs {
-          *count += 1;
-          if let Some(result) = &spec.result {
-            if let Err(_msg) = result {
-              lines.push(format!("{} {} - {}",
-                style("not ok").red().to_string(),
-                count,
-                format!("{} {}", prefix, spec.name)
-              ));
-            } else {
-              lines.push(format!("{} {} - {}",
-                style("ok").green().to_string(),
-                count,
-                format!("{} {}", prefix, spec.name)
-              ));
-            }
-          } else {
-            lines.push(format!("{} {} - {}",
-              style("ok").green().to_string(),
-              count,
-              format!("# skip {} {}", prefix, spec.name)
-            ));
-          }
-        }
-        for child_suite in &suite.context.suites {
-          get_tap_list(child_suite, lines, count, format!("{} {}", prefix, child_suite.name));
-        }
-      }
       let mut lines = vec![];
       let mut count = 0;
       get_tap_list(suite, &mut lines, &mut count, suite.name.to_string());
@@ -448,34 +521,6 @@ pub fn report_to_stdout(suite: &Suite) {
       //     suite::tests::describe_a_suite
       // test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out
 
-      fn get_count(suite: &Suite) -> u32 {
-        let mut count = suite.context.specs.len() as u32;
-        for child_suite in &suite.context.suites {
-          count += get_count(child_suite);
-        }
-        return count;
-      }
-
-      fn get_list(suite: &Suite, stats: &mut MinReporterStats, prefix: String) {
-        for spec in &suite.context.specs {
-          if let Some(result) = &spec.result {
-            if let Err(_msg) = result {
-              println!("test {}::{} ... FAILED", prefix, spec.name.to_case(Case::Snake));
-              stats.error_lines.push(format!("{}::{}", prefix, spec.name.to_case(Case::Snake)));
-              stats.failed += 1;
-            } else {
-              println!("test {}::{} ... ok", prefix, spec.name.to_case(Case::Snake));
-              stats.passed += 1;
-            }
-          } else {
-            println!("test {}::{} ... ignored", prefix, spec.name.to_case(Case::Snake));
-            stats.pending += 1;
-          }
-        }
-        for child_suite in &suite.context.suites {
-          get_list(child_suite, stats, format!("{}::{}", prefix, child_suite.name.to_case(Case::Snake)));
-        }
-      }
       let mut stats = MinReporterStats {
         passed: 0,
         failed: 0,
@@ -488,52 +533,26 @@ pub fn report_to_stdout(suite: &Suite) {
       print!("\n");
       println!("Running {} test{}", count, get_suffix(count));
       print!("\n\n");
-      get_list(suite, &mut stats, suite.name.to_case(Case::Snake));
+      get_list_for_rust(suite, &mut stats, suite.name.to_case(Case::Snake));
       print!("\n");
+      let passed = green(&format!("{} passed", stats.passed));
+      let ignored = cyan(&format!("{} ignored", stats.pending));      
       if stats.failed == 0 {
-        println!("test result: ok. {} passed; 0 failed; {} ignored; 0 measured; 0 filtered out", stats.passed, stats.pending);
+        println!("test result: ok. {}; 0 failed; {}; 0 measured; 0 filtered out", passed, ignored);
       } else {
-        println!("failures:");
+        let failed = red(&format!("{} failed", stats.failed));
+        println!("{}", red("failures:"));
         for line in &stats.error_lines {
-          println!("    {}", line);            
+          println!("    {}", red(line));            
         }
         print!("\n");
-        println!("test result: FAILED. {} passed; {} failed; {} ignored; 0 measured; 0 filtered out", stats.passed, stats.failed, stats.pending);
+        println!("test result: {}. {}; {}; {}; 0 measured; 0 filtered out", red("FAILED"), passed, failed, ignored);
       }
       print!("\n");
       println!("### Lab Results end ###");
       print!("\n\n");
     },
     Reporter::Json(pretty) => {
-      fn get_stats_for_json(suite: &Suite, stats: &mut JsonReport, prefix: String) {
-        for spec in &suite.context.specs {
-          let mut spec_stat = JsonSpecReport {
-            title: spec.name.to_string(),
-            full_title: format!("{} {}", prefix, spec.name),
-            duration: spec.duration,
-            error: None
-          };
-          if let Some(result) = &spec.result {
-            if let Err(msg) = result {
-              spec_stat.error = Some(msg.to_string());
-              stats.stats.failing += 1;
-              stats.failing.push(spec_stat.copy());
-            } else {
-              stats.passing.push(spec_stat.copy());
-              stats.stats.passing += 1;
-            }
-          } else {
-            stats.pending.push(spec_stat.copy());
-            stats.stats.pending += 1;
-          }
-          stats.stats.duration += spec.duration;
-          stats.tests.push(spec_stat);
-        }
-        for child_suite in &suite.context.suites {
-          stats.stats.suites += 1;
-          get_stats_for_json(child_suite, stats, format!("{} {}", prefix, child_suite.name));
-        }
-      }
       let mut json_report = JsonReport {
         stats: JsonStats {
           suites: 0,

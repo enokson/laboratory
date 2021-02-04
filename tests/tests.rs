@@ -65,8 +65,8 @@ fn describe_a_suite() -> LabResult {
       });
 
       ctx.it("should do stuff", move |_ctx| {
-        // Err("I am a failure".to_string())
-        Ok(())
+        Err("I am a failure".to_string())
+        // Ok(())
       });
       
     });
