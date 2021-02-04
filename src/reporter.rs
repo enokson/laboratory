@@ -538,7 +538,7 @@ pub fn report_to_stdout(suite: &Suite) {
       let passed = green(&format!("{} passed", stats.passed));
       let ignored = cyan(&format!("{} ignored", stats.pending));      
       if stats.failed == 0 {
-        println!("test result: ok. {}; 0 failed; {}; 0 measured; 0 filtered out", passed, ignored);
+        println!("test result: {}. {}; 0 failed; {}; 0 measured; 0 filtered out", green("ok"), passed, ignored);
       } else {
         let failed = red(&format!("{} failed", stats.failed));
         println!("{}", red("failures:"));
