@@ -13,13 +13,13 @@ fn main() {
 #[cfg(test)]
 mod tests {
 
-    // let bring in our functions
+    // let's bring in our functions
     use super::*;
 
     // and now let's bring in our lab tools
     use laboratory::{LabResult, describe, expect};
 
-    // define our single rust test
+    // here we define our single rust test
     #[test]
     fn test() -> LabResult {
 
@@ -29,8 +29,7 @@ mod tests {
         // under that umbrella.
         let test_results = describe("Crate", |ctx| {
             
-            ctx
-            .describe("add_one()", |ctx| {
+            ctx.describe("add_one()", |ctx| {
                 
                 ctx.it("should return 1 to when passed 0", |_| {
 
@@ -52,6 +51,12 @@ mod tests {
 
         }).run();
 
+        // the run method returns a result. So, if any of
+        // our tests fail the result will return an error as well.
+        // I catch the error in this example, but generally you should
+        // allow the suite to return the result to the function. Feel
+        // free to uncomment the "return Err(msg);" line to see the result
+        // in the terminal.
         if let Err(_msg) = test_results {
             // return Err(msg);
         }

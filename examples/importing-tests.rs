@@ -5,11 +5,14 @@ fn main() {
 }
 
 // In this crate we have two
-// public modules: add_one, and multiply_by_two
+// public modules: 
+//   - add_one, and
+//   - multiply_by_two
 
+// here is the first module
 pub mod add_one {
 
-    // here is a function that we want to test
+    // and here is its function that we want to test
     pub fn add_one (x: u64) -> u64 { x + 1 }
 
 
@@ -42,7 +45,7 @@ pub mod add_one {
 
 }
 
-// Here is our second module
+// here is our second module
 pub mod multiply_by_two {
 
     // ...and the function we want to test

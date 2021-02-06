@@ -16,7 +16,7 @@ mod tests {
 
         // In this suite we want to use hooks to
         // perform actions before and after our tests.
-        // The actions we to run in this scenario is simply
+        // The actions we want to run in this scenario is simply
         // outputting to stdout.
         describe("always_return_true()", |ctx| {
 
@@ -30,7 +30,7 @@ mod tests {
             })
 
             // We want to run this action just before every test
-            // in this suite. Since we have two tests this action
+            // in this suite (and child suites). Since we have two tests this action
             // will be ran twice.
             .before_each(|| {
 
