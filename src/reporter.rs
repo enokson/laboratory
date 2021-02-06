@@ -8,6 +8,8 @@ use crate::suite::{
 };
 use serde::{Serialize};
 use serde_json::{to_string, to_string_pretty};
+use std::fmt::Display;
+
 pub enum Reporter{
   Spec,
   Min,
@@ -25,9 +27,9 @@ enum SpeedDisplay {
 impl SpeedDisplay {
   pub fn to_string(&self) -> String {
     match self {
-      SpeedDisplay::Fast(duration) => style(duration.to_string()).green().to_string(),
-      SpeedDisplay::OnTime(duration) => style(duration.to_string()).yellow().to_string(),
-      SpeedDisplay::Slow(duration) => style(duration.to_string()).red().to_string()
+      SpeedDisplay::Fast(duration) => green(duration.to_string()),
+      SpeedDisplay::OnTime(duration) => yellow(duration.to_string()),
+      SpeedDisplay::Slow(duration) => red(duration.to_string())
     }
   }
 }
@@ -89,22 +91,31 @@ struct DotReporterStats {
   pub dots: Vec<String>
 }
 
-fn red(text: &str) -> String {
-  style(text).red().to_string()
+fn red<T: Into<String> + Display>(text: T) -> String {
+  style(text).red().for_stdout().to_string()
 }
-fn green(text: &str) -> String {
-  style(text).green().to_string()
+fn green<T: Into<String> + Display>(text: T) -> String {
+  style(text).green().for_stdout().to_string()
 }
-fn cyan(text: &str) -> String {
-  style(text).cyan().to_string()
+fn cyan<T: Into<String> + Display>(text: T) -> String {
+  style(text).cyan().for_stdout().to_string()
 }
-fn dim(text: &str) -> String {
-  style(text).dim().to_string()
+fn dim<T: Into<String> + Display>(text: T) -> String {
+  style(text).dim().for_stdout().to_string()
+}
+fn yellow<T: Into<String> + Display>(text: T) -> String {
+  style(text).yellow().for_stdout().to_string()
+}
+
+fn header() {
+  print!("\n\n### Lab Results Start ###\n\n");
+}
+
+fn footer() {
+  println!("\n### Lab Results End ###\n\n");
 }
 
 fn get_lines_for_spec(suite: &Suite, depth: u32, stats: &mut MinReporterStats) {
-
-  let red = Style::new().for_stdout().red();
 
   println!("{}{}", suite_spacing(depth), suite.name.to_string());
   for spec in &suite.context.specs {
@@ -112,9 +123,9 @@ fn get_lines_for_spec(suite: &Suite, depth: u32, stats: &mut MinReporterStats) {
       if let Err(msg) = result {
         println!("{}{} {}", 
           line_spacing(depth),
-          red.apply_to(format!("{})", stats.failed)),
-          red.apply_to(spec.name.to_string()));
-        stats.error_lines.push(style(format!("{}) {}: {}", stats.failed, spec.name, msg)).red().to_string());
+          red(&format!("{})", stats.failed)),
+          red(&spec.name.to_string()));
+        stats.error_lines.push(red(&format!("{}) {}: {}", stats.failed, spec.name, msg)));
         stats.failed += 1;
       } else {
         let duration = match suite.duration_type {
@@ -130,15 +141,15 @@ fn get_lines_for_spec(suite: &Suite, depth: u32, stats: &mut MinReporterStats) {
         };
         println!("{}{}  {} {}", 
           line_spacing(depth),
-          style("✓").green().to_string(),
-          style(spec.name.to_string()).dim().to_string(), 
+          green("✓"),
+          dim(&spec.name.to_string()), 
           speed_display.to_string());
           stats.passed += 1;
       }
     } else {
       println!("{}   {}", 
         line_spacing(depth), 
-        style(spec.name.to_string()).dim().to_string());
+        dim(&spec.name.to_string()));
         stats.pending += 1;
     }
   }
@@ -156,6 +167,7 @@ fn suite_spacing(depth: u32) -> String {
   }
   tab
 }
+
 fn line_spacing(depth: u32) -> String {
   let mut tab = String::new();
   let tab_n = (depth * 2) + 2;
@@ -189,12 +201,13 @@ fn get_lines_for_min(suite: &Suite, stats: &mut MinReporterStats, prefix: String
       if let Err(msg) = result {
         stats.failed += 1;
         stats.error_lines.push(
-          style(format!("{}) {}\n   {}{}\n{}  Error: {}", 
+          red(&format!("{}) {}\n   {}{}\n{}  Error: {}", 
             stats.failed, prefix, 
             line_spacing_for_min(depth), 
             spec.name, 
             space_per_byte(stats.failed), 
-            msg)).red().to_string()
+            msg)
+          )
         );
       } else {
         stats.passed += 1;
@@ -216,24 +229,24 @@ fn get_dots(suite: &Suite, stats: &mut DotReporterStats) {
           stats.passed += 1;
           match spec.context.speed_result {
             Speed::Fast => {
-              stats.dots.push(style(".").green().to_string())
+              stats.dots.push(green("."))
             },
             Speed::OnTime => {
-              stats.dots.push(style(".").yellow().to_string())
+              stats.dots.push(yellow("."))
             },
             Speed::Slow => {
-              stats.dots.push(style(".").red().to_string())
+              stats.dots.push(red("."))
             }
           }
         },
         Err(_) => {
           stats.failed += 1;
-          stats.dots.push(style("!").red().to_string())
+          stats.dots.push(red("!"))
         }
       }
     } else {
       stats.pending += 1;              
-      stats.dots.push(style(",").cyan().to_string())
+      stats.dots.push(cyan(","))
     }
   }
   for child_suite in &suite.context.suites {
@@ -246,7 +259,7 @@ fn get_list(suite: &Suite, stats: &mut MinReporterStats, prefix: String) {
     if let Some(result) = &spec.result {
       if let Err(msg) = result {
         println!("✖ {}",
-          style(format!("{} {}: {}", prefix, spec.name, msg)).red().to_string()
+          red(format!("{} {}: {}", prefix, spec.name, msg))
         );
         stats.failed += 1;
       } else {
@@ -257,14 +270,14 @@ fn get_list(suite: &Suite, stats: &mut MinReporterStats, prefix: String) {
           DurationType::Sec => Duration::Sec(spec.duration)
         };
         println!("✓ {}{}",
-          style(format!("{} {}", prefix, spec.name)).green().to_string(),
-          style(format!(": {}", duration.to_string())).dim().to_string()
+          green(format!("{} {}", prefix, spec.name)),
+          dim(format!(": {}", duration.to_string()))
         );
         stats.passed += 1;
       }
     } else {
       println!("  {}",
-        style(format!("{} {}", prefix, spec.name)).dim().to_string()
+        dim(format!("{} {}", prefix, spec.name))
       );
       stats.pending += 1;
     }
@@ -280,20 +293,20 @@ fn get_tap_list(suite: &Suite, lines: &mut Vec<String>, count: &mut u32, prefix:
     if let Some(result) = &spec.result {
       if let Err(_msg) = result {
         lines.push(format!("{} {} - {}",
-          style("not ok").red().to_string(),
+          red("not ok"),
           count,
           format!("{} {}", prefix, spec.name)
         ));
       } else {
         lines.push(format!("{} {} - {}",
-          style("ok").green().to_string(),
+          green("ok"),
           count,
           format!("{} {}", prefix, spec.name)
         ));
       }
     } else {
       lines.push(format!("{} {} - {}",
-        style("ok").green().to_string(),
+        green("ok"),
         count,
         format!("# skip {} {}", prefix, spec.name)
       ));
@@ -375,42 +388,52 @@ pub fn report_to_stdout(suite: &Suite) {
 
   match suite.reporter {
     Reporter::Spec => {
-            
+
       let mut stats = MinReporterStats {
         passed: 0,
         pending: 0,
         failed: 0,
         error_lines: vec![]
       };
-      print!("\n\n");
+ 
+      header();
+ 
       get_lines_for_spec(suite, 0, &mut stats);
-      
-      println!("");
+ 
       if stats.failed == 0 {
+ 
         let duration = match suite.duration_type {
           DurationType::Nano => Duration::Nano(suite.total_duration),
           DurationType::Micro => Duration::Micro(suite.total_duration),
           DurationType::Mil => Duration::Mil(suite.total_duration),
           DurationType::Sec => Duration::Sec(suite.total_duration)
         };
+ 
         println!("{}{} {}",
-          style("✓").green().to_string(), 
-          style(format!(" {} test{} completed", stats.passed, get_suffix(stats.passed))).green().to_string(),
-          style(format!("{}", duration.to_string())).dim().to_string()
+          green("✓"), 
+          green(format!(" {} test{} completed", stats.passed, get_suffix(stats.passed))),
+          dim(format!("{}", duration.to_string()))
         );
+  
       } else {
+ 
         println!(" {}{}",
-          style(format!("✖ {} of {} test{} failed", stats.failed, stats.passed + stats.failed, get_suffix(stats.failed))).red().to_string(),
-          style(":").dim().to_string()
+          red(format!("✖ {} of {} test{} failed", 
+            stats.failed, 
+            stats.passed + stats.failed, 
+            get_suffix(stats.failed))
+          ),
+          dim(":")
         );
+ 
       }
-      println!("");
-        
+ 
       for spec_report_line in &stats.error_lines {
         println!("{}", spec_report_line);
       }
-      println!("");
-      println!("");
+
+      footer();
+
     },
     Reporter::Min => {
 
@@ -442,19 +465,20 @@ pub fn report_to_stdout(suite: &Suite) {
         DurationType::Sec => Duration::Sec(suite.total_duration)
       };
 
-      print!("\n\n");
+      header();
+  
       if stats.passed > 0 {
         println!("{} {}",
-          style(format!("{} test{} complete", stats.passed, get_suffix(stats.passed))).green().to_string(),
-          style(format!("{}", duration.to_string())).dim().to_string()
+          green(format!("{} test{} complete", stats.passed, get_suffix(stats.passed))),
+          dim(format!("{}", duration.to_string()))
         );
       }
       if stats.pending > 0 {
-        println!("{}", style(format!("{} test{} pending", stats.pending, get_suffix(stats.pending))).dim().to_string());
+        println!("{}", dim(format!("{} test{} pending", stats.pending, get_suffix(stats.pending))));
       }
       if stats.failed > 0 {
         println!("{}",
-          style(format!("{} test{} failed", stats.failed, get_suffix(stats.failed))).red().to_string()
+          red(format!("{} test{} failed", stats.failed, get_suffix(stats.failed)))
         );
         print!("\n\n");
         for line in &stats.error_lines {
@@ -462,8 +486,10 @@ pub fn report_to_stdout(suite: &Suite) {
           println!("");
         }
       }
-      print!("\n\n");
-    },
+
+      footer();
+
+   },
     Reporter::Dot => {
       let mut stats = DotReporterStats {
         passed: 0,
@@ -477,9 +503,9 @@ pub fn report_to_stdout(suite: &Suite) {
         print!("{}", line);
       }
       print!("\n\n");
-      println!("{}", style(format!("{} passing", stats.passed)).green().to_string());
-      println!("{}", style(format!("{} pending", stats.pending)).cyan().to_string());
-      println!("{}", style(format!("{} failed", stats.failed)).red().to_string());
+      println!("{}", green(format!("{} passing", stats.passed)));
+      println!("{}", cyan(format!("{} pending", stats.pending)));
+      println!("{}", red(format!("{} failed", stats.failed)));
       print!("\n\n");
     },
     Reporter::List => {
@@ -498,9 +524,9 @@ pub fn report_to_stdout(suite: &Suite) {
       print!("\n\n");
       get_list(suite, &mut stats, suite.name.to_string());
       print!("\n\n");
-      println!("{}", style(format!("{} passing {}", stats.passed, duration.to_string())).green().to_string());
-      println!("{}", style(format!("{} pending", stats.pending)).cyan().to_string());
-      println!("{}", style(format!("{} failed", stats.failed)).red().to_string());
+      println!("{}", green(format!("{} passing {}", stats.passed, duration.to_string())));
+      println!("{}", cyan(format!("{} pending", stats.pending)));
+      println!("{}", red(format!("{} failed", stats.failed)));
       print!("\n\n");
     },
     Reporter::Tap => {
@@ -508,7 +534,7 @@ pub fn report_to_stdout(suite: &Suite) {
       let mut count = 0;
       get_tap_list(suite, &mut lines, &mut count, suite.name.to_string());
       print!("\n\n");
-      println!("{}", style(format!("1..{}", count)).green().to_string());
+      println!("{}", green(format!("1..{}", count)));
       for line in &lines {
         println!("{}", line);
       }
