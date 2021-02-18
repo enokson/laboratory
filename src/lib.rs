@@ -16,9 +16,10 @@ mod reporter;
 mod suite;
 mod suite_context;
 mod spec;
+mod data;
 
 
 pub use suite::{describe, Suite};
 pub use assertion::{expect, should_panic, should_not_panic};
-
+pub use data::Data;
 pub type LabResult = Result<(), String>;
