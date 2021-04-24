@@ -10,15 +10,6 @@ use crate::reporter::{
   report_to_stdout
 };
 
-/* 
-
-TODO: implement random spec iteration order
-TODO: implement async support
-
-*/
-
-
-
 #[derive(Debug, Clone, Copy)]
 pub enum Speed {
   Fast,
@@ -389,7 +380,7 @@ pub fn describe<S, H, T>(name: S, cb: H) -> Suite<T>
     S: Into<String> + Display,
     H: Fn(&mut SuiteContext<T>) + 'static
 {
-  let mut context = SuiteContext::new();
+  let context = SuiteContext::new();
   // (cb)(&mut context);
   Suite {
     name: name.to_string(),

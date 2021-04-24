@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::{fmt::Display, rc::Rc, cell::RefCell};
 use crate::spec::{Spec, SpecContext};
-use crate::suite::{Suite, describe};
+use crate::suite::{Suite};
 
 pub type State<T> = HashMap<&'static str, T>;
 

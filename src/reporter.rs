@@ -1,5 +1,5 @@
 use convert_case::{Case, Casing};
-use console::{style, Style};
+use console::{style};
 use crate::suite::{
   Duration,
   DurationType,
