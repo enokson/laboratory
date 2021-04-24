@@ -18,36 +18,19 @@ mod tests {
     use std::fmt::{Debug};
     use std::rc::Rc;
 
-
-    // We want a counter to count each time a hook or test is called
-
-    #[derive(Debug, Clone)]
-    struct Counter {
-        suite: String, // the name of the suite
-        call_count: u8 // the number of times a hook or test was called
-    }
-
-    impl Counter {
-        fn new(suite: &str) -> Counter {
-            Counter {
-                suite: String::from(suite),
-                call_count: 0
-            }
-        }
-        fn update(&mut self) {
-            self.call_count += 1;
-            println!("  {} hit count: {}", self.suite, self.call_count);
-        }
-    }
-
     #[test]
     fn test() -> LabResult {
 
-        fn imported_suite() -> Suite<i32> {
+        enum State {
+            I32(i32),
+            String(String)
+        }
+
+        fn imported_suite() -> Suite<State> {
             describe("imported suite", |suite| {
                 suite.it("should do something cool", |spec| {
-                    let state = spec.state.borrow();
-                    println!("/counter from imported suite: {}", state.get("/counter").unwrap());
+                    // let state = spec.state.borrow();
+                    // println!("/counter from imported suite: {}", state.get("/counter").unwrap());
                     expect(true).to_be(true)
                 });
             })
@@ -62,30 +45,27 @@ mod tests {
 
             suite.before_all(|state| {
 
-                state.insert("/counter", 0);
+                state.insert("/counter", State::I32(0));
                
             }).before_each(|state| {
-
-                let mut count = state.get_mut("/counter").unwrap();
-                *count += 1;
-                
+                if let State::I32(count) = state.get_mut("/counter").unwrap() {
+                    *count += 1;
+                };
             }).after_each(|state| {
-
-                let mut count = state.get_mut("/counter").unwrap();
-                *count += 1;
-
+                if let State::I32(count) = state.get_mut("/counter").unwrap() {
+                    *count += 1;
+                };
             }).after_all(|state| {
-
-                let count = state.get("/counter").unwrap();
-                println!("/counter: {:?}", count);
-              
+                if let State::I32(count) = state.get_mut("/counter").unwrap() {
+                    println!("/counter: {:?}", count);
+                };
             }).describe("add_one()", |suite| {
 
                 suite.it("should return 1", |spec| {
 
-                    let state = spec.state.borrow();
-                    let counter = state.get("/counter").unwrap();
-                    println!("/counter from spec: {:?}", counter);
+                    // let state = spec.state.borrow();
+                    // let counter = state.get("/counter").unwrap();
+                    // println!("/counter from spec: {:?}", counter);
                     expect(add_one(0)).to_be(1)
 
                 }).it("should return 2", |_| {
@@ -98,27 +78,34 @@ mod tests {
 
                 suite.before_all(|state| {
                     
-                    state.insert("/add_two()", 0);
+                    state.insert("/add_two()", State::String("hello".to_string()));
 
                 }).before_each(|state| {
                     
-                    let mut count = state.get_mut("/add_two()").unwrap();
-                    *count += 1;
+                    // let mut count = state.get_mut("/add_two()").unwrap();
+                    // *count += 1;
 
                 }).after_each(|state| {
                     
-                    let mut count = state.get_mut("/add_two()").unwrap();
-                    *count += 1;
+                    // let mut count = state.get_mut("/add_two()").unwrap();
+                    // *count += 1;
 
                 }).after_all(|state| {
 
-                    let count = state.get("/add_two()").unwrap();
-                    println!("/add_two(): {:?}", count);
+                    if let State::String(string) = state.get_mut("/add_two()").unwrap() {
+                        string.push_str(", world!")
+                    }
+
+                    if let State::String(string) = state.get_mut("/add_two()").unwrap() {
+                        println!("/add_two(): {:?}", string);
+                    }
+                    // let count = state.get("/add_two()").unwrap();
+                    // println!("/add_two(): {:?}", count);
                     
                 }).it("should return 2", |spec| {
 
-                    let state = spec.state.borrow();
-                    println!("/add_two spec: {}", state.get("/add_two()").unwrap());
+                    // let state = spec.state.borrow();
+                    // println!("/add_two spec: {}", state.get("/add_two()").unwrap());
 
                     expect(add_two(0)).to_be(2)
 
@@ -138,7 +125,9 @@ mod tests {
                 });
 
             })
-            .describe_import(imported_suite());
+            .describe_import(imported_suite()).it("should do something", |spec| {
+                expect(true).to_be(true)
+            });
 
         }).rust().run()
 
