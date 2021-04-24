@@ -18,6 +18,7 @@ mod tests {
     use std::fmt::{Debug};
     use std::rc::Rc;
 
+
     // We want a counter to count each time a hook or test is called
 
     #[derive(Debug, Clone)]
@@ -42,106 +43,80 @@ mod tests {
     #[test]
     fn test() -> LabResult {
 
-        // Here we will define a function to handle all the hook calls
-        let hook_handle = |counter: Rc<RefCell<Counter>>| {
-            let mut counter = counter.borrow_mut();
-            counter.update();
-        };
+        describe("My Crate", |suite| {
 
-        let hook_handle_2 = |mut counter: RefMut<Counter>| {
-            counter.update();
-        };
+            // let mut state = suite.state.borrow_mut();
+            // state.insert(0, 0);
+            // state.insert(1, 0);
+            // drop(state);
 
-        describe("My Crate", move |ctx| {
+            suite.before_all(|state| {
 
-            let parent_counter = Rc::new(RefCell::new(Counter::new("Parent Counter")));
-            let parent_counter_2 = parent_counter.clone();
-            let before_all_counter = parent_counter.clone();
-            let before_each_counter = parent_counter.clone();
-            let after_all_counter = parent_counter.clone();
-            let after_each_counter = parent_counter.clone();
-            let add_one_counter = parent_counter.clone();
-            ctx.before_all(move || {
+                state.insert("/counter", 0);
+               
+            }).before_each(|state| {
 
-                let counter = parent_counter.borrow_mut();
-                hook_handle_2(counter);
-                hook_handle(before_all_counter.clone());
+                let mut count = state.get_mut("/counter").unwrap();
+                *count += 1;
+                
+            }).after_each(|state| {
 
-            }).before_each(move || {
+                let mut count = state.get_mut("/counter").unwrap();
+                *count += 1;
 
-                hook_handle(before_each_counter.clone());
+            }).after_all(|state| {
 
-            }).after_each(move || {
+                let count = state.get("/counter").unwrap();
+                println!("/counter: {:?}", count);
+              
+            }).describe("add_one()", |suite| {
 
-                hook_handle(after_each_counter.clone());
+                suite.it("should return 1", |spec| {
 
-            }).after_all(move || {
+                    expect(add_one(0)).to_be(1)
 
-                let counter_rc = after_all_counter.clone();
-                hook_handle(counter_rc.clone());
-                println!("{:#?}\n\n", counter_rc.clone());
-
-            }).describe("add_one()", move |ctx| {
-
-                let add_one_counter = add_one_counter.clone();
-                let counter_1 = add_one_counter.clone();
-                let counter_2 = add_one_counter.clone();
-                ctx.it("should return 1", move |_| {
-
-                hook_handle(counter_1.clone());
-                expect(add_one(0)).to_be(1)
-
-                }).it("should return 2", move |_| {
-
-                hook_handle(counter_2.clone());
-                expect(add_one(1)).to_be(2)
+                }).it("should return 2", |_| {
+                
+                    expect(add_one(1)).to_be(2)
 
                 });
 
-            }).describe("add_two()", move |ctx| {
+            }).describe("add_two()", |suite| {
 
-                let child_counter = Rc::new(RefCell::new(Counter::new("Child Counter")));
-                let before_all_counter = child_counter.clone();
-                let before_each_counter = child_counter.clone();
-                let after_all_counter = child_counter.clone();
-                let after_each_counter = child_counter.clone();
-                let test_1 = child_counter.clone();
-                let test_2 = child_counter.clone();
-                ctx.before_all(move || {
+                suite.before_all(|state| {
+                    
+                    state.insert("/add_two()", 0);
 
-                    hook_handle(before_all_counter.clone());
+                }).before_each(|state| {
+                    
+                    let mut count = state.get_mut("/add_two()").unwrap();
+                    *count += 1;
 
-                }).before_each(move || {
+                }).after_each(|state| {
+                    
+                    let mut count = state.get_mut("/add_two()").unwrap();
+                    *count += 1;
 
-                    hook_handle(before_each_counter.clone());
+                }).after_all(|state| {
 
-                }).after_each(move || {
+                    let count = state.get("/add_two()").unwrap();
+                    println!("/add_two(): {:?}", count);                    
+                    
+                }).it("should return 2", |_| {
 
-                    hook_handle(after_each_counter.clone());
-
-                }).after_all(move || {
-
-                    hook_handle(after_all_counter.clone());
-
-                }).it("should return 2", move |_| {
-
-                    hook_handle(test_1.clone());
                     expect(add_two(0)).to_be(2)
 
-                }).it("should return 4", move |_| {
+                }).it("should return 4", |_| {
 
-                    hook_handle(test_2.clone());
                     expect(add_two(2)).to_be(4)
 
-                });
+                })
 
-            }).describe("always_return_true()", move |ctx| {
+            }).describe("always_return_true()", |ctx| {
 
-                let parent_counter = parent_counter_2.clone();
 
-                ctx.it("should always return true", move |_| {
+                ctx.it("should always return true", |_| {
 
-                    hook_handle(parent_counter.clone());
                     expect(always_return_true()).to_be(true)
 
                 });

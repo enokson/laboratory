@@ -17,6 +17,8 @@ TODO: implement async support
 
 */
 
+
+
 #[derive(Debug, Clone, Copy)]
 pub enum Speed {
   Fast,
@@ -50,10 +52,10 @@ pub enum DurationType {
   Sec
 }
 
-pub struct Suite {
+pub struct Suite<T> {
   pub name: String,
   pub only: bool,
-  pub context: SuiteContext,
+  pub context: SuiteContext<T>,
   pub duration_type: DurationType,
   pub suite_duration: u128,
   pub total_duration: u128,
@@ -62,12 +64,13 @@ pub struct Suite {
   pub start_time: String,
   pub end_time: String
 }
-impl Suite {
+impl<T> Suite<T> {
   pub fn run(&mut self) -> LabResult {
     Suite::apply_depth_to_suites(self);
     Suite::index_specs(self, &mut 0);
     Suite::ignore_non_onlys(self);
     Suite::apply_hooks(self);
+    Suite::apply_state(self);
     Suite::apply_duration_type(self);
     Suite::run_specs_and_suites(self);
     Suite::sum_result_counts(self);
@@ -129,13 +132,13 @@ impl Suite {
     self.duration_type = DurationType::Sec;
     self
   }
-  fn run_specs_and_suites(suite: &mut Suite) {
+  fn run_specs_and_suites(suite: &mut Suite<T>) {
     let system_time = SystemTime::now();
     let datetime: DateTime<Utc> = system_time.into();
     suite.start_time = datetime.to_string();
     if let Some(boxed_hook) = &suite.context.before_all_hook {
       let hook = boxed_hook.as_ref();
-      (hook)()
+      (hook)(&mut suite.context.state.borrow_mut())
     }
     for spec in &mut suite.context.specs {
       if !spec.skip {
@@ -157,7 +160,7 @@ impl Suite {
         for _i in 0..=(retries + 1) {
           if let Some(boxed_hook) = &suite.context.before_each_hook {
             let hook = boxed_hook.as_ref();
-            (hook)()
+            (hook)(&mut suite.context.state.borrow_mut())
           }
           let start_time = Instant::now();
           let result = (spec.hook.as_ref())(&mut spec.context);
@@ -172,7 +175,7 @@ impl Suite {
           spec.duration = duration_int;
           if let Some(boxed_hook) = &suite.context.after_each_hook {
             let hook = boxed_hook.as_ref();
-            (hook)()
+            (hook)(&mut suite.context.state.borrow_mut())
           }
           if spec.result.as_ref().unwrap().is_ok() {
             break;
@@ -187,13 +190,13 @@ impl Suite {
     }
     if let Some(boxed_hook) = &suite.context.after_all_hook {
       let hook = boxed_hook.as_ref();
-      (hook)()
+      (hook)(&mut suite.context.state.borrow_mut())
     }
     let system_time = SystemTime::now();
     let datetime: DateTime<Utc> = system_time.into();
     suite.end_time = datetime.to_string();
   }
-  fn index_specs(suite: &mut Suite, count: &mut u32) {
+  fn index_specs(suite: &mut Suite<T>, count: &mut u32) {
     for spec in suite.context.specs.iter_mut() {
       spec.order = Some(*count);
       *count += 1;
@@ -202,12 +205,12 @@ impl Suite {
       Suite::index_specs(suite, count);
     }
   }
-  fn apply_depth_to_suites(suite: &mut Suite) {
+  fn apply_depth_to_suites(suite: &mut Suite<T>) {
     for child_suite in &mut suite.context.suites {
       child_suite.depth += suite.depth;
     }
   }
-  fn apply_hooks(suite: &mut Suite) {
+  fn apply_hooks(suite: &mut Suite<T>) {
     for child_suite in suite.context.suites.iter_mut() {
       if let Some(hook) = &suite.context.before_each_hook {
         if let None = child_suite.context.before_each_hook {
@@ -221,7 +224,12 @@ impl Suite {
       }
     }
   }
-  fn ignore_non_onlys(suite: &mut Suite) {
+  fn apply_state(suite: &mut Suite<T>) {
+    for child_suite in suite.context.suites.iter_mut() {
+      child_suite.context.state = suite.context.state.clone();
+    }
+  }
+  fn ignore_non_onlys(suite: &mut Suite<T>) {
     if suite.context.skip_ == true {
       for spec in &mut suite.context.specs {
         spec.skip = true;
@@ -263,7 +271,7 @@ impl Suite {
       Suite::ignore_non_onlys(child_suite);
     }
   }
-  fn apply_retries(suite: &mut Suite) {
+  fn apply_retries(suite: &mut Suite<T>) {
     if let Some(retries) = suite.context.retries_ {
       for spec in &mut suite.context.specs {
         if let None = spec.context.retries_ {
@@ -280,12 +288,12 @@ impl Suite {
       }
     }
   }
-  fn apply_duration_type(suite: &mut Suite) {
+  fn apply_duration_type(suite: &mut Suite<T>) {
     for child_suite in &mut suite.context.suites {
       child_suite.duration_type = suite.duration_type;
     }
   }
-  fn apply_slow_settings(suite: &mut Suite) {
+  fn apply_slow_settings(suite: &mut Suite<T>) {
     if let Some(slow_setting) = suite.context.slow_ {
       for spec in &mut suite.context.specs {
         if let None = spec.context.slow_ {
@@ -302,7 +310,7 @@ impl Suite {
       Suite::apply_slow_settings(child_suite);
     }
   }
-  fn sum_result_counts(suite: &mut Suite) {
+  fn sum_result_counts(suite: &mut Suite<T>) {
     for spec in &suite.context.specs {
       if let Some(result) = &spec.result {
         match result {
@@ -321,7 +329,7 @@ impl Suite {
       Suite::sum_result_counts(child_suite);
     }
   }
-  fn sum_test_durations(suite: &mut Suite) {
+  fn sum_test_durations(suite: &mut Suite<T>) {
     for spec in &suite.context.specs {
       suite.suite_duration += spec.duration;
       suite.total_duration += spec.duration;
@@ -331,7 +339,7 @@ impl Suite {
       suite.total_duration += child_suite.total_duration;
     }
   }
-  fn calculate_speed(suite: &mut Suite) {
+  fn calculate_speed(suite: &mut Suite<T>) {
     for spec in &mut suite.context.specs {
       if let Some(slow_time) = spec.context.slow_{
         let fast_time = ((slow_time as f64) / 2.0) as u128;
@@ -352,10 +360,10 @@ impl Suite {
   }
 }
 
-pub fn describe<S, T>(name: S, cb: T) -> Suite
+pub fn describe<S, H, T>(name: S, cb: H) -> Suite<T>
   where
     S: Into<String> + Display,
-    T: Fn(&mut SuiteContext) + 'static
+    H: Fn(&mut SuiteContext<T>) + 'static
 {
   let mut context = SuiteContext::new();
   (cb)(&mut context);

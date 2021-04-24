@@ -115,7 +115,7 @@ fn footer() {
   println!("\n### Lab Results End ###\n\n");
 }
 
-fn get_lines_for_spec(suite: &Suite, depth: u32, stats: &mut MinReporterStats) {
+fn get_lines_for_spec<T>(suite: &Suite<T>, depth: u32, stats: &mut MinReporterStats) {
 
   println!("{}{}", suite_spacing(depth), suite.name.to_string());
   for spec in &suite.context.specs {
@@ -195,7 +195,7 @@ fn line_spacing_for_min(depth: u32) -> String {
   tab
 }  
 
-fn get_lines_for_min(suite: &Suite, stats: &mut MinReporterStats, prefix: String, depth: u32) {
+fn get_lines_for_min<T>(suite: &Suite<T>, stats: &mut MinReporterStats, prefix: String, depth: u32) {
   for spec in &suite.context.specs {
     if let Some(result) = &spec.result {
       if let Err(msg) = result {
@@ -221,7 +221,7 @@ fn get_lines_for_min(suite: &Suite, stats: &mut MinReporterStats, prefix: String
   }
 }
 
-fn get_dots(suite: &Suite, stats: &mut DotReporterStats) {
+fn get_dots<T>(suite: &Suite<T>, stats: &mut DotReporterStats) {
   for spec in &suite.context.specs {
     if let Some(result) = &spec.result {
       match result {
@@ -254,7 +254,7 @@ fn get_dots(suite: &Suite, stats: &mut DotReporterStats) {
   }
 }
 
-fn get_list(suite: &Suite, stats: &mut MinReporterStats, prefix: String) {
+fn get_list<T>(suite: &Suite<T>, stats: &mut MinReporterStats, prefix: String) {
   for spec in &suite.context.specs {
     if let Some(result) = &spec.result {
       if let Err(msg) = result {
@@ -287,7 +287,7 @@ fn get_list(suite: &Suite, stats: &mut MinReporterStats, prefix: String) {
   }
 }
 
-fn get_tap_list(suite: &Suite, lines: &mut Vec<String>, count: &mut u32, prefix: String) {
+fn get_tap_list<T>(suite: &Suite<T>, lines: &mut Vec<String>, count: &mut u32, prefix: String) {
   for spec in &suite.context.specs {
     *count += 1;
     if let Some(result) = &spec.result {
@@ -317,7 +317,7 @@ fn get_tap_list(suite: &Suite, lines: &mut Vec<String>, count: &mut u32, prefix:
   }
 }
 
-fn get_count(suite: &Suite) -> u32 {
+fn get_count<T>(suite: &Suite<T>) -> u32 {
   let mut count = suite.context.specs.len() as u32;
   for child_suite in &suite.context.suites {
     count += get_count(child_suite);
@@ -325,7 +325,7 @@ fn get_count(suite: &Suite) -> u32 {
   return count;
 }
 
-fn get_list_for_rust(suite: &Suite, stats: &mut MinReporterStats, prefix: String) {
+fn get_list_for_rust<T>(suite: &Suite<T>, stats: &mut MinReporterStats, prefix: String) {
   for spec in &suite.context.specs {
     if let Some(result) = &spec.result {
       if let Err(_msg) = result {
@@ -346,7 +346,7 @@ fn get_list_for_rust(suite: &Suite, stats: &mut MinReporterStats, prefix: String
   }
 }
 
-fn get_stats_for_json(suite: &Suite, stats: &mut JsonReport, prefix: String) {
+fn get_stats_for_json<T>(suite: &Suite<T>, stats: &mut JsonReport, prefix: String) {
   for spec in &suite.context.specs {
     let mut spec_stat = JsonSpecReport {
       title: spec.name.to_string(),
@@ -384,7 +384,7 @@ fn get_suffix(n: u32) -> String {
   }
 }
 
-pub fn report_to_stdout(suite: &Suite) {
+pub fn report_to_stdout<T>(suite: &Suite<T>) {
 
   match suite.reporter {
     Reporter::Spec => {

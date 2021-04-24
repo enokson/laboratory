@@ -1,13 +1,20 @@
+use std::{
+  cell::RefCell,
+  rc::Rc
+};
 use crate::suite::Speed;
+use crate::suite_context::State;
 
-pub struct SpecContext {
+pub struct SpecContext<T> {
+  pub state: Rc<RefCell<State<T>>>,
   pub retries_: Option<u32>,
   pub slow_: Option<u128>,
   pub speed_result: Speed
 }
-impl SpecContext {
-  pub fn new() -> SpecContext {
+impl<T> SpecContext<T> {
+  pub fn new(state: Rc<RefCell<State<T>>>) -> SpecContext<T> {
     SpecContext {
+      state,
       retries_: None,
       slow_: None,
       speed_result: Speed::Fast
@@ -30,19 +37,19 @@ impl SpecContext {
 
 }
 
-pub struct Spec {
+pub struct Spec<T> {
   pub name: String,
   pub order: Option<u32>,
   pub only: bool,
-  pub hook: Box<dyn Fn(&mut SpecContext) -> Result<(), String> + 'static>,
+  pub hook: Box<dyn Fn(&mut SpecContext<T>) -> Result<(), String> + 'static>,
   pub result: Option<Result<(), String>>,
   pub duration: u128,
-  pub context:  SpecContext,
+  pub context:  SpecContext<T>,
   pub skip: bool
 }
-impl Spec {
-  pub fn new(name: String, hook: Box<dyn Fn(&mut SpecContext) -> Result<(), String>>) -> Spec {
-    let context = SpecContext::new();
+impl<T> Spec<T> {
+  pub fn new(name: String, state: Rc<RefCell<State<T>>>, hook: Box<dyn Fn(&mut SpecContext<T>) -> Result<(), String>>) -> Spec<T> {
+    let context = SpecContext::new(state);
     Spec {
       name,
       order: None,
