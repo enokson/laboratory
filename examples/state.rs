@@ -12,7 +12,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
 
-    use laboratory::{describe, expect, LabResult};
+    use laboratory::{describe, expect, LabResult, Suite};
     use super::{always_return_true, add_one, add_two};
     use std::cell::{RefCell, RefMut};
     use std::fmt::{Debug};
@@ -43,13 +43,15 @@ mod tests {
     #[test]
     fn test() -> LabResult {
 
-        // let imported_suite = describe("imported suite", |suite| {
-        //     suite.it("should do something cool", |spec| {
-        //         let state = spec.state.borrow();
-        //         println!("/counter from imported suite: {}", state.get("/counter").unwrap());
-        //         expect(true).to_be(true)
-        //     });
-        // });
+        fn imported_suite() -> Suite<i32> {
+            describe("imported suite", |suite| {
+                suite.it("should do something cool", |spec| {
+                    let state = spec.state.borrow();
+                    println!("/counter from imported suite: {}", state.get("/counter").unwrap());
+                    expect(true).to_be(true)
+                });
+            })
+        }
 
         describe("My Crate", |suite| {
 
@@ -135,8 +137,8 @@ mod tests {
 
                 });
 
-            });
-            // .describe_import(imported_suite);
+            })
+            .describe_import(imported_suite());
 
         }).rust().run()
 
