@@ -43,6 +43,14 @@ mod tests {
     #[test]
     fn test() -> LabResult {
 
+        // let imported_suite = describe("imported suite", |suite| {
+        //     suite.it("should do something cool", |spec| {
+        //         let state = spec.state.borrow();
+        //         println!("/counter from imported suite: {}", state.get("/counter").unwrap());
+        //         expect(true).to_be(true)
+        //     });
+        // });
+
         describe("My Crate", |suite| {
 
             // let mut state = suite.state.borrow_mut();
@@ -73,6 +81,9 @@ mod tests {
 
                 suite.it("should return 1", |spec| {
 
+                    let state = spec.state.borrow();
+                    let counter = state.get("/counter").unwrap();
+                    println!("/counter from spec: {:?}", counter);
                     expect(add_one(0)).to_be(1)
 
                 }).it("should return 2", |_| {
@@ -100,9 +111,12 @@ mod tests {
                 }).after_all(|state| {
 
                     let count = state.get("/add_two()").unwrap();
-                    println!("/add_two(): {:?}", count);                    
+                    println!("/add_two(): {:?}", count);
                     
-                }).it("should return 2", |_| {
+                }).it("should return 2", |spec| {
+
+                    let state = spec.state.borrow();
+                    println!("/add_two spec: {}", state.get("/add_two()").unwrap());
 
                     expect(add_two(0)).to_be(2)
 
@@ -110,7 +124,7 @@ mod tests {
 
                     expect(add_two(2)).to_be(4)
 
-                })
+                });
 
             }).describe("always_return_true()", |ctx| {
 
@@ -122,8 +136,9 @@ mod tests {
                 });
 
             });
+            // .describe_import(imported_suite);
 
-        }).run()
+        }).rust().run()
 
     }
 

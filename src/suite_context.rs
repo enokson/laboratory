@@ -87,17 +87,21 @@ impl<T> SuiteContext<T> {
     S: Into<String> + Display,
     H: Fn(&mut SuiteContext<T>) + 'static
  {
-    let suite = describe(name, cb);
+    let mut suite = Suite::new(name, cb);
+    suite.context.state = self.state.clone();
+    // (cb)(&mut suite.context);
     self.suites.push(suite);
     self
   }
   pub fn describe_skip<S, H>(&mut self, name: S, cb: H) -> &mut Self
-  where 
+  where
     S: Into<String> + Display,
     H: Fn(&mut SuiteContext<T>) + 'static
  {
-    let mut suite = describe(name.to_string(), cb);
+    let mut suite = Suite::new(name, cb);
+    suite.context.state = self.state.clone();
     suite.context.skip_ = true;
+    // (cb)(&mut suite.context);
     self.suites.push(suite);
     self
   }
@@ -106,21 +110,26 @@ impl<T> SuiteContext<T> {
     S: Into<String> + Display,
     H: Fn(&mut SuiteContext<T>) + 'static
  {
-    let mut suite = describe(name.to_string(), cb);
+    let mut suite = Suite::new(name, cb);
+    suite.context.state = self.state.clone();
     suite.only = true;
+    // (cb)(&mut suite.context);
     self.suites.push(suite);
     self
   }
-  pub fn describe_import(&mut self, suite: Suite<T>) -> &mut Self {
+  pub fn describe_import(&mut self, mut suite: Suite<T>) -> &mut Self {
+    suite.context.state = self.state.clone();
     self.suites.push(suite);
     self
   }
   pub fn describe_import_skip(&mut self, mut suite: Suite<T>) -> &mut Self {
+    suite.context.state = self.state.clone();
     suite.context.skip_ = true;
     self.suites.push(suite);
     self
   }
   pub fn describe_import_only(&mut self, mut suite: Suite<T>) -> &mut Self {
+    suite.context.state = self.state.clone();
     suite.only = true;
     self.suites.push(suite);
     self

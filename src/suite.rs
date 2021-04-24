@@ -55,6 +55,7 @@ pub enum DurationType {
 pub struct Suite<T> {
   pub name: String,
   pub only: bool,
+  pub cb: Box<dyn Fn(&mut SuiteContext<T>)>,
   pub context: SuiteContext<T>,
   pub duration_type: DurationType,
   pub suite_duration: u128,
@@ -65,6 +66,25 @@ pub struct Suite<T> {
   pub end_time: String
 }
 impl<T> Suite<T> {
+  pub fn new<N, H>(name: N, cb: H) -> Suite<T> where
+  N: Into<String> + Display,
+  H: Fn(&mut SuiteContext<T>) + 'static
+  {
+    let context = SuiteContext::new();
+    Suite {
+      name: name.to_string(),
+      only: false,
+      cb: Box::new(cb),
+      context,
+      duration_type: DurationType::Nano,
+      depth: 0,
+      suite_duration: 0,
+      total_duration: 0,
+      reporter: Reporter::Spec,
+      start_time: String::new(),
+      end_time: String::new()
+    }
+  }
   pub fn run(&mut self) -> LabResult {
     Suite::apply_depth_to_suites(self);
     Suite::index_specs(self, &mut 0);
@@ -136,6 +156,7 @@ impl<T> Suite<T> {
     let system_time = SystemTime::now();
     let datetime: DateTime<Utc> = system_time.into();
     suite.start_time = datetime.to_string();
+    (suite.cb)(&mut suite.context);
     if let Some(boxed_hook) = &suite.context.before_all_hook {
       let hook = boxed_hook.as_ref();
       (hook)(&mut suite.context.state.borrow_mut())
@@ -228,6 +249,9 @@ impl<T> Suite<T> {
     for child_suite in suite.context.suites.iter_mut() {
       child_suite.context.state = suite.context.state.clone();
     }
+    // for spec in suite.context.specs.iter_mut() {
+    //   spec.context.state = suite.context.state.clone();
+    // }
   }
   fn ignore_non_onlys(suite: &mut Suite<T>) {
     if suite.context.skip_ == true {
@@ -366,10 +390,11 @@ pub fn describe<S, H, T>(name: S, cb: H) -> Suite<T>
     H: Fn(&mut SuiteContext<T>) + 'static
 {
   let mut context = SuiteContext::new();
-  (cb)(&mut context);
+  // (cb)(&mut context);
   Suite {
     name: name.to_string(),
     only: false,
+    cb: Box::new(cb),
     context,
     duration_type: DurationType::Nano,
     depth: 0,
