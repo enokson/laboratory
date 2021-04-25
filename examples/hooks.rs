@@ -9,7 +9,7 @@ fn main() {
 mod tests {
 
     use super::always_return_true;
-    use laboratory::{describe, expect, LabResult};
+    use laboratory::{describe, expect, LabResult, NullState};
 
     #[test]
     fn test() -> LabResult {
@@ -23,7 +23,7 @@ mod tests {
             // We want to run this action before all
             // all tests in this suite is ran. This action
             // will only be ran once.
-            ctx.before_all(|| {
+            ctx.before_all(|_| {
 
                 println!("\n\n  before_all hook called");
 
@@ -32,7 +32,7 @@ mod tests {
             // We want to run this action just before every test
             // in this suite (and child suites). Since we have two tests this action
             // will be ran twice.
-            .before_each(|| {
+            .before_each(|_| {
 
                 println!("  before_each hook called");
 
@@ -40,11 +40,11 @@ mod tests {
 
             // likewise, we also have actions we want to run
             // after our tests.
-            .after_each(|| {
+            .after_each(|_| {
 
                 println!("  after_each hook called");
 
-            }).after_all(|| {
+            }).after_all(|_| {
 
                 println!("  after_all hook called");
 
@@ -62,8 +62,7 @@ mod tests {
 
             });
 
-
-        }).run()
+        }).state(NullState).run()
 
     }
 

@@ -44,7 +44,8 @@ pub struct SpecContext<T> {
   pub state: Rc<RefCell<State<T>>>,
   pub retries_: Option<u32>,
   pub slow_: Option<u128>,
-  pub speed_result: Speed
+  pub speed_result: Speed,
+  pub attempts: u32,
 }
 impl<T> SpecContext<T> {
   pub fn new(state: Rc<RefCell<State<T>>>) -> SpecContext<T> {
@@ -52,7 +53,8 @@ impl<T> SpecContext<T> {
       state,
       retries_: None,
       slow_: None,
-      speed_result: Speed::Fast
+      speed_result: Speed::Fast,
+      attempts: 0
     }
   }
   pub fn retries(&mut self, count: u32) -> &mut Self {

@@ -13,7 +13,7 @@ fn panic_at_the_disco(should_panic: bool) {
 #[cfg(test)]
 mod tests {
 
-    use laboratory::{describe, LabResult, should_panic, should_not_panic};
+    use laboratory::{describe, LabResult, should_panic, should_not_panic, NullState};
     use super::*;
 
     #[test]
@@ -31,7 +31,7 @@ mod tests {
 
             });
 
-        }).run()
+        }).state(NullState).run()
 
     }
 

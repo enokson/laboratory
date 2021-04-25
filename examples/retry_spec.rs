@@ -10,35 +10,26 @@ mod tests {
     use std::borrow::BorrowMut;
 
     use super::*;
-    use laboratory::{describe, expect, LabResult};
+    use laboratory::{describe, expect, LabResult, NullState};
 
     #[test]
     fn suite() -> LabResult {
 
         describe("add_one()", |suite| {
 
-            suite.before_all(|state| {
-                state.insert("count", 0);
-            }).before_each(|state| {
-
-                let count = state.get_mut("count").unwrap();
-                *count += 1;
-
-            }).spec(|spec| {
+            suite.spec(|spec| {
 
                 spec.it("should retry ten times", |spec| {
 
-                    if let Some(count) = spec.state.borrow().get("count") {
-                        if count > &10 {
-                            return Ok(())
-                        } else {
-                            Err(String::from("fail"))
-                        }
+                    println!("attempt number: {}", spec.attempts);
+
+                    if spec.attempts < 10 {
+                        Err(String::from("not enough attempts have been performed"))
                     } else {
-                        Err(String::from("fail"))
+                        Ok(())
                     }
 
-                }).retries(10).slow(1000);
+                }).retries(9).slow(1000);
 
             })
 
@@ -48,7 +39,7 @@ mod tests {
 
             });
 
-        }).milis().run()
+        }).state(NullState).milis().run()
 
     }
 }

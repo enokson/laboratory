@@ -39,7 +39,8 @@ struct JsonSpecReport {
   pub title: String,
   pub full_title: String,
   pub duration: u128,
-  pub error: Option<String>
+  pub error: Option<String>,
+  pub attempts: u32
 }
 
 impl JsonSpecReport {
@@ -51,7 +52,8 @@ impl JsonSpecReport {
       error: match &self.error {
         Some(msg) => Some(msg.to_string()),
         None => None
-      }
+      },
+      attempts: self.attempts
     }
   }
 }
@@ -352,7 +354,8 @@ fn get_stats_for_json<T>(suite: &Suite<T>, stats: &mut JsonReport, prefix: Strin
       title: spec.name.to_string(),
       full_title: format!("{} {}", prefix, spec.name),
       duration: spec.duration,
-      error: None
+      error: None,
+      attempts: spec.context.attempts
     };
     if let Some(result) = &spec.result {
       if let Err(msg) = result {

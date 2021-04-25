@@ -43,6 +43,8 @@ pub enum DurationType {
   Sec
 }
 
+pub struct NullState;
+
 pub struct Suite<T> {
   pub name: String,
   pub only: bool,
@@ -143,6 +145,10 @@ impl<T> Suite<T> {
     self.duration_type = DurationType::Sec;
     self
   }
+  pub fn state(self, state: T) -> Self {
+    self.context.state.borrow_mut().insert("/", state);
+    self
+  }
   fn run_specs_and_suites(suite: &mut Suite<T>) {
     let system_time = SystemTime::now();
     let datetime: DateTime<Utc> = system_time.into();
@@ -169,11 +175,13 @@ impl<T> Suite<T> {
             }
           }
         };
-        for _i in 0..=(retries + 1) {
+        let attempts = 1 + retries;
+        for _i in 1..=attempts {
           if let Some(boxed_hook) = &suite.context.before_each_hook {
             let hook = boxed_hook.as_ref();
             (hook)(&mut suite.context.state.borrow_mut())
           }
+          spec.context.attempts += 1;
           let start_time = Instant::now();
           let result = (spec.hook.as_ref())(&mut spec.context);
           let duration = start_time.elapsed();
@@ -375,7 +383,7 @@ impl<T> Suite<T> {
   }
 }
 
-pub fn describe<S, H, T>(name: S, cb: H) -> Suite<T>
+pub fn describe<T, S, H>(name: S, cb: H) -> Suite<T>
   where
     S: Into<String> + Display,
     H: Fn(&mut SuiteContext<T>) + 'static

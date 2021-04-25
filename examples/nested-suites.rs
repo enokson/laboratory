@@ -31,7 +31,7 @@ mod tests {
     use super::*;
 
     // Now pull in the lab tools
-    use laboratory::{LabResult, describe, expect};
+    use laboratory::{LabResult, describe, expect, NullState};
 
     // Define a single test
     #[test]
@@ -82,7 +82,7 @@ mod tests {
 
             });
 
-        }).milis().run()
+        }).state(NullState).milis().run()
 
     }
 

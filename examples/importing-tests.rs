@@ -15,7 +15,6 @@ pub mod add_one {
     // and here is its function that we want to test
     pub fn add_one (x: u64) -> u64 { x + 1 }
 
-
     #[cfg(test)]
     pub mod tests {
 
@@ -25,7 +24,7 @@ pub mod add_one {
         // Here is where we will define our suite.
         // Notice that this function returns a Suite struct.
         // Also notice that no other methods are called on this suite.
-        pub fn suite() -> Suite {
+        pub fn suite<T>() -> Suite<T> {
 
             describe("add_one()", |ctx| {
                 
@@ -58,7 +57,7 @@ pub mod multiply_by_two {
         use laboratory::{describe, expect, Suite};
 
         // Again, we will define a function that returns a Suite struct
-        pub fn suite() -> Suite {
+        pub fn suite<T>() -> Suite<T> {
 
             describe("multiply_by_two()", |ctx| {
 
@@ -86,7 +85,7 @@ mod tests {
     use super::*;
 
     // pull in our lab tools
-    use laboratory::{describe, LabResult};
+    use laboratory::{describe, LabResult, NullState};
 
     #[test]
     fn test() -> LabResult {
@@ -96,7 +95,7 @@ mod tests {
             context
                 .describe_import(add_one::tests::suite())
                 .describe_import(multiply_by_two::tests::suite());
-        })
+        }).state(NullState)
 
         // Now we can run our tests with any other options
         .run()

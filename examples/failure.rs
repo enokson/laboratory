@@ -17,7 +17,7 @@ mod tests {
     use super::*;
 
     // and now let's bring in our lab tools
-    use laboratory::{LabResult, describe, expect};
+    use laboratory::{LabResult, describe, expect, NullState};
 
     // here we define our single rust test
     #[test]
@@ -49,7 +49,7 @@ mod tests {
 
             });
 
-        }).run();
+        }).state(NullState).run();
 
         // the run method returns a result. So, if any of
         // our tests fail the result will return an error as well.

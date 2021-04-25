@@ -38,34 +38,34 @@ mod tests {
 
         describe("My Crate", |suite| {
 
-            // let mut state = suite.state.borrow_mut();
-            // state.insert(0, 0);
-            // state.insert(1, 0);
-            // drop(state);
+
 
             suite.before_all(|state| {
 
                 state.insert("/counter", State::I32(0));
                
             }).before_each(|state| {
+
                 if let State::I32(count) = state.get_mut("/counter").unwrap() {
                     *count += 1;
                 };
+
             }).after_each(|state| {
+
                 if let State::I32(count) = state.get_mut("/counter").unwrap() {
                     *count += 1;
                 };
+
             }).after_all(|state| {
+
                 if let State::I32(count) = state.get_mut("/counter").unwrap() {
                     println!("/counter: {:?}", count);
                 };
+
             }).describe("add_one()", |suite| {
 
                 suite.it("should return 1", |spec| {
 
-                    // let state = spec.state.borrow();
-                    // let counter = state.get("/counter").unwrap();
-                    // println!("/counter from spec: {:?}", counter);
                     expect(add_one(0)).to_be(1)
 
                 }).it("should return 2", |_| {
@@ -81,14 +81,8 @@ mod tests {
                     state.insert("/add_two()", State::String("hello".to_string()));
 
                 }).before_each(|state| {
-                    
-                    // let mut count = state.get_mut("/add_two()").unwrap();
-                    // *count += 1;
 
                 }).after_each(|state| {
-                    
-                    // let mut count = state.get_mut("/add_two()").unwrap();
-                    // *count += 1;
 
                 }).after_all(|state| {
 
@@ -99,13 +93,8 @@ mod tests {
                     if let State::String(string) = state.get_mut("/add_two()").unwrap() {
                         println!("/add_two(): {:?}", string);
                     }
-                    // let count = state.get("/add_two()").unwrap();
-                    // println!("/add_two(): {:?}", count);
                     
                 }).it("should return 2", |spec| {
-
-                    // let state = spec.state.borrow();
-                    // println!("/add_two spec: {}", state.get("/add_two()").unwrap());
 
                     expect(add_two(0)).to_be(2)
 
@@ -115,10 +104,10 @@ mod tests {
 
                 });
 
-            }).describe("always_return_true()", |ctx| {
+            }).describe("always_return_true()", |suite| {
 
 
-                ctx.it("should always return true", |_| {
+                suite.it("should always return true", |_| {
 
                     expect(always_return_true()).to_be(true)
 

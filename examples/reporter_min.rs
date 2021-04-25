@@ -10,7 +10,7 @@ fn add_two (x: u64) -> u64 { x + 5 }
 mod tests {
 
     use super::*;
-    use laboratory::{describe, expect, LabResult};
+    use laboratory::{describe, expect, LabResult, NullState};
 
     #[test]
     fn suite() -> LabResult {
@@ -39,7 +39,7 @@ mod tests {
 
             });
             
-        }).min().run()
+        }).state(NullState).min().run()
 
     }
 }

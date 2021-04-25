@@ -15,7 +15,7 @@ mod tests {
 
     // now let's pull in our lab tools into scope
     // to test our function
-    use laboratory::{describe, expect, LabResult};
+    use laboratory::{describe, expect, LabResult, NullState};
 
     // From Rust's perspective we will only define
     // one test, but inside this test we can define
@@ -24,11 +24,11 @@ mod tests {
     fn suite() -> LabResult {
 
         // let's describe what our add_one function will do.
-        describe("add_one()", |ctx| {
+        describe("add_one()", |suite| {
 
             // when describing what it should do, feel free to be
             // as expressive as you would like.
-            ctx.it("should return 1 when passed 0", |_| {
+            suite.it("should return 1 when passed 0", |_| {
 
                 // here we will use the default expect function
                 // that comes with laboratory.
@@ -44,7 +44,7 @@ mod tests {
 
             });
 
-        }).milis().run()
+        }).state(NullState).milis().run()
 
     }
 }

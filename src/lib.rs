@@ -18,6 +18,6 @@ mod suite_context;
 mod spec;
 
 
-pub use suite::{describe, Suite};
+pub use suite::{describe, Suite, NullState};
 pub use assertion::{expect, should_panic, should_not_panic};
 pub type LabResult = Result<(), String>;
