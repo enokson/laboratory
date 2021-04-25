@@ -18,7 +18,8 @@ pub struct SuiteContext<T> {
   pub slow_: Option<u128>,
   pub passed: u32,
   pub failed: u32,
-  pub ignored: u32
+  pub ignored: u32,
+  pub fail: bool
 }
 impl<T> SuiteContext<T> {
   pub fn new() -> SuiteContext<T> {
@@ -35,7 +36,8 @@ impl<T> SuiteContext<T> {
       slow_: None,
       passed: 0,
       failed: 0,
-      ignored: 0
+      ignored: 0,
+      fail: false
     }
   }
   pub fn before_all<H: Fn(&mut State<T>) + 'static>(&mut self, hook: H) -> &mut Self {
