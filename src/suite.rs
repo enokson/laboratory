@@ -91,10 +91,10 @@ impl<T> Suite<T> {
     Suite::apply_slow_settings(self);
     Suite::calculate_speed(self);
     report_to_stdout(&self);
-    if self.context.failed == 0 {
+    if self.context.fail == false {
       Ok(())
     } else {
-      Err(format!("Expected {} to equal 0", self.context.failed))
+      Err(format!("Expected number of failed tests to equal 0"))
     }
   }
   pub fn spec(mut self) -> Self {
@@ -201,11 +201,19 @@ impl<T> Suite<T> {
             break;
           }
         }
-      }    
+        if let Some(result) = &spec.result {
+          if result.is_err() {
+            suite.context.fail = true;
+          }
+        }
+      }
     }
     for child_suite in suite.context.suites.iter_mut() {
       if !child_suite.context.skip_ {
         Suite::run_specs_and_suites(child_suite);
+        if child_suite.context.fail == true {
+          suite.context.fail = true;
+        }
       }
     }
     if let Some(boxed_hook) = &suite.context.after_all_hook {
