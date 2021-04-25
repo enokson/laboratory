@@ -1,5 +1,5 @@
 
-fn always_return_true() -> bool { true  }
+fn always_return_true() -> bool { true }
 
 fn main() {
     always_return_true();
@@ -9,34 +9,32 @@ fn main() {
 mod tests {
 
     use super::always_return_true;
-    use laboratory::{describe, expect, it};
+    use laboratory::{describe, expect, LabResult, NullState};
 
     #[test]
-    fn test() {
+    fn test() -> LabResult {
 
         // In this suite we want to use hooks to
         // perform actions before and after our tests.
-        // The actions we to run in this scenario is simply
-        // outputting to to stdout.
-        describe("always_return_true")
+        // The actions we want to run in this scenario is simply
+        // outputting to stdout.
+        describe("always_return_true()", |ctx| {
 
             // We want to run this action before all
             // all tests in this suite is ran. This action
             // will only be ran once.
-            .before_all(|_| {
+            ctx.before_all(|_| {
 
                 println!("\n\n  before_all hook called");
-                Ok(())
 
             })
 
             // We want to run this action just before every test
-            // in this suite. Since we have two tests this action
+            // in this suite (and child suites). Since we have two tests this action
             // will be ran twice.
             .before_each(|_| {
 
                 println!("  before_each hook called");
-                Ok(())
 
             })
 
@@ -45,24 +43,26 @@ mod tests {
             .after_each(|_| {
 
                 println!("  after_each hook called");
-                Ok(())
 
             }).after_all(|_| {
 
                 println!("  after_all hook called");
-                Ok(())
 
-            }).specs(vec![
+            })
 
-                it("should return true", |_| {
-                    expect(always_return_true()).to_be(true)
-                }),
+            .it("should return true", |_| {
 
-                it("should return true again", |_| {
-                    expect(always_return_true()).to_be(true)
-                })
+                expect(always_return_true()).to_be(true)
 
-            ]).run().unwrap();
+            })
+
+            .it("should return true again", |_| {
+
+                expect(always_return_true()).to_be(true)
+
+            });
+
+        }).state(NullState).run()
 
     }
 

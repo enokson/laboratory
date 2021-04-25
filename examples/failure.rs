@@ -13,43 +13,55 @@ fn main() {
 #[cfg(test)]
 mod tests {
 
-    // let call in our functions
+    // let's bring in our functions
     use super::*;
 
     // and now let's bring in our lab tools
-    use laboratory::{describe,it,expect};
+    use laboratory::{LabResult, describe, expect, NullState};
 
-    // define our single rust test
+    // here we define our single rust test
     #[test]
-    fn test() {
+    fn test() -> LabResult {
 
         // We have two different functions that we
         // want to test in our crate. So, let's
         // describe our crate and nest our functions
         // under that umbrella.
-        describe("Crate").suites(vec![
-
-            describe("add_one()").specs(vec![
-
-                it("should return 1 to when passed 0", |_| {
+        let test_results = describe("Crate", |ctx| {
+            
+            ctx.describe("add_one()", |ctx| {
+                
+                ctx.it("should return 1 to when passed 0", |_| {
 
                     expect(add_one(0)).to_equal(1)
 
-                })
+                });
 
-            ]),
+            })
 
-            describe("add_two()").specs(vec![
-
-                it("should return 2 to when passed 0", |_| {
+            .describe("add_two()", |ctx| {
+                
+                ctx.it("should return 2 to when passed 0", |_| {
 
                     expect(add_two(0)).to_equal(2)
 
-                })
+                });
 
-            ])
+            });
 
-        ]).run().unwrap();
+        }).state(NullState).run();
+
+        // the run method returns a result. So, if any of
+        // our tests fail the result will return an error as well.
+        // I catch the error in this example, but generally you should
+        // allow the suite to return the result to the function. Feel
+        // free to uncomment the "return Err(msg);" line to see the result
+        // in the terminal.
+        if let Err(_msg) = test_results {
+            // return Err(msg);
+        }
+
+        Ok(())
 
     }
 

@@ -12,148 +12,111 @@ fn main() {
 #[cfg(test)]
 mod tests {
 
-    use super::*;
-    use laboratory::{Deserialize, LabResult, Serialize, State, describe, expect, it};
+    use laboratory::{describe, expect, LabResult, Suite};
+    use super::{always_return_true, add_one, add_two};
+    use std::cell::{RefCell, RefMut};
     use std::fmt::{Debug};
-
-    // We want a counter to count each time a hook or test is called
-    // Note that any state we want to use in the suite
-    // must be able to be serialized and deserialized by serde.
-
-    #[derive(Deserialize, Serialize, Debug)]
-    struct Counter {
-        suite: String, // the name of the suite
-        call_count: u8 // the number of times a hook or test was called
-    }
-
-    impl Counter {
-        fn new(suite: &str) -> Counter {
-            Counter {
-                suite: String::from(suite),
-                call_count: 0
-            }
-        }
-        fn update(&mut self) {
-            self.call_count += 1;
-            println!("  {} hit count: {}", self.suite, self.call_count);
-        }
-    }
+    use std::rc::Rc;
 
     #[test]
-    fn test() {
+    fn test() -> LabResult {
 
-        // Here we will define a function to handle all the hook calls
-        fn hook_handle(state: &mut State) -> LabResult {
-
-            // We need to call the get_state method in order to get the counter.
-            // We also we to tell the Rust compiler what
-            // type the result of get_state will be which
-            // in this case is the counter.
-            let mut counter = state.get::<Counter>()?;
-
-            // Now we will call the update method on Counter
-            counter.update();
-
-            // And if we want to update the state we need to call set_state
-            state.set(counter)?;
-            Ok(())
+        enum State {
+            I32(i32),
+            String(String)
         }
 
-        // In this example we want to return the state
-        // after all the tests are ran so that we can echo the
-        // the final result to stdout.
-        let state: Counter = describe("My Crate")
+        fn imported_suite() -> Suite<State> {
+            describe("imported suite", |suite| {
+                suite.it("should do something cool", |spec| {
+                    // let state = spec.state.borrow();
+                    // println!("/counter from imported suite: {}", state.get("/counter").unwrap());
+                    expect(true).to_be(true)
+                });
+            })
+        }
 
-            // We can give the suite the initial state by
-            // using the state method, but we could very well
-            // skip using the state method and define the state
-            // in the before_all or even in the before_each hook.
-            .state(Counter::new("Parent Level")).unwrap()
+        describe("My Crate", |suite| {
 
-            // Now we will define our hooks
-            .before_all(hook_handle)
-            .before_each(hook_handle)
-            .after_each(hook_handle)
-            .after_all(hook_handle)
+            suite.before_all(|state| {
 
-            .suites(vec![
+                state.insert("/counter", State::I32(0));
+               
+            }).before_each(|state| {
 
-                // this suite will inherit the parent's state
-                describe("add_one()")
+                if let State::I32(count) = state.get_mut("/counter").unwrap() {
+                    *count += 1;
+                };
 
-                    // Here is the set of hooks for the child suite
-                    .before_all(hook_handle)
-                    .before_each(hook_handle)
-                    .after_each(hook_handle)
-                    .after_all(hook_handle)
+            }).after_each(|state| {
 
+                if let State::I32(count) = state.get_mut("/counter").unwrap() {
+                    *count += 1;
+                };
 
-                    .specs(vec![
+            }).after_all(|state| {
 
-                        it("should return 1", |state| {
-                            hook_handle(state)?;
-                            expect(add_one(0)).to_be(1)
-                        }),
+                if let State::I32(count) = state.get_mut("/counter").unwrap() {
+                    println!("/counter: {:?}", count);
+                };
 
-                        it("should return 2", |state| {
-                            hook_handle(state)?;
-                            expect(add_one(1)).to_be(2)
-                        })
+            }).describe("add_one()", |suite| {
 
-                    ])
-                    .inherit_state(),
+                suite.it("should return 1", |spec| {
 
-                // This suite will use its own state
-                describe("add_two()")
+                    expect(add_one(0)).to_be(1)
 
-                    // since this suite will not inherit state
-                    // from the parent we will give it a new one.
-                    .state(Counter::new("Child Level")).unwrap()
+                }).it("should return 2", |_| {
+                
+                    expect(add_one(1)).to_be(2)
 
-                    // Here is the set of hooks for the second child suite
-                    .before_all(hook_handle)
-                    .before_each(hook_handle)
-                    .after_each(hook_handle)
-                    .after_all(hook_handle)
-                    .specs(vec![
+                });
 
-                        it("should return 2", |state| {
-                            hook_handle(state)?;
-                            expect(add_two(0)).to_be(2)
-                        }),
+            }).describe("add_two()", |suite| {
 
-                        it("should return 4", |state| {
-                            hook_handle(state)?;
-                            expect(add_two(2)).to_be(4)
-                        })
+                suite.before_all(|state| {
+                    
+                    state.insert("/add_two()", State::String("hello".to_string()));
 
-                    ]),
+                }).before_each(|state| {
 
-                // this suite will also inherit the parent's state
-                describe("always_return_true()")
+                }).after_each(|state| {
 
-                    // Here is the set of hooks for the child suite
-                    .before_all(hook_handle)
-                    .before_each(hook_handle)
-                    .after_each(hook_handle)
-                    .after_all(hook_handle)
+                }).after_all(|state| {
 
+                    if let State::String(string) = state.get_mut("/add_two()").unwrap() {
+                        string.push_str(", world!")
+                    }
 
-                    .specs(vec![
+                    if let State::String(string) = state.get_mut("/add_two()").unwrap() {
+                        println!("/add_two(): {:?}", string);
+                    }
+                    
+                }).it("should return 2", |spec| {
 
-                        it("should always return true", |state| {
-                            hook_handle(state)?;
-                            expect(add_one(0)).to_be(1)
-                        })
+                    expect(add_two(0)).to_be(2)
 
-                    ])
-                    .inherit_state()
+                }).it("should return 4", |_| {
+
+                    expect(add_two(2)).to_be(4)
+
+                });
+
+            }).describe("always_return_true()", |suite| {
 
 
-            ]).run().unwrap()
-            .to_state().unwrap();
+                suite.it("should always return true", |_| {
 
-        println!("{:#?}\n\n", state);
+                    expect(always_return_true()).to_be(true)
+
+                });
+
+            })
+            .describe_import(imported_suite()).it("should do something", |spec| {
+                expect(true).to_be(true)
+            });
+
+        }).rust().run()
 
     }
 

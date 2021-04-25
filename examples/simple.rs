@@ -15,39 +15,36 @@ mod tests {
 
     // now let's pull in our lab tools into scope
     // to test our function
-    use laboratory::{describe, expect, it};
+    use laboratory::{describe, expect, LabResult, NullState};
 
     // From Rust's perspective we will only define
     // one test, but inside this test we can define
-    // however many test we need.
+    // however many tests we need.
     #[test]
-    fn suite() {
+    fn suite() -> LabResult {
 
         // let's describe what our add_one function will do.
-        // Notice the method "specs" which takes a Vec as it's
-        // argument. Inside this vec is where we will define
-        // the tests related to add_one.
-        describe("add_one()").specs(vec![
+        describe("add_one()", |suite| {
 
             // when describing what it should do, feel free to be
             // as expressive as you would like.
-            it("should return 1 when passed 0", |_| {
+            suite.it("should return 1 when passed 0", |_| {
 
                 // here we will use the default expect function
                 // that comes with laboratory.
                 // We expect the result of add_one(0) to equal 1
                 expect(add_one(0)).to_equal(1)
 
-            }),
+            })
 
             // just as a sanity check, let's add a second test
-            it("should return 2 when passed 1", |_| {
+            .it("should return 2 when passed 1", |_| {
 
                 expect(add_one(1)).to_equal(2)
 
-            })
+            });
 
-        ]).in_nanoseconds().run().unwrap();
+        }).state(NullState).milis().run()
 
     }
 }

@@ -1,4 +1,4 @@
-#[macro_use] extern crate laboratory;
+extern crate laboratory;
 
 fn main() {
     panic_at_the_disco(false);
@@ -13,22 +13,25 @@ fn panic_at_the_disco(should_panic: bool) {
 #[cfg(test)]
 mod tests {
 
-    use laboratory::{describe, it};
+    use laboratory::{describe, LabResult, should_panic, should_not_panic, NullState};
     use super::*;
 
     #[test]
-    fn should_panic() {
-        describe("panic_at_the_disco()").specs(vec![
+    fn panic_test() -> LabResult {
+        
+        describe("panic_at_the_disco()", |ctx| {
 
-            it("should panic when passed true", |_| {
-                should_panic!(panic_at_the_disco, || { panic_at_the_disco(true); })
-            }),
+            ctx.it("should panic when passed true", |_| {
 
-            it("should not panic when passed false", |_| {
-                should_not_panic!(panic_at_the_disco, || { panic_at_the_disco(false); })
-            })
+                should_panic(|| { panic_at_the_disco(true); })
 
-        ]).run().unwrap();
+            }).it("should not panic when passed false", |_| {
+
+                should_not_panic(|| { panic_at_the_disco(false); })
+
+            });
+
+        }).state(NullState).run()
 
     }
 

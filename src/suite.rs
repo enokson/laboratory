@@ -1,318 +1,406 @@
-use std::borrow::{BorrowMut};
-use std::collections::HashMap;
-use std::time::{Instant, Duration};
-use std::path::Path;
-use std::thread::Thread;
-use console::style;
-
-// use serde::de::Deserialize;
-use serde::{Deserialize, Serialize};
+use chrono::offset::Utc;
+use chrono::DateTime;
+use std::{fmt::Display};
+use std::time::{Instant, SystemTime};
 
 use crate::LabResult;
+use crate::suite_context::SuiteContext;
+use crate::reporter::{
+  Reporter,
+  report_to_stdout
+};
 
-use super::spec::Spec;
-use super::reporter::{ReporterType, Reporter};
-use super::state::State;
-use super::suite_result::SuiteResult;
-
-pub enum DurationPrecision {
-    Micro,
-    Mil,
-    Nano,
-    Sec
+#[derive(Debug, Clone, Copy)]
+pub enum Speed {
+  Fast,
+  OnTime,
+  Slow
 }
 
-pub struct Suite {
-    duration: Duration,
-    duration_precision: DurationPrecision,
-    hooks: HashMap<String, Box<dyn Fn(&mut State) -> Result<(), String>>>,
-    pub ignore: bool,
-    name: String,
-    reporter_: ReporterType,
-    result: Option<SuiteResult>,
-    report: String,
-    state_: State,
-    suites_: Vec<Suite>,
-    specs_: Vec<Spec>,
-    stdout: bool,
-    export_: Option<String>,
-    inherit_state_: bool
+#[derive(Debug, Clone, Copy)]
+pub enum Duration {
+  Nano(u128),
+  Micro(u128),
+  Mil(u128),
+  Sec(u128)
+}
+impl Duration {
+  pub fn to_string(&self) -> String {
+    match self {
+      Duration::Nano(duration) => format!("({}ns)", duration),
+      Duration::Micro(duration) => format!("({}μs)", duration),
+      Duration::Mil(duration) => format!("({}ms)", duration),
+      Duration::Sec(duration) => format!("({}sec)", duration)
+    }
+  }
 }
 
-impl Suite {
+#[derive(Debug, Clone, Copy)]
+pub enum DurationType {
+  Nano,
+  Micro,
+  Mil,
+  Sec
+}
 
-    pub fn new(name: String) -> Suite {
-        Suite {
-            duration: Duration::new(0,0),
-            duration_precision: DurationPrecision::Mil,
-            hooks: HashMap::new(),
-            ignore: false,
-            name,
-            reporter_: ReporterType::Spec,
-            report: "".to_string(),
-            result: None,
-            state_: State::new(),
-            suites_: vec![],
-            specs_: vec![],
-            stdout: true,
-            export_: None,
-            inherit_state_: false
-        }
-    }
-    pub fn run(mut self) -> Result<Self, String> {
-        self.run_(0)?;
-        Ok(self)
-    }
-    pub fn specs(mut self, tests: Vec<Spec>) -> Self {
-        self.specs_ = tests;
-        self
-    }
-    pub fn suites(mut self, suites: Vec<Suite>) -> Self {
-        self.suites_ = suites;
-        self
-    }
-    pub fn state<'a, S: Deserialize<'a> + Serialize>(mut self, state: S) -> Result<Self, String> {
-        self.state_.set(state)?;
-        Ok(self)
-    }
-    pub fn skip (mut self) -> Self {
-        self.ignore = true;
-        self
-    }
-    pub fn inherit_state(mut self) -> Self {
-        self.inherit_state_ = true;
-        self
-    }
+pub struct NullState;
 
-    // change reporter
-    pub fn spec(mut self) -> Self {
-        self.reporter_ = ReporterType::Spec;
-        self
+pub struct Suite<T> {
+  pub name: String,
+  pub only: bool,
+  pub cb: Box<dyn Fn(&mut SuiteContext<T>)>,
+  pub context: SuiteContext<T>,
+  pub duration_type: DurationType,
+  pub suite_duration: u128,
+  pub total_duration: u128,
+  pub depth: u32,
+  pub reporter: Reporter,
+  pub start_time: String,
+  pub end_time: String
+}
+impl<T> Suite<T> {
+  pub fn new<N, H>(name: N, cb: H) -> Suite<T> where
+  N: Into<String> + Display,
+  H: Fn(&mut SuiteContext<T>) + 'static
+  {
+    let context = SuiteContext::new();
+    Suite {
+      name: name.to_string(),
+      only: false,
+      cb: Box::new(cb),
+      context,
+      duration_type: DurationType::Nano,
+      depth: 0,
+      suite_duration: 0,
+      total_duration: 0,
+      reporter: Reporter::Spec,
+      start_time: String::new(),
+      end_time: String::new()
     }
-    pub fn min(mut self) -> Self {
-        self.reporter_ = ReporterType::Minimal;
-        self
+  }
+  pub fn run(&mut self) -> LabResult {
+    Suite::apply_depth_to_suites(self);
+    Suite::index_specs(self, &mut 0);
+    Suite::ignore_non_onlys(self);
+    Suite::apply_hooks(self);
+    Suite::apply_state(self);
+    Suite::apply_duration_type(self);
+    Suite::run_specs_and_suites(self);
+    Suite::sum_result_counts(self);
+    Suite::sum_test_durations(self);
+    Suite::apply_slow_settings(self);
+    Suite::calculate_speed(self);
+    report_to_stdout(&self);
+    if self.context.failed == 0 {
+      Ok(())
+    } else {
+      Err(format!("Expected {} to equal 0", self.context.failed))
     }
-    pub fn json(mut self) -> Self {
-        self.reporter_ = ReporterType::Json;
-        self
+  }
+  pub fn spec(mut self) -> Self {
+    self.reporter = Reporter::Spec;
+    self
+  }
+  pub fn min(mut self) -> Self {
+    self.reporter = Reporter::Min;
+    self
+  }
+  pub fn dot(mut self) -> Self {
+    self.reporter = Reporter::Dot;
+    self
+  }
+  pub fn list(mut self) -> Self {
+    self.reporter = Reporter::List;
+    self
+  }
+  pub fn tap(mut self) -> Self {
+    self.reporter = Reporter::Tap;
+    self
+  }
+  pub fn rust(mut self) -> Self {
+    self.reporter = Reporter::Rust;
+    self    
+  }
+  pub fn json(mut self) -> Self {
+    self.reporter = Reporter::Json(false);
+    self
+  }
+  pub fn json_pretty(mut self) -> Self {
+    self.reporter = Reporter::Json(true);
+    self
+  }
+  pub fn nano(mut self) -> Self {
+    self.duration_type = DurationType::Nano;
+    self
+  }
+  pub fn micro(mut self) -> Self {
+    self.duration_type = DurationType::Micro;
+    self
+  }
+  pub fn milis(mut self) -> Self {
+    self.duration_type = DurationType::Mil;
+    self
+  }
+  pub fn sec(mut self) -> Self {
+    self.duration_type = DurationType::Sec;
+    self
+  }
+  pub fn state(self, state: T) -> Self {
+    self.context.state.borrow_mut().insert("/", state);
+    self
+  }
+  fn run_specs_and_suites(suite: &mut Suite<T>) {
+    let system_time = SystemTime::now();
+    let datetime: DateTime<Utc> = system_time.into();
+    suite.start_time = datetime.to_string();
+    (suite.cb)(&mut suite.context);
+    if let Some(boxed_hook) = &suite.context.before_all_hook {
+      let hook = boxed_hook.as_ref();
+      (hook)(&mut suite.context.state.borrow_mut())
     }
-    pub fn json_pretty(mut self) -> Self {
-        self.reporter_ = ReporterType::JsonPretty;
-        self
-    }
-    pub fn export_to(mut self, path: &str) -> Self {
-        self.export_ = Some(path.to_string());
-        self
-    }
-    pub fn no_stdout(mut self) -> Self {
-        self.stdout = false;
-        self
-    }
-    pub fn to_state<'a, S: Deserialize<'a>>(&'a self) -> Result<S, String> {
-        self.state_.get()
-    }
-    pub fn to_string(&self) -> String {
-        self.report.clone()
-    }
-    pub fn to_result(&self) -> Result<(), String> {
-        match &self.result {
-            Some(result) => {
-                let failing_tests = result.get_failing();
-                if failing_tests == 0 {
-                    Ok(())
-                } else {
-                    let total_tests = result.get_passing() + failing_tests;
-                    Err(format!("{} of {} tests failed", failing_tests, total_tests))
-                }
-            },
-            None => Err(format!("Results for the suite was not found"))
-        }
-    }
-
-    // change duration precision
-    pub fn in_milliseconds(mut self) -> Self {
-        self.duration_precision = DurationPrecision::Mil;
-        self
-    }
-    pub fn in_microseconds(mut self) -> Self {
-        self.duration_precision = DurationPrecision::Micro;
-        self
-    }
-    pub fn in_nanoseconds(mut self) -> Self {
-        self.duration_precision = DurationPrecision::Nano;
-        self
-    }
-    pub fn in_seconds(mut self) -> Self {
-        self.duration_precision = DurationPrecision::Sec;
-        self
-    }
-
-    fn clone_result(&self) -> Option<SuiteResult> {
-        match &self.result {
-            Some(result) => Some(result.clone()),
-            None => None
-        }
-    }
-    fn run_(&mut self, nest_count: u32) -> Result<(), String> {
-
-        let mut result = SuiteResult::new(&self.name);
-        if let Err(msg) = self.execute_hook("before all") {
-            return Err(format!("There was an error in the before all hook in the {} suite: {}", self.name, msg));
+    for spec in &mut suite.context.specs {
+      if !spec.skip {
+        let retries: u32 = {
+          if let Some(suite_retries) = suite.context.retries_ {
+            if let Some(spec_retries) = spec.context.retries_ {
+              spec_retries
+            } else {
+              suite_retries
+            }
+          } else {
+            if let Some(spec_retries) = spec.context.retries_ {
+              spec_retries
+            } else {
+              0
+            }
+          }
         };
-        let len = self.specs_.len();
-        let mut only_id = None;
-
-        // check for specs marked as only
-        for i in 0..len {
-            let test = &self.specs_[i];
-            if test.only_ {
-                only_id = Some(i);
-                break;
-            }
+        let attempts = 1 + retries;
+        for _i in 1..=attempts {
+          if let Some(boxed_hook) = &suite.context.before_each_hook {
+            let hook = boxed_hook.as_ref();
+            (hook)(&mut suite.context.state.borrow_mut())
+          }
+          spec.context.attempts += 1;
+          let start_time = Instant::now();
+          let result = (spec.hook.as_ref())(&mut spec.context);
+          let duration = start_time.elapsed();
+          let duration_int = match suite.duration_type {
+            DurationType::Nano => duration.as_nanos(),
+            DurationType::Micro => duration.as_micros(),
+            DurationType::Mil => duration.as_millis(),
+            DurationType::Sec => duration.as_secs() as u128
+          };
+          spec.result = Some(result);
+          spec.duration = duration_int;
+          if let Some(boxed_hook) = &suite.context.after_each_hook {
+            let hook = boxed_hook.as_ref();
+            (hook)(&mut suite.context.state.borrow_mut())
+          }
+          if spec.result.as_ref().unwrap().is_ok() {
+            break;
+          }
         }
-
-        if let Some(id) = only_id {
-
-            // set all other specs to be ignored
-            for i in 0..len {
-                if i != id {
-                    let spec = &mut self.specs_[i];
-                    spec.ignore = true;
-                }
-            }
-
+      }    
+    }
+    for child_suite in suite.context.suites.iter_mut() {
+      if !child_suite.context.skip_ {
+        Suite::run_specs_and_suites(child_suite);
+      }
+    }
+    if let Some(boxed_hook) = &suite.context.after_all_hook {
+      let hook = boxed_hook.as_ref();
+      (hook)(&mut suite.context.state.borrow_mut())
+    }
+    let system_time = SystemTime::now();
+    let datetime: DateTime<Utc> = system_time.into();
+    suite.end_time = datetime.to_string();
+  }
+  fn index_specs(suite: &mut Suite<T>, count: &mut u32) {
+    for spec in suite.context.specs.iter_mut() {
+      spec.order = Some(*count);
+      *count += 1;
+    }
+    for suite in suite.context.suites.iter_mut() {
+      Suite::index_specs(suite, count);
+    }
+  }
+  fn apply_depth_to_suites(suite: &mut Suite<T>) {
+    for child_suite in &mut suite.context.suites {
+      child_suite.depth += suite.depth;
+    }
+  }
+  fn apply_hooks(suite: &mut Suite<T>) {
+    for child_suite in suite.context.suites.iter_mut() {
+      if let Some(hook) = &suite.context.before_each_hook {
+        if let None = child_suite.context.before_each_hook {
+          child_suite.context.before_each_hook = Some(hook.clone());
         }
-
-        // run specs not marked with ignore
-        for i in 0..len {
-            if let Err(msg) = self.execute_hook("before each") {
-                return Err(format!("There was an error in the before each hook in the {} suite: {}", self.name, msg));
-            };
-            let spec = &mut self.specs_[i];
-            if self.ignore {
-                spec.ignore = true;
-            }
-            spec.run(&mut self.state_);
-            result.update_from_spec(spec.export_results(&self.name));
-            if let Err(msg) = self.execute_hook("after each") {
-                return Err(format!("There was an error in the after each hook in the {} suite: {}", self.name, msg));
-            }            
+      }
+      if let Some(hook) = &suite.context.after_each_hook {
+        if let None = child_suite.context.before_each_hook {
+          child_suite.context.before_each_hook = Some(hook.clone());
         }
-
-        let len = self.suites_.len();
-        let mut raw_state = self.get_state_raw();
-        for i in 0..len {
-            let suite = self.suites_[i].borrow_mut();
-            if self.ignore {
-                suite.ignore = true;
-            }
-            if suite.should_inherit() {
-                // let raw_state = self.get_state_raw();
-                suite.set_state_raw(&raw_state);
-            }
-            suite.run_(nest_count + 1)?;
-            result.updated_from_suite(suite.clone_result());
-            if suite.should_inherit() {
-                raw_state = suite.get_state_raw();
-               // self.set_state_raw(&suite.get_state_raw());
-            }
+      }
+    }
+  }
+  fn apply_state(suite: &mut Suite<T>) {
+    for child_suite in suite.context.suites.iter_mut() {
+      child_suite.context.state = suite.context.state.clone();
+    }
+    // for spec in suite.context.specs.iter_mut() {
+    //   spec.context.state = suite.context.state.clone();
+    // }
+  }
+  fn ignore_non_onlys(suite: &mut Suite<T>) {
+    if suite.context.skip_ == true {
+      for spec in &mut suite.context.specs {
+        spec.skip = true;
+      }
+      for child_suite in &mut suite.context.suites {
+        child_suite.context.skip_ = true;
+      }
+    } else {
+      let mut has_at_least_one_only = false;
+      for spec in &suite.context.specs {
+        if spec.only {
+          has_at_least_one_only = true;
+          break;
         }
-        self.set_state_raw(&raw_state);
-        if let Err(msg) = self.execute_hook("after all") {
-            return Err(format!("There was an error in the after all hook in the {} suite: {}", self.name, msg));
-        };
-        
-
-        self.result = Some(result);
-        if nest_count == 0 {
-            self.report();
+      }
+      if has_at_least_one_only {
+        for spec in &mut suite.context.specs {
+          if !spec.only {
+            spec.skip = true;
+          }
         }
-        Ok(())
-    }
-    fn execute_hook(&mut self, hook_name: &str) -> Result<(), String> {
-        if let Some(hook) = self.hooks.get(hook_name) {
-            (hook)(&mut self.state_)?;
+      }
+      has_at_least_one_only = false;
+      for child_suite in &suite.context.suites {
+        if child_suite.only {
+          has_at_least_one_only = true;
+          break;
         }
-        Ok(())
-    }
-    fn report(&mut self) {
-
-        let get_output = |result: Option<SuiteResult>, reporter: &ReporterType, stdout: bool, precision: &DurationPrecision| -> String {
-
-            match result {
-                Some(result) => {
-                    match reporter {
-                        ReporterType::Spec => Reporter::spec(result, stdout, precision),
-                        ReporterType::Minimal => Reporter::min(result, stdout, precision),
-                        ReporterType::Json => Reporter::json(result),
-                        ReporterType::JsonPretty => Reporter::json_pretty(result)
-                    }
-                },
-                None => {
-                    // no result found
-                    String::from("result not found")
-                }
-            }
-
-        };
-
-        self.report = get_output(self.result.clone(), &self.reporter_, false, &self.duration_precision);
-
-        match &self.export_ {
-            Some(path) => {
-                // let result = get_output(false);
-                Reporter::export_to_file(&path, &self.report);
-            },
-            None => { }
+      }
+      if has_at_least_one_only {
+        for child_suite in &mut suite.context.suites {
+          if !child_suite.only {
+            child_suite.context.skip_ = true;
+          }
         }
-        if self.stdout {
-            let result = get_output(self.result.clone(), &self.reporter_, true, &self.duration_precision);
-            println!("\n{}\n\n", &result);
+      }
+    }    
+    for child_suite in &mut suite.context.suites {
+      Suite::ignore_non_onlys(child_suite);
+    }
+  }
+  fn apply_retries(suite: &mut Suite<T>) {
+    if let Some(retries) = suite.context.retries_ {
+      for spec in &mut suite.context.specs {
+        if let None = spec.context.retries_ {
+          spec.context.retries_ = Some(retries);
         }
+      }
+      for child_suite in &mut suite.context.suites {
+        if let None = child_suite.context.retries_ {
+          child_suite.context.retries_ = Some(retries);
+        }
+      }
+      for child_suite in &mut suite.context.suites {
+        Suite::apply_retries(child_suite);
+      }
+    }
+  }
+  fn apply_duration_type(suite: &mut Suite<T>) {
+    for child_suite in &mut suite.context.suites {
+      child_suite.duration_type = suite.duration_type;
+    }
+  }
+  fn apply_slow_settings(suite: &mut Suite<T>) {
+    if let Some(slow_setting) = suite.context.slow_ {
+      for spec in &mut suite.context.specs {
+        if let None = spec.context.slow_ {
+          spec.context.slow_ = Some(slow_setting);
+        }
+      }
+      for child_suite in &mut suite.context.suites {
+        if let None = child_suite.context.slow_ {
+          child_suite.context.slow_ = Some(slow_setting);
+        }
+      }
+    }
+    for child_suite in &mut suite.context.suites {
+      Suite::apply_slow_settings(child_suite);
+    }
+  }
+  fn sum_result_counts(suite: &mut Suite<T>) {
+    for spec in &suite.context.specs {
+      if let Some(result) = &spec.result {
+        match result {
+          Ok(_) => {
+            suite.context.passed += 1;
+          },
+          Err(_) => {
+            suite.context.failed += 1;
+          }
+        }
+      } else {
+        suite.context.ignored += 1;
+      }
+    }
+    for child_suite in &mut suite.context.suites {
+      Suite::sum_result_counts(child_suite);
+    }
+  }
+  fn sum_test_durations(suite: &mut Suite<T>) {
+    for spec in &suite.context.specs {
+      suite.suite_duration += spec.duration;
+      suite.total_duration += spec.duration;
+    }
+    for child_suite in &mut suite.context.suites {
+      Suite::sum_test_durations(child_suite);
+      suite.total_duration += child_suite.total_duration;
+    }
+  }
+  fn calculate_speed(suite: &mut Suite<T>) {
+    for spec in &mut suite.context.specs {
+      if let Some(slow_time) = spec.context.slow_{
+        let fast_time = ((slow_time as f64) / 2.0) as u128;
+        if spec.duration > slow_time {
+          spec.context.speed_result = Speed::Slow;
+        } else if spec.duration <= fast_time {
+          spec.context.speed_result = Speed::Fast;
+        } else {
+          spec.context.speed_result = Speed::OnTime;
+        }
+      } else {
+        spec.context.speed_result = Speed::Fast;
+      }      
+    }
+    for child_suite in &mut suite.context.suites {
+      Suite::calculate_speed(child_suite);
+    }
+  }
+}
 
-    }
-
-    // GETTERS
-    pub fn should_inherit(&self) -> bool { self.inherit_state_ }
-    // pub fn should_ignore(&self) -> bool { self.ignore }
-    pub fn get_state_raw(&self) -> Vec<u8> {
-        self.state_.get_raw_state().to_vec()
-    }
-    pub fn get_precision(&self) -> &DurationPrecision { &self.duration_precision }
-
-    // SETTERS
-    pub fn set_state_raw(&mut self, state: &[u8]) {
-        self.state_.set_raw_state(state.to_vec());
-    }
-
-    pub fn before_all<H>(mut self, handle: H) -> Self
-        where
-            H: Fn(&mut State) -> Result<(), String> + 'static
-    {
-        self.hooks.insert("before all".to_string(), Box::new(handle));
-        self
-    }
-    pub fn before_each<H>(mut self, handle: H) -> Self
-        where
-            H: Fn(&mut State) -> Result<(), String> + 'static
-    {
-        self.hooks.insert("before each".to_string(), Box::new(handle));
-        self
-    }
-    pub fn after_all<H>(mut self, handle: H) -> Self
-        where
-            H: Fn(&mut State) -> Result<(), String> + 'static
-    {
-        self.hooks.insert("after all".to_string(), Box::new(handle));
-        self
-    }
-    pub fn after_each<H>(mut self, handle: H) -> Self
-        where
-            H: Fn(&mut State) -> Result<(), String> + 'static
-    {
-        self.hooks.insert("after each".to_string(), Box::new(handle));
-        self
-    }
-
+pub fn describe<T, S, H>(name: S, cb: H) -> Suite<T>
+  where
+    S: Into<String> + Display,
+    H: Fn(&mut SuiteContext<T>) + 'static
+{
+  let context = SuiteContext::new();
+  // (cb)(&mut context);
+  Suite {
+    name: name.to_string(),
+    only: false,
+    cb: Box::new(cb),
+    context,
+    duration_type: DurationType::Nano,
+    depth: 0,
+    suite_duration: 0,
+    total_duration: 0,
+    reporter: Reporter::Spec,
+    start_time: String::new(),
+    end_time: String::new()
+  }
 }
