@@ -524,24 +524,23 @@ pub fn report_to_stdout<T>(suite: &Suite<T>) {
         DurationType::Mil => Duration::Mil(suite.total_duration),
         DurationType::Sec => Duration::Sec(suite.total_duration)
       };
-      print!("\n\n");
       get_list(suite, &mut stats, suite.name.to_string());
-      print!("\n\n");
+      header();
       println!("{}", green(format!("{} passing {}", stats.passed, duration.to_string())));
       println!("{}", cyan(format!("{} pending", stats.pending)));
       println!("{}", red(format!("{} failed", stats.failed)));
-      print!("\n\n");
+      footer();
     },
     Reporter::Tap => {
       let mut lines = vec![];
       let mut count = 0;
       get_tap_list(suite, &mut lines, &mut count, suite.name.to_string());
-      print!("\n\n");
+      header();
       println!("{}", green(format!("1..{}", count)));
       for line in &lines {
         println!("{}", line);
       }
-      print!("\n\n");
+      footer();
     },
     Reporter::Rust => {
 
@@ -557,9 +556,7 @@ pub fn report_to_stdout<T>(suite: &Suite<T>) {
         error_lines: vec![]
       };
       let count = get_count(suite);
-      print!("\n\n");
-      println!("### Lab Results start ###");
-      print!("\n");
+      header();
       println!("Running {} test{}", count, get_suffix(count));
       print!("\n\n");
       get_list_for_rust(suite, &mut stats, suite.name.to_case(Case::Snake));
@@ -577,9 +574,7 @@ pub fn report_to_stdout<T>(suite: &Suite<T>) {
         print!("\n");
         println!("test result: {}. {}; {}; {}; 0 measured; 0 filtered out", red("FAILED"), passed, failed, ignored);
       }
-      print!("\n");
-      println!("### Lab Results end ###");
-      print!("\n\n");
+      footer();
     },
     Reporter::Json(pretty) => {
       let mut json_report = JsonReport {
@@ -599,7 +594,7 @@ pub fn report_to_stdout<T>(suite: &Suite<T>) {
         failing: vec![]
       };
       get_stats_for_json(suite, &mut json_report, suite.name.to_string());
-      print!("\n\n");
+      header();
       if pretty {
         if let Ok(json) = to_string_pretty(&json_report) {
           println!("{}", json);
@@ -613,7 +608,7 @@ pub fn report_to_stdout<T>(suite: &Suite<T>) {
           println!("Could not print out json result");
         }
       }
-      print!("\n\n");
+      footer();
     }
   }    
 }
