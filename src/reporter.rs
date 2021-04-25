@@ -524,8 +524,9 @@ pub fn report_to_stdout<T>(suite: &Suite<T>) {
         DurationType::Mil => Duration::Mil(suite.total_duration),
         DurationType::Sec => Duration::Sec(suite.total_duration)
       };
-      get_list(suite, &mut stats, suite.name.to_string());
       header();
+      get_list(suite, &mut stats, suite.name.to_string());
+      print!("\n");
       println!("{}", green(format!("{} passing {}", stats.passed, duration.to_string())));
       println!("{}", cyan(format!("{} pending", stats.pending)));
       println!("{}", red(format!("{} failed", stats.failed)));
