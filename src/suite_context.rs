@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::{fmt::Display, rc::Rc, cell::RefCell};
-use crate::spec::{Spec, SpecContext};
+use crate::spec::{Spec, SpecContext, SpecOptions};
 use crate::suite::{Suite};
 
 pub type State<T> = HashMap<&'static str, T>;
@@ -80,6 +80,26 @@ impl<T> SuiteContext<T> {
     let mut spec = Spec::new(name.to_string(), self.state.clone(), Box::new(hook));
     spec.only = true;
     self.specs.push(spec);
+    self
+  }
+  pub fn spec<H>(&mut self, cb: H) -> &mut Self
+  where
+  H: Fn(&mut SpecOptions<T>)
+  {
+    let mut options: SpecOptions<T> = SpecOptions::new();
+    (cb)(&mut options);
+    match options.name {
+      Some(name) => match options.hook {
+        Some(hook) => {
+          let mut spec = Spec::new(name.to_string(), self.state.clone(), hook);
+          spec.context.retries_ = options.retries_;
+          spec.context.slow_ = options.slow_;
+          self.specs.push(spec);
+        },
+        None => { /* no hook skips the test */}
+      },
+      None => { /* no name skips the test */ }
+    }    
     self
   }
   pub fn describe<S, H>(&mut self, name: S, cb: H) -> &mut Self

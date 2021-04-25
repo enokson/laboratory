@@ -1,9 +1,44 @@
 use std::{
   cell::RefCell,
+  fmt::Display,
   rc::Rc
 };
 use crate::suite::Speed;
 use crate::suite_context::State;
+
+pub struct SpecOptions<T> {
+  pub name: Option<String>,
+  pub retries_: Option<u32>,
+  pub slow_: Option<u128>,
+  pub hook: Option<Box<dyn Fn(&mut SpecContext<T>) -> Result<(), String> + 'static>>,
+}
+impl<T> SpecOptions<T> {
+  pub fn new() -> SpecOptions<T> {
+    SpecOptions {
+      name: None,
+      retries_: None,
+      slow_: None,
+      hook: None
+    }
+  }
+  pub fn it<N, H>(&mut self, name: N, cb: H) -> &mut Self
+  where
+  N: Into<String> + Display,
+  H: Fn(&mut SpecContext<T>) -> Result<(), String> + 'static
+  {
+    self.name = Some(name.to_string());
+    self.hook = Some(Box::new(cb));
+    self
+  }
+  pub fn retries(&mut self, retries: u32) -> &mut Self {
+    self.retries_ = Some(retries);
+    self
+  }
+  pub fn slow(&mut self, threshold: u128) -> &mut Self {
+    self.slow_ = Some(threshold);
+    self
+  }
+}
 
 pub struct SpecContext<T> {
   pub state: Rc<RefCell<State<T>>>,
