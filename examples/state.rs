@@ -38,8 +38,6 @@ mod tests {
 
         describe("My Crate", |suite| {
 
-
-
             suite.before_all(|state| {
 
                 state.insert("/counter", State::I32(0));
