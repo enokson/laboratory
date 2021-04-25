@@ -501,7 +501,7 @@ pub fn report_to_stdout<T>(suite: &Suite<T>) {
         dots: vec![]
       };
       get_dots(suite, &mut stats);
-      print!("\n\n");
+      header();
       for line in &stats.dots {
         print!("{}", line);
       }
@@ -509,7 +509,7 @@ pub fn report_to_stdout<T>(suite: &Suite<T>) {
       println!("{}", green(format!("{} passing", stats.passed)));
       println!("{}", cyan(format!("{} pending", stats.pending)));
       println!("{}", red(format!("{} failed", stats.failed)));
-      print!("\n\n");
+      footer();
     },
     Reporter::List => {
       let mut stats = MinReporterStats {
