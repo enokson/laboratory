@@ -40,6 +40,7 @@ describe("add_one()", |suite| {
     }).before_each(|state| {
 
         let mut counter = state.get_mut(&"/counter").unwrap();
+        *counter += 1;
 
     }).after_each(|state| {
 
@@ -48,7 +49,7 @@ describe("add_one()", |suite| {
     }).after_all(|state| {
 
         println!("Final Count: {}", state.get(&"/counter").unwrap());
-        
+
     });
 
 })
