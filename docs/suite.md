@@ -30,7 +30,7 @@ Laboratory is considered a layer 2 test runner that runs on top of rust's layer 
 
 By default failing a lab test will result in a failed rust test as well, however, it may be beneficial in some cases for a failed lab result not be passed to the layer 1 test runner. 
 
-For example, in the Laboratory examples section, there are many tests that fails but fails on purpose as part of the example and so is actually a success.
+For example, in the Laboratory [examples](https://github.com/enokson/laboratory/tree/master/examples) section, there are many tests that fail but fails on purpose as part of the example and so is actually a success.
 ```rust
 describe("my_function()", |suite| {
 
@@ -46,7 +46,7 @@ describe("my_function()", |suite| {
 ### Suite.rust()
 ### Suite.json()
 ### Suite.json_pretty()
-A suite provides the above methods to produce the desired reporting style. Take a look at the [reporters](reporters.md) section to choose which is right for your project. The default style is spec.
+A suite provides the above methods to produce the desired reporting style. Take a look at the [reporters](reporters.md) section to choose which style is right for your project. The default style is spec.
 ```rust
 describe("my_function()", |suite| {
 
