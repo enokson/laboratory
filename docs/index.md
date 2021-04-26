@@ -7,3 +7,6 @@
 
 ## [Suites](suite.md)
 The backbone of laboratory.
+
+## [SuiteContexts](suite-context.md)
+For customizing the nature of suites.
