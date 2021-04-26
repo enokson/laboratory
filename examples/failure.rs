@@ -27,11 +27,11 @@ mod tests {
         // want to test in our crate. So, let's
         // describe our crate and nest our functions
         // under that umbrella.
-        let test_results = describe("Crate", |ctx| {
+        describe("Crate", |suite| {
             
-            ctx.describe("add_one()", |ctx| {
+            suite.describe("add_one()", |suite| {
                 
-                ctx.it("should return 1 to when passed 0", |_| {
+                suite.it("should return 1 to when passed 0", |_| {
 
                     expect(add_one(0)).to_equal(1)
 
@@ -39,9 +39,9 @@ mod tests {
 
             })
 
-            .describe("add_two()", |ctx| {
+            .describe("add_two()", |suite| {
                 
-                ctx.it("should return 2 to when passed 0", |_| {
+                suite.it("should return 2 to when passed 0", |_| {
 
                     expect(add_two(0)).to_equal(2)
 
@@ -49,19 +49,7 @@ mod tests {
 
             });
 
-        }).state(NullState).run();
-
-        // the run method returns a result. So, if any of
-        // our tests fail the result will return an error as well.
-        // I catch the error in this example, but generally you should
-        // allow the suite to return the result to the function. Feel
-        // free to uncomment the "return Err(msg);" line to see the result
-        // in the terminal.
-        if let Err(_msg) = test_results {
-            // return Err(msg);
-        }
-
-        Ok(())
+        }).state(NullState).ignore_errors().run()
 
     }
 

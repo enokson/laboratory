@@ -18,12 +18,12 @@ mod tests {
         // perform actions before and after our tests.
         // The actions we want to run in this scenario is simply
         // outputting to stdout.
-        describe("always_return_true()", |ctx| {
+        describe("always_return_true()", |suite| {
 
             // We want to run this action before all
             // all tests in this suite is ran. This action
             // will only be ran once.
-            ctx.before_all(|_| {
+            suite.before_all(|_| {
 
                 println!("\n\n  before_all hook called");
 

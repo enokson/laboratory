@@ -13,9 +13,9 @@ mod tests {
     #[test]
     fn suite() -> LabResult {
 
-        describe("add_one()", |ctx| {
+        describe("add_one()", |suite| {
 
-            ctx.it("should return 1", |_| {
+            suite.it("should return 1", |_| {
 
                 expect(add_one(0)).to_equal(1)
 
