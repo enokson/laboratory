@@ -246,8 +246,8 @@ impl<T> Suite<T> {
         }
       }
       if let Some(hook) = &suite.context.after_each_hook {
-        if let None = child_suite.context.before_each_hook {
-          child_suite.context.before_each_hook = Some(hook.clone());
+        if let None = child_suite.context.after_each_hook {
+          child_suite.context.after_each_hook = Some(hook.clone());
         }
       }
     }
