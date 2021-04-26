@@ -18,7 +18,7 @@
           "error_msg": null,
           "duration": {
             "secs": 0,
-            "nanos": 387
+            "nanos": 401
           }
         },
         {
@@ -28,13 +28,13 @@
           "error_msg": null,
           "duration": {
             "secs": 0,
-            "nanos": 121
+            "nanos": 143
           }
         }
       ],
       "duration": {
         "secs": 0,
-        "nanos": 508
+        "nanos": 544
       }
     },
     {
@@ -51,19 +51,19 @@
           "error_msg": "Expected 5 to equal 2",
           "duration": {
             "secs": 0,
-            "nanos": 749
+            "nanos": 958
           }
         }
       ],
       "duration": {
         "secs": 0,
-        "nanos": 749
+        "nanos": 958
       }
     }
   ],
   "child_tests": [],
   "duration": {
     "secs": 0,
-    "nanos": 0
+    "nanos": 1502
   }
 }

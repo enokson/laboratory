@@ -1,6 +1,8 @@
-#[macro_use] extern crate laboratory;
+extern crate laboratory;
 
-fn main() {}
+fn main() {
+    panic_at_the_disco(false);
+}
 
 fn panic_at_the_disco(should_panic: bool) {
     if should_panic {
@@ -8,27 +10,35 @@ fn panic_at_the_disco(should_panic: bool) {
     }
 }
 
+// Sometimes it is necessary to ensure that a 
+// program will panic under certain conditions.
+// Laboratory comes with two functions to test whether
+// a function being tested had indeed panicked without crashing
+// the underlying Laboratory test runner.
+
 #[cfg(test)]
 mod tests {
 
-    use laboratory::{describe, it};
+    use laboratory::{describe, LabResult, should_panic, should_not_panic, NullState};
     use super::*;
 
     #[test]
-    fn should_panic() {
-        describe("panic_at_the_disco()").specs(vec![
+    fn panic_test() -> LabResult {
+        
+        describe("panic_at_the_disco()", |suite| {
 
-            it("should panic when passed true", |_| {
-                should_panic!(panic_at_the_disco, || { panic_at_the_disco(true); })
-            }),
+            suite.it("should panic when passed true", |_| {
 
-            it("should not panic when passed false", |_| {
-                should_not_panic!(panic_at_the_disco, || { panic_at_the_disco(false); })
-            })
+                should_panic(|| { panic_at_the_disco(true); })
 
-        ]).run();
+            }).it("should not panic when passed false", |_| {
+
+                should_not_panic(|| { panic_at_the_disco(false); })
+
+            });
+
+        }).state(NullState).ignore_errors().run()
 
     }
-
 
 }

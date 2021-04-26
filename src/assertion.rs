@@ -1,8 +1,6 @@
 use std::cmp::PartialEq;
-use std::fmt::{Debug, Display};
-use std::panic::catch_unwind;
-
-
+use std::fmt::Debug;
+use std::{panic::{catch_unwind, UnwindSafe, set_hook, take_hook}};
 
 pub struct Expect<T>
     where
@@ -51,3 +49,33 @@ impl<T> Expect<T>
     }
 }
 
+pub fn expect<T>(result: T) -> Expect<T>
+    where T: PartialEq + Debug
+{
+    Expect::new(result)
+}
+
+pub fn should_panic<T: FnOnce() + UnwindSafe>(closure: T) -> Result<(), String> {
+    set_hook(Box::new(|_| {}));
+    let result = catch_unwind(|| {
+        (closure)()
+    });
+    let _ = take_hook();
+    if result.is_ok() {
+        Err("Expected to panic".to_string())
+    } else {
+        Ok(())
+    }    
+}
+pub fn should_not_panic<T: FnOnce() + UnwindSafe>(closure: T) -> Result<(), String> {
+    set_hook(Box::new(|_| {}));
+    let result = catch_unwind(|| {
+        (closure)()
+    });
+    let _ = take_hook();
+    if result.is_ok() {
+        Ok(())
+    } else {
+        Err("Expected not to panic".to_string())
+    }    
+}
