@@ -79,6 +79,7 @@ impl<T> Suite<T> {
     }
   }
   pub fn run(&mut self) -> LabResult {
+    Suite::run_callbacks(self);
     Suite::apply_depth_to_suites(self);
     Suite::index_specs(self, &mut 0);
     Suite::ignore_non_onlys(self);
@@ -153,7 +154,6 @@ impl<T> Suite<T> {
     let system_time = SystemTime::now();
     let datetime: DateTime<Utc> = system_time.into();
     suite.start_time = datetime.to_string();
-    (suite.cb)(&mut suite.context);
     if let Some(boxed_hook) = &suite.context.before_all_hook {
       let hook = boxed_hook.as_ref();
       (hook)(&mut suite.context.state.borrow_mut())
@@ -223,6 +223,12 @@ impl<T> Suite<T> {
     let system_time = SystemTime::now();
     let datetime: DateTime<Utc> = system_time.into();
     suite.end_time = datetime.to_string();
+  }
+  fn run_callbacks(suite: &mut Suite<T>) {
+    (suite.cb)(&mut suite.context);
+    for child_suite in suite.context.suites.iter_mut() {
+      Suite::run_callbacks(child_suite);
+    }
   }
   fn index_specs(suite: &mut Suite<T>, count: &mut u32) {
     for spec in suite.context.specs.iter_mut() {
