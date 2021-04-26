@@ -194,5 +194,3 @@ add_one()
 
 ### Lab Results End ###
 ```
-
-## Not Using State
