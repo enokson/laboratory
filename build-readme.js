@@ -32,23 +32,23 @@ const appendExampleResult = (tagName, exampleName) => readme => {
     appendExample('//###SIMPLE###//', './examples/simple.rs'),
     appendExampleResult('//###SIMPLE-RESULT###//', 'simple'),
 
-    appendExample('//###NESTED###//', './examples/nested-suites.rs'),
-    appendExampleResult('//###NESTED-RESULT###//', 'nested-suites'),
+    // appendExample('//###NESTED###//', './examples/nested-suites.rs'),
+    // appendExampleResult('//###NESTED-RESULT###//', 'nested-suites'),
 
-    appendExample('//###FAILURE###//', './examples/failure.rs'),
-    appendExampleResult('//###FAILURE-RESULT###//', 'failure'),
+    // appendExample('//###FAILURE###//', './examples/failure.rs'),
+    // appendExampleResult('//###FAILURE-RESULT###//', 'failure'),
 
-    appendExample('//###HOOKS###//', './examples/hooks.rs'),
-    appendExampleResult('//###HOOKS-RESULT###//', 'hooks'),
+    // appendExample('//###HOOKS###//', './examples/hooks.rs'),
+    // appendExampleResult('//###HOOKS-RESULT###//', 'hooks'),
 
-    appendExample('//###STATE###//', './examples/state.rs'),
-    appendExampleResult('//###STATE-RESULT###//', 'state'),
+    // appendExample('//###STATE###//', './examples/state.rs'),
+    // appendExampleResult('//###STATE-RESULT###//', 'state'),
 
-    appendExample('//###IMPORT###//', './examples/importing-tests.rs'),
-    appendExampleResult('//###IMPORT-RESULT###//', 'importing-tests'),
+    // appendExample('//###IMPORT###//', './examples/importing-tests.rs'),
+    // appendExampleResult('//###IMPORT-RESULT###//', 'importing-tests'),
 
-    appendExample('//###REPORT###//', './examples/reporting-json-pretty.rs'),
-    appendExampleResult('//###REPORT-RESULT###//', 'reporting-json-pretty'),
+    // appendExample('//###REPORT###//', './examples/reporting-json-pretty.rs'),
+    // appendExampleResult('//###REPORT-RESULT###//', 'reporting-json-pretty'),
 
     str => fs.writeFile('./README.md', str)
 ))().catch(console.log)
