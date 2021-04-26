@@ -38,9 +38,13 @@ mod tests {
     fn test() -> LabResult {
 
         // Now we can describe Foo.
-        // Notice the "suites" method that takes a Vec
-        // as its argument. This is where we can describe
-        // Foo's members and methods.
+        // Notice how the callback closure takes an argument name "suite".
+        // the suite variable is the suite's context and many child suites, specs 
+        // and options can be defined using that struct.
+        
+        // The suite context struct has a method named describe where a developer
+        // can append child suites that are relevant to the parent such as 
+        // a method or member of a struct. 
         describe("Foo", |suite| {
 
             // Here we can describe the "new" associated function

@@ -12,6 +12,15 @@ fn add_one (x: u64) -> u64 {
     x + 1
 }
 
+// Sometimes a developer would like to know
+// if a function takes longer than expected.
+// So, with Laboratory one could tell the test
+// runner how much time should be expected before
+// the function is considered "slow".
+
+// In the spec reporter, the speed will be he highlighted
+// green, yellow, or red.
+
 #[cfg(test)]
 mod tests {
 
@@ -25,7 +34,6 @@ mod tests {
         describe("add_one()", |suite| {
 
             suite.it("should return 1", |_| {
-
                 
                 expect(add_one(0)).to_equal(1)
 

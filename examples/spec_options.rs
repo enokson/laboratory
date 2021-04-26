@@ -15,6 +15,20 @@ mod tests {
     #[test]
     fn suite() -> LabResult {
 
+        // just as there is a context for the suite, there is
+        // also a context for each spec. And that context can be
+        // accessed from the callback closure. However, since the test would
+        // be immediately ran, whatever options you would like to include
+        // will not be included until after the test is completed.
+
+        // So, the suite also provides a spec() method where a 
+        // developer can include any additional options on a per spec
+        // basis before the test is ran.
+        // Options such as:
+        // skip(),
+        // retries()
+        // slow()
+
         describe("add_one()", |suite| {
 
             suite.spec(|spec| {

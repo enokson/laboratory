@@ -18,6 +18,19 @@ mod tests {
     #[test]
     fn test() -> LabResult {
 
+        // Using state for tests is straight forward process
+        // with Laboratory.
+
+        // The state is simply a Rc<RefCell<HashMap<&'static str, T>>.
+        // Depending on where you try to access the state, sometimes
+        // the outer Rc and RefCell containers are abstracted away.
+        // An example of this are the hooks where one has direct
+        // access to the HashMap.
+
+        // Since we are using a HashMap, any number of key-value pairs
+        // can be used as state values to be read and updated throughout
+        // the Laboratory test runner.
+
         describe("My Crate", |suite| {
 
             suite.before_all(|state| {

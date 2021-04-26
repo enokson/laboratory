@@ -23,7 +23,13 @@ mod tests {
     #[test]
     fn suite() -> LabResult {
 
-        // let's describe what our add_one function will do.
+        // let's describe what our add_one() function will do.
+        // The describe function takes a closure as its second
+        // argument. And that closure also takes an argument which
+        // we will call "suite". The argument is the suite's context
+        // and it allows for extensive customizations. The context struct
+        // comes with a method called it() and using this method we can
+        // define a test.
         describe("add_one()", |suite| {
 
             // when describing what it should do, feel free to be

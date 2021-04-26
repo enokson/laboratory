@@ -10,6 +10,12 @@ fn panic_at_the_disco(should_panic: bool) {
     }
 }
 
+// Sometimes it is necessary to ensure that a 
+// program will panic under certain conditions.
+// Laboratory comes with two functions to test whether
+// a function being tested had indeed panicked without crashing
+// the underlying Laboratory test runner.
+
 #[cfg(test)]
 mod tests {
 
@@ -34,6 +40,5 @@ mod tests {
         }).state(NullState).ignore_errors().run()
 
     }
-
 
 }

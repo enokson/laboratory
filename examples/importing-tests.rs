@@ -21,7 +21,7 @@ pub mod add_one {
         use super::*;
         use laboratory::{describe, expect, Suite};
 
-        // Here is where we will define our suite.
+        // Here is where we will define our first suite.
         // Notice that this function returns a Suite struct.
         // Also notice that no other methods are called on this suite.
         pub fn suite<T>() -> Suite<T> {
@@ -91,6 +91,8 @@ mod tests {
     fn test() -> LabResult {
 
         // Describe the crate.
+        // And using the describe_import() method we make the two
+        // modules child suites to be tested
         describe("My Crate", |suite| {
             suite
                 .describe_import(add_one::tests::suite())

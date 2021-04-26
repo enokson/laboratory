@@ -32,7 +32,9 @@ mod tests {
             }).describe("add_two()", |suite| {
 
                 suite.it("should return 2", |_| {
+
                     expect(add_two(0)).to_equal(2)
+                    
                 });
 
             });
