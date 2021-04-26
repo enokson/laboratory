@@ -56,7 +56,8 @@ pub struct Suite<T> {
   pub depth: u32,
   pub reporter: Reporter,
   pub start_time: String,
-  pub end_time: String
+  pub end_time: String,
+  pub ignore_errors: bool,
 }
 impl<T> Suite<T> {
   pub fn new<N, H>(name: N, cb: H) -> Suite<T> where
@@ -75,7 +76,8 @@ impl<T> Suite<T> {
       total_duration: 0,
       reporter: Reporter::Spec,
       start_time: String::new(),
-      end_time: String::new()
+      end_time: String::new(),
+      ignore_errors: false
     }
   }
   pub fn run(&mut self) -> LabResult {
@@ -92,7 +94,7 @@ impl<T> Suite<T> {
     Suite::apply_slow_settings(self);
     Suite::calculate_speed(self);
     report_to_stdout(&self);
-    if self.context.fail == false {
+    if self.context.fail == false || self.ignore_errors == true {
       Ok(())
     } else {
       Err(format!("Expected number of failed tests to equal 0"))
@@ -144,6 +146,10 @@ impl<T> Suite<T> {
   }
   pub fn sec(mut self) -> Self {
     self.duration_type = DurationType::Sec;
+    self
+  }
+  pub fn ignore_errors(mut self) -> Self {
+    self.ignore_errors = true;
     self
   }
   pub fn state(self, state: T) -> Self {
@@ -415,6 +421,7 @@ pub fn describe<T, S, H>(name: S, cb: H) -> Suite<T>
     total_duration: 0,
     reporter: Reporter::Spec,
     start_time: String::new(),
-    end_time: String::new()
+    end_time: String::new(),
+    ignore_errors: false
   }
 }
