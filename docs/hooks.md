@@ -54,3 +54,5 @@ describe("add_one()", |suite| {
 
 })
 ```
+
+The before each and after each hooks will be called for each test ran in the suite and also in every child suite.
