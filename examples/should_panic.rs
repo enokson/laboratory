@@ -10,6 +10,12 @@ fn panic_at_the_disco(should_panic: bool) {
     }
 }
 
+// Sometimes it is necessary to ensure that a 
+// program will panic under certain conditions.
+// Laboratory comes with two functions to test whether
+// a function being tested had indeed panicked without crashing
+// the underlying Laboratory test runner.
+
 #[cfg(test)]
 mod tests {
 
@@ -19,9 +25,9 @@ mod tests {
     #[test]
     fn panic_test() -> LabResult {
         
-        describe("panic_at_the_disco()", |ctx| {
+        describe("panic_at_the_disco()", |suite| {
 
-            ctx.it("should panic when passed true", |_| {
+            suite.it("should panic when passed true", |_| {
 
                 should_panic(|| { panic_at_the_disco(true); })
 
@@ -31,9 +37,8 @@ mod tests {
 
             });
 
-        }).state(NullState).run()
+        }).state(NullState).ignore_errors().run()
 
     }
-
 
 }

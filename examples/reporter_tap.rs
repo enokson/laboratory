@@ -16,11 +16,11 @@ mod tests {
     #[test]
     fn suite() -> LabResult {
 
-        describe("Package", |ctx| {
+        describe("Package", |suite| {
 
-            ctx.describe("add_one()", |ctx| {
+            suite.describe("add_one()", |suite| {
 
-                ctx.it("should return 1", |_| {
+                suite.it("should return 1", |_| {
 
                     expect(add_one(0)).to_equal(1)
 
@@ -30,9 +30,9 @@ mod tests {
 
                 });
 
-            }).describe("add_two()", |ctx| {
+            }).describe("add_two()", |suite| {
 
-                ctx.it("should return 2", |_| {
+                suite.it("should return 2", |_| {
 
                     expect(add_two(0)).to_equal(2)
 
@@ -40,7 +40,7 @@ mod tests {
 
             });
             
-        }).state(NullState).tap().run()
+        }).state(NullState).tap().ignore_errors().run()
 
     }
 }

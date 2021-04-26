@@ -18,11 +18,11 @@ mod tests {
 
         // To export to json-pretty we will simply call
         // the json_pretty method on the suite.
-        describe("My Crate", |ctx| {
+        describe("My Crate", |suite| {
 
-            ctx.describe("add_one()", |ctx| {
+            suite.describe("add_one()", |suite| {
 
-                ctx.it("should return 1", |_| {
+                suite.it("should return 1", |_| {
 
                     expect(add_one(0)).to_equal(1)
 
@@ -32,9 +32,9 @@ mod tests {
 
                 });
 
-            }).describe("add_two()", |ctx| {
+            }).describe("add_two()", |suite| {
 
-                    ctx.it("should return 2", |_| {
+                    suite.it("should return 2", |_| {
 
                         expect(add_two(0)).to_equal(2)
 
@@ -42,7 +42,7 @@ mod tests {
 
                 });
 
-        }).state(NullState).json_pretty().run()
+        }).state(NullState).json_pretty().ignore_errors().run()
 
     }
 }

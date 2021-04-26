@@ -38,15 +38,19 @@ mod tests {
     fn test() -> LabResult {
 
         // Now we can describe Foo.
-        // Notice the "suites" method that takes a Vec
-        // as its argument. This is where we can describe
-        // Foo's members and methods.
-        describe("Foo", |ctx| {
+        // Notice how the callback closure takes an argument name "suite".
+        // the suite variable is the suite's context and many child suites, specs 
+        // and options can be defined using that struct.
+        
+        // The suite context struct has a method named describe where a developer
+        // can append child suites that are relevant to the parent such as 
+        // a method or member of a struct. 
+        describe("Foo", |suite| {
 
             // Here we can describe the "new" associated function
-            ctx.describe("#new()", |ctx| {
+            suite.describe("#new()", |suite| {
 
-                ctx.it("should return an instance of Foo with two members", |_| {
+                suite.it("should return an instance of Foo with two members", |_| {
 
                     let foo = Foo::new();
                     expect(foo.line).to_be(String::new())?;
@@ -57,9 +61,9 @@ mod tests {
             })
 
             // Now we will describe the "append" method
-            .describe("#append()", |ctx| {
+            .describe("#append()", |suite| {
 
-                ctx.it("should append \"fizzbuzz\" to Foo#line", |_| {
+                suite.it("should append \"fizzbuzz\" to Foo#line", |_| {
 
                     let mut foo = Foo::new();
                     foo.append("fizzbuzz");
@@ -70,9 +74,9 @@ mod tests {
             })
 
             // Finally, we will describe the "increase" method
-            .describe("#increase()", |ctx| {
+            .describe("#increase()", |suite| {
 
-                ctx.it("should increase Foo#count by 1", |_| {
+                suite.it("should increase Foo#count by 1", |_| {
 
                     let mut foo = Foo::new();
                     foo.increase();

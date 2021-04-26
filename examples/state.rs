@@ -1,5 +1,5 @@
 
-fn always_return_true() -> bool { true  }
+fn always_return_true() -> bool { true }
 fn add_one(n: i32) -> i32 { n + 1 }
 fn add_two(n: i32) -> i32 { n + 2 }
 
@@ -14,55 +14,43 @@ mod tests {
 
     use laboratory::{describe, expect, LabResult, Suite};
     use super::{always_return_true, add_one, add_two};
-    use std::cell::{RefCell, RefMut};
-    use std::fmt::{Debug};
-    use std::rc::Rc;
 
     #[test]
     fn test() -> LabResult {
 
-        enum State {
-            I32(i32),
-            String(String)
-        }
+        // Using state for tests is straight forward process
+        // with Laboratory.
 
-        fn imported_suite() -> Suite<State> {
-            describe("imported suite", |suite| {
-                suite.it("should do something cool", |spec| {
-                    // let state = spec.state.borrow();
-                    // println!("/counter from imported suite: {}", state.get("/counter").unwrap());
-                    expect(true).to_be(true)
-                });
-            })
-        }
+        // The state is simply a Rc<RefCell<HashMap<&'static str, T>>.
+        // Depending on where you try to access the state, sometimes
+        // the outer Rc and RefCell containers are abstracted away.
+        // An example of this are the hooks where one has direct
+        // access to the HashMap.
+
+        // Since we are using a HashMap, any number of key-value pairs
+        // can be used as state values to be read and updated throughout
+        // the Laboratory test runner.
 
         describe("My Crate", |suite| {
 
             suite.before_all(|state| {
 
-                state.insert("/counter", State::I32(0));
+                state.insert("/counter", 0);
                
             }).before_each(|state| {
 
-                if let State::I32(count) = state.get_mut("/counter").unwrap() {
-                    *count += 1;
-                };
-
-            }).after_each(|state| {
-
-                if let State::I32(count) = state.get_mut("/counter").unwrap() {
-                    *count += 1;
-                };
+                let mut counter = state.get_mut("/counter").unwrap();
+                *counter += 1;
 
             }).after_all(|state| {
 
-                if let State::I32(count) = state.get_mut("/counter").unwrap() {
-                    println!("/counter: {:?}", count);
-                };
+                println!("counter: {:?}", state.get("/counter").unwrap());
 
             }).describe("add_one()", |suite| {
 
                 suite.it("should return 1", |spec| {
+
+                    let counter = spec.state.borrow().get("/counter").unwrap();
 
                     expect(add_one(0)).to_be(1)
 
@@ -76,23 +64,19 @@ mod tests {
 
                 suite.before_all(|state| {
                     
-                    state.insert("/add_two()", State::String("hello".to_string()));
+                    state.insert("/add_two()/counter", 0);
 
                 }).before_each(|state| {
 
-                }).after_each(|state| {
+                    let mut counter = state.get_mut("/add_two()/counter").unwrap();
+                    *counter += 1;
 
                 }).after_all(|state| {
 
-                    if let State::String(string) = state.get_mut("/add_two()").unwrap() {
-                        string.push_str(", world!")
-                    }
-
-                    if let State::String(string) = state.get_mut("/add_two()").unwrap() {
-                        println!("/add_two(): {:?}", string);
-                    }
+                    println!("add_two counter: {:?}", state.get("/add_two()/counter").unwrap());
                     
-                }).it("should return 2", |spec| {
+                })
+                .it("should return 2", |spec| {
 
                     expect(add_two(0)).to_be(2)
 
@@ -102,21 +86,9 @@ mod tests {
 
                 });
 
-            }).describe("always_return_true()", |suite| {
-
-
-                suite.it("should always return true", |_| {
-
-                    expect(always_return_true()).to_be(true)
-
-                });
-
-            })
-            .describe_import(imported_suite()).it("should do something", |spec| {
-                expect(true).to_be(true)
             });
 
-        }).rust().run()
+        }).run()
 
     }
 

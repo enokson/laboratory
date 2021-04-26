@@ -21,14 +21,14 @@ pub mod add_one {
         use super::*;
         use laboratory::{describe, expect, Suite};
 
-        // Here is where we will define our suite.
+        // Here is where we will define our first suite.
         // Notice that this function returns a Suite struct.
         // Also notice that no other methods are called on this suite.
         pub fn suite<T>() -> Suite<T> {
 
-            describe("add_one()", |ctx| {
+            describe("add_one()", |suite| {
                 
-                ctx.it("should return 1", |_| {
+                suite.it("should return 1", |_| {
                     expect(add_one(0)).to_equal(1)
                 })
 
@@ -59,9 +59,9 @@ pub mod multiply_by_two {
         // Again, we will define a function that returns a Suite struct
         pub fn suite<T>() -> Suite<T> {
 
-            describe("multiply_by_two()", |ctx| {
+            describe("multiply_by_two()", |suite| {
 
-                ctx.it("should return 2", |_| {
+                suite.it("should return 2", |_| {
                     expect(multiply_by_two(1)).to_equal(2)
                 })
 
@@ -91,8 +91,10 @@ mod tests {
     fn test() -> LabResult {
 
         // Describe the crate.
-        describe("My Crate", |context| {
-            context
+        // And using the describe_import() method we make the two
+        // modules child suites to be tested
+        describe("My Crate", |suite| {
+            suite
                 .describe_import(add_one::tests::suite())
                 .describe_import(multiply_by_two::tests::suite());
         }).state(NullState)
