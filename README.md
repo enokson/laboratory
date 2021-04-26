@@ -31,7 +31,7 @@ Laboratory is layer 2 test runner solution that sits on top of the Rust test run
 In Cargo.toml:
 ```toml
 [dev-dependencies]
-laboratory = "*"
+laboratory = "2.0.0"
 ```
 Then in your test files
 ```rust
