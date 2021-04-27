@@ -9,17 +9,17 @@ A simple, expressive unit test framework for Rust
 
 Checkout the [documentation](https://enokson.github.io/laboratory/) and the extensive [examples](https://github.com/enokson/laboratory/tree/master/examples) over on github.
 
-Laboratory is layer 2 test runner solution that sits on top of the Rust test runner to provide unparalleled features and ease of use.
+Laboratory is a layer 2 test runner solution that sits on top of the Rust test runner to provide unparalleled features and ease of use.
 
 ## Features
-* before_all, before_each, after_all, after_each hooks  
-* Different reporter options: spec, minimal, json, json-pretty, rust, dot, tap, list
+* before_all, before_each, after_all, after_each [hooks](https://enokson.github.io/laboratory/hooks.html)  
+* [Different reporter options](https://enokson.github.io/laboratory/reporters.html): spec, minimal, json, json-pretty, rust, dot, tap, list
+* The use of [state](https://enokson.github.io/laboratory/state.html)
 * Reports test durations in: nanoseconds, microseconds, milliseconds and seconds  
 * The use of custom assertion libraries  
 * Exclude tests  
 * Nested test suites  
-* Test retry support
-* The use of state  
+* Test retry support  
 * "should panic" testing
 * Console highlighting
 * Dynamic testing
